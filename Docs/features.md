@@ -184,11 +184,12 @@ NOTIFY CHANGE:
   - Obstacle level:
     - level gameplay design
       - Scene, Env Obj, Collectible, everything setup
+      - Level Manager
+      - Star Collectible place at destination
     
-    - Star Collectible place at destination
-  
-    - walkable platform
-    - if Player drop, Player die
+    - platform
+      - walkable platform
+      - if Player drop, Player die
     
     - Traps:
       - Spike
@@ -208,6 +209,7 @@ NOTIFY CHANGE:
   - Puzzle level:
     - level gameplay design
       - Scene, Env Obj, Collectible, everything setup
+      - Level Manager
     
     - dark room
     - light source light up area
@@ -231,6 +233,7 @@ NOTIFY CHANGE:
   - Combat level:
     - level gameplay design
       - Scene, Env Obj, Collectible, everything setup
+      - Level Manager
 
     - Bow and Arrow
       - Player have max x Arrow

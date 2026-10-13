@@ -47,6 +47,11 @@ NOTIFY CHANGE:
     - Delete Button to delete corresponding Save File
     - Back Button to enter Main Menu
   
+  - Level Complete Screen
+    - Press Enter to go back Level Select Screen
+    - Button to write Level in Save File
+    - Button to reset Level in Save File
+
   - Sequence Manager
     - Control high level gameflow
     - Load State: init the game, load into Main menu
@@ -98,9 +103,8 @@ NOTIFY CHANGE:
     
   - All level
     - Level complete step
-      - ⚠️ write last checkpoint to Save File?  
-      - ⚠️ reset checkpoint to Save File?  
-    
+      - show Level Complete Screen
+
     - Level Manager ((each level have diff implementation))
       - Start State
         - Sequence Manager init Level Manager
@@ -115,6 +119,9 @@ NOTIFY CHANGE:
       - Pause State
         - show Pause Menu
       
+      - Complete State
+        - listening to Complete Screen
+
       - Exit State
         - if save & exit, Save File
         - cleanup
@@ -131,7 +138,6 @@ NOTIFY CHANGE:
       - Player move into Enemy, Enemy knockback Player, Player hurt 
       - Player dash through Enemy, nothing happen
       - move pattern, implement by type
-      - ⚠️ should enemy push player?
       - Damage
         - Enemy has 1 HP, when HP=0, Enemy die
         - when Enemy die, it disappear
@@ -250,6 +256,7 @@ NOTIFY CHANGE:
         - Player movement recover
       - When Bow charge fully and release Left Click
         - Arrow fire with Player face direction
+        - Arrow fly horizontally, gravity has no effect on Arrow
         - Arrow - 1
 
       - When Arrow touch Independent Env Obj, Arrow break
@@ -259,7 +266,6 @@ NOTIFY CHANGE:
 
       - When Arrow Break, Arrow disappear
       
-      - ⚠️ Arrow able to fly upward or just horizontal?
 
     - Enemy
       - more Enemy type:
@@ -272,9 +278,10 @@ NOTIFY CHANGE:
     - Enemy Wave
       - x total Waves
       - spawn next Wave every x second
-      - store Wave state in Waves File
+      - if no enemy, spawn next Wave after x second
+      - load Wave Info in Waves File
 
-      - Wave state:
+      - Wave Info:
         - enemy groups
           - spawn area
           - enemy formation

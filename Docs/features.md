@@ -102,9 +102,6 @@ NOTIFY CHANGE:
       - Player spawn at active Checkpoint (DUP)
     
   - All level
-    - Level complete step
-      - show Level Complete Screen
-
     - Level Manager ((each level have diff implementation))
       - Start State
         - Sequence Manager init Level Manager
@@ -120,7 +117,7 @@ NOTIFY CHANGE:
         - show Pause Menu
       
       - Complete State
-        - listening to Complete Screen
+        - show Level Complete Screen
 
       - Exit State
         - if save & exit, Save File

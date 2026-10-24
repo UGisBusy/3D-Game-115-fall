@@ -54,7 +54,6 @@ NOTIFY CHANGE:
 
   - Sequence Manager
     - Control high level gameflow
-    - Load State: init the game, load into Main menu
     - Main Menu State: show Main Menu, listening to Main Menu action
     - Level Select State: show Level Select Menu, listening to Level Menu action
     - Save Load State: show Save Load Menu, listening to Save Load Menu action

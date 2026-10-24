@@ -4,16 +4,24 @@ using UnityEngine;
 
 public class State
 {
+    public string Name { get; }
+
     bool isTransitionEventBound;
     List<ILink> links;
     Action enter, exit;
 
-    public State(Action enter = null, Action exit = null)
+    public State(string name = "Unnamed", Action enter = null, Action exit = null)
     {
+        Name = name;
         links = new List<ILink>();
         isTransitionEventBound = false;
         this.enter = enter;
         this.exit = exit;
+    }
+
+    public override string ToString()
+    {
+        return Name;
     }
 
     public void Enter()

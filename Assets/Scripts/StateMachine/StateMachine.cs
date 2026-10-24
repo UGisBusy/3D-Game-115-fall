@@ -3,10 +3,12 @@ using System;
 public class StateMachine
 {
     public State CurrentState { get; private set; }
+    Action<State> onStateChange;
 
-    public StateMachine()
+    public StateMachine(Action<State> onStateChange = null)
     {
         CurrentState = null;
+        this.onStateChange = onStateChange;
     }
 
     public void EnterState(State state)
@@ -38,5 +40,6 @@ public class StateMachine
     {
         ExitState();
         EnterState(nextState);
+        onStateChange?.Invoke(nextState);
     }
 }

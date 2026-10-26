@@ -19,7 +19,7 @@ NOTIFY CHANGE:
   - Main Menu
     - Start Button to enter Level Select Menu
     - Load Button to enter Save Load Menu
-    - Exit Button to close Game
+    - Quit Button to close Game
     
   - Level Select Menu
     - show 3 level

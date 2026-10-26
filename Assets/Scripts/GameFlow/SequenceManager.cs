@@ -4,11 +4,16 @@ using UnityEngine.InputSystem;
 public class SequenceManager : MonoBehaviour
 {
     [Header("Debug")]
-    [SerializeField] string currentStateName = "None";
+    [SerializeField]
+    string currentStateName = "None";
 
     static SequenceManager instance;
     StateMachine stateMachine;
-    State mainMenuState, levelSelectState, saveLoadState, gameState, exitState;
+    State mainMenuState,
+        levelSelectState,
+        saveLoadState,
+        gameState,
+        exitState;
 
     private void Awake()
     {

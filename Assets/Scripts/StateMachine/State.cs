@@ -8,7 +8,8 @@ public class State
 
     bool isTransitionEventBound;
     List<ILink> links;
-    Action enter, exit;
+    Action enter;
+    Action exit;
 
     public State(string name = "Unnamed", Action enter = null, Action exit = null)
     {

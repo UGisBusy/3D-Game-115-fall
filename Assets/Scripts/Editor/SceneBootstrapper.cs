@@ -2,7 +2,6 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
-
 [InitializeOnLoad]
 public class SceneBootstrapper
 {
@@ -29,7 +28,6 @@ public class SceneBootstrapper
 
     private static void OnPlayModeStateChanged(PlayModeStateChange playModeStateChange)
     {
-
         if (!isLoadMenuScene)
             return;
 
@@ -62,5 +60,4 @@ public class SceneBootstrapper
         Menu.SetChecked(keyLoadMenuScene, isLoadMenuScene);
         return true;
     }
-
 }

@@ -17,7 +17,7 @@ NOTIFY CHANGE:
 
 - UI and Game Flow
   - Main Menu
-    - Play Button to enter Level Select Menu
+    - Start Button to enter Level Select Menu
     - Load Button to enter Save Load Menu
     - Exit Button to close Game
     

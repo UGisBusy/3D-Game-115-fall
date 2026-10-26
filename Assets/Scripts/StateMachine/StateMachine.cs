@@ -3,12 +3,12 @@ using System;
 public class StateMachine
 {
     public State CurrentState { get; private set; }
-    Action<State> onStateChange;
+    Action<State> onEnterState;
 
-    public StateMachine(Action<State> onStateChange = null)
+    public StateMachine(Action<State> onEnterState = null)
     {
         CurrentState = null;
-        this.onStateChange = onStateChange;
+        this.onEnterState = onEnterState;
     }
 
     public void EnterState(State state)
@@ -23,6 +23,7 @@ public class StateMachine
         CurrentState = state;
         CurrentState.BindTransitionEvent(OnStateTransition);
         CurrentState.Enter();
+        onEnterState?.Invoke(state);
     }
 
     public void ExitState()
@@ -40,6 +41,5 @@ public class StateMachine
     {
         ExitState();
         EnterState(nextState);
-        onStateChange?.Invoke(nextState);
     }
 }

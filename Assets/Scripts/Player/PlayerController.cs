@@ -5,53 +5,94 @@ using UnityEngine.InputSystem;
 
 /// <summary>
 /// Third-person player movement:
-///   Move = WASD 
-///   Jump = Space 
-///   Crouch = C 
-///   Dash = Left Shift 
+///   Move = WASD
+///   Jump = Space
+///   Crouch = C
+///   Dash = Left Shift
 ///   Attack = Left Mouse
 /// </summary>
-
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] Transform cameraTransform; // camera used for camera-relative movement
-    [SerializeField] Transform crouchVisual; // placeholder model that gets squashed when crouching
+    [SerializeField]
+    Transform cameraTransform; // camera used for camera-relative movement
+
+    [SerializeField]
+    Transform crouchVisual; // placeholder model that gets squashed when crouching
 
     [Header("Movement")]
-    [SerializeField] float walkSpeed = 5f;
-    [SerializeField] float crouchSpeed = 2.5f;
-    [SerializeField] float acceleration = 30f;
-    [SerializeField] float rotationSpeed = 720f; // degrees per second the player turns
+    [SerializeField]
+    float walkSpeed = 5f;
+
+    [SerializeField]
+    float crouchSpeed = 2.5f;
+
+    [SerializeField]
+    float acceleration = 30f;
+
+    [SerializeField]
+    float rotationSpeed = 720f; // degrees per second the player turns
 
     [Header("Jump & Gravity")]
-    [SerializeField] float jumpHeight = 1.5f;
-    [SerializeField] float gravity = -20f;
-    [SerializeField] float maxFallSpeed = -50f;
-    [SerializeField] float coyoteTime = 0.1f; // small time after walking off a ledge
+    [SerializeField]
+    float jumpHeight = 1.5f;
+
+    [SerializeField]
+    float gravity = -20f;
+
+    [SerializeField]
+    float maxFallSpeed = -50f;
+
+    [SerializeField]
+    float coyoteTime = 0.1f; // small time after walking off a ledge
 
     [Header("Crouch")]
-    [SerializeField] bool crouchIsToggle = false;
-    [SerializeField] float standingHeight = 2f;
-    [SerializeField] float crouchHeight = 1.2f;
-    [SerializeField] float crouchTransitionSpeed = 10f;
+    [SerializeField]
+    bool crouchIsToggle = false;
+
+    [SerializeField]
+    float standingHeight = 2f;
+
+    [SerializeField]
+    float crouchHeight = 1.2f;
+
+    [SerializeField]
+    float crouchTransitionSpeed = 10f;
 
     [Header("Dash")]
-    [SerializeField] float dashSpeed = 20f;
-    [SerializeField] float dashDuration = 0.5f;
-    [SerializeField] float dashCooldown = 3f;
+    [SerializeField]
+    float dashSpeed = 20f;
+
+    [SerializeField]
+    float dashDuration = 0.5f;
+
+    [SerializeField]
+    float dashCooldown = 3f;
+
     [Tooltip("Snap the character to face the dash direction")]
-    [SerializeField] bool faceDashDirection = true;
+    [SerializeField]
+    bool faceDashDirection = true;
 
     [Header("Attack")]
-    [SerializeField] float attackDamage = 10f;
-    [SerializeField] float attackCooldown = 0.5f;
-    [SerializeField] float attackRange = 1.2f;
-    [SerializeField] float attackRadius = 0.8f;
-    [SerializeField] LayerMask attackMask = ~0;
+    [SerializeField]
+    float attackDamage = 10f;
+
+    [SerializeField]
+    float attackCooldown = 0.5f;
+
+    [SerializeField]
+    float attackRange = 1.2f;
+
+    [SerializeField]
+    float attackRadius = 0.8f;
+
+    [SerializeField]
+    LayerMask attackMask = ~0;
+
     [Tooltip("Turn on = Turn to camera forward when attacking")]
-    [SerializeField] bool faceCameraOnAttack = false;
+    [SerializeField]
+    bool faceCameraOnAttack = false;
 
     // Internal state variables
     public bool IsGrounded { get; private set; }
@@ -61,7 +102,11 @@ public class PlayerController : MonoBehaviour
     public float DashCooldownRemaining => Mathf.Max(0f, lastDashTime + dashCooldown - Time.time);
 
     CharacterController controller;
-    InputAction moveAction, jumpAction, crouchAction, dashAction, attackAction;
+    InputAction moveAction,
+        jumpAction,
+        crouchAction,
+        dashAction,
+        attackAction;
 
     Vector3 horizontalVelocity;
     float verticalVelocity;
@@ -75,7 +120,8 @@ public class PlayerController : MonoBehaviour
 
     Renderer[] renderers;
     readonly List<Renderer> hiddenRenderers = new();
-    Vector3 crouchVisualBaseScale, crouchVisualBasePos;
+    Vector3 crouchVisualBaseScale,
+        crouchVisualBasePos;
     readonly Collider[] overlapBuffer = new Collider[32];
 
     private void Awake()
@@ -107,7 +153,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnEnable() => InputSystem.actions.FindActionMap("Player", true).Enable(); // enables the player input map
 
-    private void OnDisable() 
+    private void OnDisable()
     {
         if (IsDashing)
         {
@@ -156,17 +202,23 @@ public class PlayerController : MonoBehaviour
         Vector3 right = Vector3.Cross(Vector3.up, forward); // converts screen-relative 2D direction into camera-relative 3D world direction
         Vector3 moveDir = forward * input.y + right * input.x;
 
-        float speed = IsCrouching 
-            ? crouchSpeed 
-            : walkSpeed;
+        float speed = IsCrouching ? crouchSpeed : walkSpeed;
 
-        horizontalVelocity = Vector3.MoveTowards(horizontalVelocity, moveDir * speed, acceleration * Time.deltaTime); // smooth acceleration
+        horizontalVelocity = Vector3.MoveTowards(
+            horizontalVelocity,
+            moveDir * speed,
+            acceleration * Time.deltaTime
+        ); // smooth acceleration
 
         // Rotate to face where we are moving
         if (moveDir.sqrMagnitude > 0.0001f)
         {
             Quaternion targetRot = Quaternion.LookRotation(moveDir, Vector3.up);
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRot, rotationSpeed * Time.deltaTime);
+            transform.rotation = Quaternion.RotateTowards(
+                transform.rotation,
+                targetRot,
+                rotationSpeed * Time.deltaTime
+            );
         }
     }
 
@@ -215,7 +267,7 @@ public class PlayerController : MonoBehaviour
             wantsCrouch = crouchAction.IsPressed();
         }
 
-        if (wantsCrouch) 
+        if (wantsCrouch)
         {
             IsCrouching = true; // initiates crouch
         }
@@ -224,13 +276,17 @@ public class PlayerController : MonoBehaviour
             IsCrouching = false;
         }
 
-        float targetHeight = IsCrouching 
-            ? crouchHeight 
-            : standingHeight;
+        float targetHeight = IsCrouching ? crouchHeight : standingHeight;
 
         if (!Mathf.Approximately(controller.height, targetHeight))
         {
-            SetControllerHeight(Mathf.MoveTowards(controller.height, targetHeight, crouchTransitionSpeed * Time.deltaTime)); // smoothly transitions character height over time
+            SetControllerHeight(
+                Mathf.MoveTowards(
+                    controller.height,
+                    targetHeight,
+                    crouchTransitionSpeed * Time.deltaTime
+                )
+            ); // smoothly transitions character height over time
         }
     }
 
@@ -243,8 +299,16 @@ public class PlayerController : MonoBehaviour
         {
             float ratio = height / standingHeight;
 
-            crouchVisual.localScale = new Vector3(crouchVisualBaseScale.x, crouchVisualBaseScale.y * ratio, crouchVisualBaseScale.z);
-            crouchVisual.localPosition = new Vector3(crouchVisualBasePos.x, crouchVisualBasePos.y * ratio, crouchVisualBasePos.z);
+            crouchVisual.localScale = new Vector3(
+                crouchVisualBaseScale.x,
+                crouchVisualBaseScale.y * ratio,
+                crouchVisualBaseScale.z
+            );
+            crouchVisual.localPosition = new Vector3(
+                crouchVisualBasePos.x,
+                crouchVisualBasePos.y * ratio,
+                crouchVisualBasePos.z
+            );
         }
     }
 
@@ -254,7 +318,14 @@ public class PlayerController : MonoBehaviour
         Vector3 bottom = transform.position + Vector3.up * (controller.height - radius);
         Vector3 top = transform.position + Vector3.up * (standingHeight - radius);
 
-        int count = Physics.OverlapCapsuleNonAlloc(bottom, top, radius, overlapBuffer, ~0, QueryTriggerInteraction.Ignore);
+        int count = Physics.OverlapCapsuleNonAlloc(
+            bottom,
+            top,
+            radius,
+            overlapBuffer,
+            ~0,
+            QueryTriggerInteraction.Ignore
+        );
 
         for (int i = 0; i < count; i++)
         {
@@ -262,7 +333,7 @@ public class PlayerController : MonoBehaviour
             {
                 return false;
             }
-        }  
+        }
         return true;
     }
 
@@ -345,7 +416,13 @@ public class PlayerController : MonoBehaviour
         }
 
         Vector3 center = GetAttackCenter();
-        int count = Physics.OverlapSphereNonAlloc(center, attackRadius, overlapBuffer, attackMask, QueryTriggerInteraction.Collide);
+        int count = Physics.OverlapSphereNonAlloc(
+            center,
+            attackRadius,
+            overlapBuffer,
+            attackMask,
+            QueryTriggerInteraction.Collide
+        );
         var alreadyHit = new HashSet<IDamageable>();
 
         for (int i = 0; i < count; i++)
@@ -364,9 +441,10 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private Vector3 GetAttackCenter() => transform.position + Vector3.up * (controller != null 
-        ? controller.height * 0.5f 
-        : 1f) + transform.forward * attackRange;
+    private Vector3 GetAttackCenter() =>
+        transform.position
+        + Vector3.up * (controller != null ? controller.height * 0.5f : 1f)
+        + transform.forward * attackRange;
 
     private Vector3 GetCameraFlatForward()
     {
@@ -377,9 +455,7 @@ public class PlayerController : MonoBehaviour
 
         Vector3 forward = Vector3.ProjectOnPlane(cameraTransform.forward, Vector3.up);
 
-        return forward.sqrMagnitude > 0.0001f 
-            ? forward.normalized 
-            : transform.forward;
+        return forward.sqrMagnitude > 0.0001f ? forward.normalized : transform.forward;
     }
 
     private void OnDrawGizmosSelected()

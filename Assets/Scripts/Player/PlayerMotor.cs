@@ -102,10 +102,10 @@ namespace PlayerSystem
 
         // ---------------- Commands (called by states / abilities) ----------------
 
-        /// <summary>Desired move direction this frame. Pass Vector3.zero to stand still.</summary>
+        // Desired move direction this frame. Pass Vector3.zero to stand still.
         public void SetMoveInput(Vector3 worldDirection) => moveInput = worldDirection;
 
-        /// <summary>Returns false if not allowed (in the air or blocked by a modifier).</summary>
+        // Returns false if not allowed (in the air or blocked by a modifier).
         public bool TryJump()
         {
             if (!CanJump)
@@ -120,7 +120,7 @@ namespace PlayerSystem
 
         public void SetGravityEnabled(bool enabled) => gravityEnabled = enabled;
 
-        /// <summary>Adds a velocity that fades over time (knockback, blade push).</summary>
+        // Adds a velocity that fades over time (knockback, blade push).
         public void AddImpulse(Vector3 velocity) => externalVelocity += velocity;
 
         public void AddModifier(MovementModifier mod)
@@ -131,7 +131,7 @@ namespace PlayerSystem
 
         public void RemoveModifier(MovementModifier mod) => modifiers.Remove(mod);
 
-        /// <summary>Stop all motion now (used on death).</summary>
+        // Stop all motion now (used on death).
         public void Stop()
         {
             moveInput = Vector3.zero;
@@ -141,7 +141,7 @@ namespace PlayerSystem
             rb.linearVelocity = Vector3.zero;
         }
 
-        /// <summary>Full reset for spawn.</summary>
+        // Full reset for spawn.
         public void ResetMotor()
         {
             Stop();

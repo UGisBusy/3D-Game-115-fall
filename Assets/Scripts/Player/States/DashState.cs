@@ -13,7 +13,7 @@ namespace PlayerSystem
         public DashState(Player player)
             : base(player, "Dashing") { }
 
-        /// <summary>Flat dash direction, read by Dashable objects to check which side was hit.</summary>
+        // Flat dash direction, read by Dashable objects to check which side was hit.
         public Vector3 Direction { get; private set; }
 
         protected override void OnEnter()

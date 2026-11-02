@@ -43,7 +43,7 @@ namespace PlayerSystem
             chargeModifier.SpeedMultiplier = chargeMoveMultiplier;
         }
 
-        /// <summary>Called by Player every frame.</summary>
+        // Called by Player every frame.
         internal void Tick(float dt, bool allowed)
         {
             var input = player.Input;

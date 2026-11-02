@@ -172,7 +172,7 @@ namespace CameraSystem
 
         // ---------------- Public API ----------------
 
-        /// <summary>Follow a new target. modelRoot = renderers to hide when close (null = the target).</summary>
+        // Follow a new target. modelRoot = renderers to hide when close (null = the target).
         public void SetTarget(Transform newTarget, Transform newModelRoot = null)
         {
             SetModelHidden(false);
@@ -181,7 +181,7 @@ namespace CameraSystem
             RefreshModelRenderers();
         }
 
-        /// <summary>Call after adding or removing renderers on the model (e.g. equipping a weapon).</summary>
+        // Call after adding or removing renderers on the model (e.g. equipping a weapon).
         public void RefreshModelRenderers()
         {
             bool wasHidden = modelHidden;
@@ -243,7 +243,7 @@ namespace CameraSystem
                 SetCursorLocked(true);
         }
 
-        /// <summary>How far the camera can go from the pivot along dir before hitting something.</summary>
+        // How far the camera can go from the pivot along dir before hitting something.
         private float GetAllowedDistance(Vector3 pivot, Vector3 dir, float wanted)
         {
             int count = Physics.SphereCastNonAlloc(

@@ -5,7 +5,6 @@ namespace PlayerSystem
 {
     /// <summary>
     /// Reads raw input and converts it to camera-relative world directions. No game rules here.
-    /// (Not named PlayerInput to avoid clashing with UnityEngine.InputSystem.PlayerInput.)
     /// </summary>
     public class PlayerInputReader : MonoBehaviour
     {
@@ -20,15 +19,15 @@ namespace PlayerSystem
         private InputActionReference jumpAction; // Button (Space)
 
         [SerializeField]
-        private InputActionReference dashAction; // Button (Shift)
+        private InputActionReference dashAction; // Button (Right Click)
 
         [SerializeField]
         private InputActionReference attackAction; // Button (Left Click)
 
-        /// <summary>Raw WASD vector.</summary>
+        /// Raw WASD vector
         public Vector2 MoveRaw => moveAction.action.ReadValue<Vector2>();
 
-        /// <summary>WASD converted to a flat world direction relative to the camera (length 0..1).</summary>
+        /// WASD converted to a flat world direction relative to the camera (length 0..1).
         public Vector3 MoveDirection
         {
             get

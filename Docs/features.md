@@ -77,7 +77,7 @@ NOTIFY CHANGE:
       - gravity affect Player
         
     - Dash
-      - press Shift, Player Dash Camera's forward
+      - press right click, Player Dash Camera's forward
         - enter dash mode, set high velocity, disable control and gravity for 0.5 sec.
         - after 0.5 sec, activate control and gravity, exit dash mode
       - when in dash mode, Player invincible 

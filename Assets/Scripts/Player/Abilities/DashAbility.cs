@@ -9,7 +9,7 @@ namespace PlayerSystem
     public class DashAbility : MonoBehaviour
     {
         [SerializeField]
-        private float speed = 20f;
+        private float speed = 15f;
 
         [SerializeField]
         private float duration = 0.5f;

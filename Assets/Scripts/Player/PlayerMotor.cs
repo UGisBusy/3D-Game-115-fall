@@ -21,27 +21,27 @@ namespace PlayerSystem
     {
         [Header("Move")]
         [SerializeField]
-        private float moveSpeed = 6f;
+        private float moveSpeed = 4.5f;
 
         [SerializeField]
         private float turnSpeed = 720f; // degrees / sec
 
         [Header("Jump & Gravity")]
         [SerializeField]
-        private float jumpVelocity = 7f;
+        private float jumpVelocity = 8f;
 
         [SerializeField]
         private float gravity = -20f;
 
         [SerializeField]
-        private float maxFallSpeed = -30f;
+        private float maxFallSpeed = -22.5f;
 
         [Header("Ground Check")]
         [SerializeField]
         private Vector3 groundCheckOffset = new(0f, 0.05f, 0f);
 
         [SerializeField]
-        private float groundCheckRadius = 0.3f;
+        private float groundCheckRadius = 0.225f;
 
         [SerializeField]
         private LayerMask groundMask;

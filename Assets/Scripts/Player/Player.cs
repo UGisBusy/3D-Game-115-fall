@@ -8,7 +8,7 @@ namespace PlayerSystem
     /// </summary>
     [RequireComponent(typeof(Rigidbody), typeof(PlayerMotor), typeof(PlayerInputReader))]
     [RequireComponent(typeof(DashAbility))]
-    public class Player : MonoBehaviour
+    public class Player : MonoBehaviour, IDamageable
     {
         [Header("Health")]
         [SerializeField]

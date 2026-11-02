@@ -1,11 +1,11 @@
 namespace PlayerSystem
 {
     /// <summary>
-    /// Base class for Player states, built on the shared State class.
-    /// Adds per-frame Tick (called by Player.Update). Transitions are Links added in Player.BuildStateMachine.
+    /// Base class for Player states, built on the shared TickState class.
+    /// Tick is called every frame by Player.Update. Transitions are Links added in Player.BuildStateMachine.
     /// A state reads input and calls Motor verbs; it never touches the Rigidbody.
     /// </summary>
-    public abstract class PlayerState : State
+    public abstract class PlayerState : TickState
     {
         protected readonly Player player;
         protected PlayerMotor Motor => player.Motor;
@@ -20,13 +20,10 @@ namespace PlayerSystem
             SetExit(OnExit);
         }
 
-        /// <summary>Can the bow be charged in this state?</summary>
         public virtual bool AllowsAttack => false;
 
         protected virtual void OnEnter() { }
 
         protected virtual void OnExit() { }
-
-        public virtual void Tick(float dt) { }
     }
 }

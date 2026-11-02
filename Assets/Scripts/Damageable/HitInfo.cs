@@ -1,8 +1,5 @@
 using UnityEngine;
 
-/// <summary>
-/// Data passed by anything that hurts or knocks back the Player (enemy, spike, blade, darkness).
-/// </summary>
 public struct HitInfo
 {
     public int Damage;

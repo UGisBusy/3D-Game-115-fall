@@ -445,7 +445,7 @@ namespace OLD
 
                 if (target != null && alreadyHit.Add(target))
                 {
-                    target.TakeDamage(attackDamage, gameObject);
+                    // target.TakeDamage(attackDamage, gameObject);
                 }
             }
         }

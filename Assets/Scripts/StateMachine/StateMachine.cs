@@ -26,6 +26,12 @@ public class StateMachine
         onEnterState?.Invoke(state);
     }
 
+    /// Ticks the current state if it is a TickState. Call from the owner's Update.
+    public void Tick(float dt)
+    {
+        (CurrentState as TickState)?.Tick(dt);
+    }
+
     public void ExitState()
     {
         if (CurrentState == null)

@@ -72,10 +72,12 @@ namespace PlayerSystem
             if (invincibleTimer > 0f)
                 invincibleTimer -= dt;
 
-            PlayerState state = CurrentState;
-            state?.Tick(dt);
+            stateMachine.Tick(dt);
             if (Bow != null)
+            {
+                PlayerState state = CurrentState;
                 Bow.Tick(dt, state != null && state.AllowsAttack);
+            }
         }
 
         /// <summary>

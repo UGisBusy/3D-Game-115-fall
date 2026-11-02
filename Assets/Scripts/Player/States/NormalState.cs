@@ -7,7 +7,8 @@ namespace PlayerSystem
     /// </summary>
     public class NormalState : PlayerState
     {
-        public NormalState(Player player) : base(player, "Normal") { }
+        public NormalState(Player player)
+            : base(player, "Normal") { }
 
         public override bool AllowsAttack => true;
 
@@ -16,10 +17,10 @@ namespace PlayerSystem
             Motor.SetMoveInput(Input.MoveDirection);
 
             if (Input.JumpPressed)
-                Motor.TryJump();   // Motor refuses if in the air or a modifier blocks jumping
+                Motor.TryJump(); // Motor refuses if in the air or a modifier blocks jumping
 
             if (Input.DashPressed && player.Dash.CanDash)
-                Events.RaiseDashRequested();   // Link -> Dashing
+                Events.RaiseDashRequested(); // Link -> Dashing
         }
 
         protected override void OnExit()

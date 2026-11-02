@@ -11,19 +11,27 @@ namespace PlayerSystem
     public class Player : MonoBehaviour
     {
         [Header("Health")]
-        [SerializeField] private int maxHp = 3;
-        [SerializeField] private float hurtInvincibleTime = 1f;
-        [SerializeField] private float spawnInvincibleTime = 2f;
+        [SerializeField]
+        private int maxHp = 3;
+
+        [SerializeField]
+        private float hurtInvincibleTime = 1f;
+
+        [SerializeField]
+        private float spawnInvincibleTime = 2f;
 
         [Header("Debug")]
-        [Tooltip("Spawn at the current position on Start. Turn off when a LevelManager spawns the Player.")]
-        [SerializeField] private bool spawnOnStart = true;
+        [Tooltip(
+            "Spawn at the current position on Start. Turn off when a LevelManager spawns the Player."
+        )]
+        [SerializeField]
+        private bool spawnOnStart = true;
 
         // --- Components ---
         public PlayerMotor Motor { get; private set; }
         public PlayerInputReader Input { get; private set; }
         public DashAbility Dash { get; private set; }
-        public BowAbility Bow { get; private set; }           // optional, only in combat level
+        public BowAbility Bow { get; private set; } // optional, only in combat level
         public PlayerEvents Events { get; } = new();
 
         // --- States ---
@@ -54,17 +62,20 @@ namespace PlayerSystem
 
         private void Start()
         {
-            if (spawnOnStart) Spawn(transform.position, transform.rotation);
+            if (spawnOnStart)
+                Spawn(transform.position, transform.rotation);
         }
 
         private void Update()
         {
             float dt = Time.deltaTime;
-            if (invincibleTimer > 0f) invincibleTimer -= dt;
+            if (invincibleTimer > 0f)
+                invincibleTimer -= dt;
 
             PlayerState state = CurrentState;
             state?.Tick(dt);
-            if (Bow != null) Bow.Tick(dt, state != null && state.AllowsAttack);
+            if (Bow != null)
+                Bow.Tick(dt, state != null && state.AllowsAttack);
         }
 
         /// <summary>
@@ -103,7 +114,7 @@ namespace PlayerSystem
         /// <summary>Called by LevelManager (or on Start for testing). Resets everything and places the Player.</summary>
         public void Spawn(Vector3 position, Quaternion rotation)
         {
-            stateMachine.EnterState(Normal);   // exits the old state first (e.g. ends a dash)
+            stateMachine.EnterState(Normal); // exits the old state first (e.g. ends a dash)
 
             Hp = maxHp;
             Events.RaiseHpChanged(Hp, maxHp);
@@ -111,7 +122,8 @@ namespace PlayerSystem
             Motor.ResetMotor();
             Motor.Teleport(position, rotation);
             Dash.ResetCooldown();
-            if (Bow != null) Bow.ResetBow();
+            if (Bow != null)
+                Bow.ResetBow();
 
             invincibleTimer = spawnInvincibleTime;
             Events.RaiseSpawned();
@@ -120,7 +132,8 @@ namespace PlayerSystem
         /// <summary>Damage + optional knockback. Ignored while invincible or dead.</summary>
         public void TakeHit(HitInfo hit)
         {
-            if (IsDead || IsInvincible) return;
+            if (IsDead || IsInvincible)
+                return;
 
             Hp = Mathf.Max(0, Hp - hit.Damage);
             Events.RaiseHpChanged(Hp, maxHp);
@@ -143,7 +156,8 @@ namespace PlayerSystem
 
         public void Heal(int amount)
         {
-            if (IsDead) return;
+            if (IsDead)
+                return;
             Hp = Mathf.Min(maxHp, Hp + amount);
             Events.RaiseHpChanged(Hp, maxHp);
         }
@@ -151,10 +165,11 @@ namespace PlayerSystem
         /// <summary>Instant death (fall off platform, HP reached 0).</summary>
         public void Kill()
         {
-            if (IsDead) return;
+            if (IsDead)
+                return;
             Hp = 0;
             Events.RaiseHpChanged(Hp, maxHp);
-            Events.RaiseDied();   // Link moves the state machine to Dead
+            Events.RaiseDied(); // Link moves the state machine to Dead
         }
     }
 }

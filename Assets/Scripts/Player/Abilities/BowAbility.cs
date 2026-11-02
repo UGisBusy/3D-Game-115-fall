@@ -10,12 +10,23 @@ namespace PlayerSystem
     /// </summary>
     public class BowAbility : MonoBehaviour
     {
-        [SerializeField] private int maxArrows = 5;
-        [SerializeField] private float chargeTime = 1f;         // seconds to full charge
-        [SerializeField] private float chargeDecayTime = 0.5f;  // seconds to drain from full when not held
-        [SerializeField] private float chargeMoveMultiplier = 0.4f;
-        [SerializeField] private Transform firePoint;
-        [SerializeField] private GameObject arrowPrefab;        // TODO: replace with Arrow component/pool
+        [SerializeField]
+        private int maxArrows = 5;
+
+        [SerializeField]
+        private float chargeTime = 1f; // seconds to full charge
+
+        [SerializeField]
+        private float chargeDecayTime = 0.5f; // seconds to drain from full when not held
+
+        [SerializeField]
+        private float chargeMoveMultiplier = 0.4f;
+
+        [SerializeField]
+        private Transform firePoint;
+
+        [SerializeField]
+        private GameObject arrowPrefab; // TODO: replace with Arrow component/pool
 
         private Player player;
         private readonly MovementModifier chargeModifier = new() { BlockJump = true };
@@ -85,10 +96,13 @@ namespace PlayerSystem
 
         private void SetModifier(bool active)
         {
-            if (active == modifierActive) return;
+            if (active == modifierActive)
+                return;
             modifierActive = active;
-            if (active) player.Motor.AddModifier(chargeModifier);
-            else player.Motor.RemoveModifier(chargeModifier);
+            if (active)
+                player.Motor.AddModifier(chargeModifier);
+            else
+                player.Motor.RemoveModifier(chargeModifier);
         }
     }
 }

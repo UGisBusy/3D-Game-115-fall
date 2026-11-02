@@ -20,3 +20,8 @@ Format entire project:
 ```
 dotnet csharpier format .
 ```
+
+If eccounter "contains more than one project file" error:
+```
+dotnet build 3D-Game-115-fall.slnx
+```

@@ -9,13 +9,21 @@ namespace PlayerSystem
     /// </summary>
     public class PlayerInputReader : MonoBehaviour
     {
-        [SerializeField] private Transform cameraTransform;
+        [SerializeField]
+        private Transform cameraTransform;
 
         [Header("Actions")]
-        [SerializeField] private InputActionReference moveAction;    // Vector2 (WASD)
-        [SerializeField] private InputActionReference jumpAction;    // Button (Space)
-        [SerializeField] private InputActionReference dashAction;    // Button (Shift)
-        [SerializeField] private InputActionReference attackAction;  // Button (Left Click)
+        [SerializeField]
+        private InputActionReference moveAction; // Vector2 (WASD)
+
+        [SerializeField]
+        private InputActionReference jumpAction; // Button (Space)
+
+        [SerializeField]
+        private InputActionReference dashAction; // Button (Shift)
+
+        [SerializeField]
+        private InputActionReference attackAction; // Button (Left Click)
 
         /// <summary>Raw WASD vector.</summary>
         public Vector2 MoveRaw => moveAction.action.ReadValue<Vector2>();

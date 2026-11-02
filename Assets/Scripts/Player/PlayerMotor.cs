@@ -20,28 +20,42 @@ namespace PlayerSystem
     public class PlayerMotor : MonoBehaviour
     {
         [Header("Move")]
-        [SerializeField] private float moveSpeed = 6f;
-        [SerializeField] private float turnSpeed = 720f;           // degrees / sec
+        [SerializeField]
+        private float moveSpeed = 6f;
+
+        [SerializeField]
+        private float turnSpeed = 720f; // degrees / sec
 
         [Header("Jump & Gravity")]
-        [SerializeField] private float jumpVelocity = 7f;
-        [SerializeField] private float gravity = -20f;
-        [SerializeField] private float maxFallSpeed = -30f;
+        [SerializeField]
+        private float jumpVelocity = 7f;
+
+        [SerializeField]
+        private float gravity = -20f;
+
+        [SerializeField]
+        private float maxFallSpeed = -30f;
 
         [Header("Ground Check")]
-        [SerializeField] private Vector3 groundCheckOffset = new(0f, 0.05f, 0f);
-        [SerializeField] private float groundCheckRadius = 0.3f;
-        [SerializeField] private LayerMask groundMask;
+        [SerializeField]
+        private Vector3 groundCheckOffset = new(0f, 0.05f, 0f);
+
+        [SerializeField]
+        private float groundCheckRadius = 0.3f;
+
+        [SerializeField]
+        private LayerMask groundMask;
 
         [Header("External Forces")]
-        [SerializeField] private float externalDamping = 8f;       // how fast knockback/impulses fade
+        [SerializeField]
+        private float externalDamping = 8f; // how fast knockback/impulses fade
 
         private Rigidbody rb;
         private readonly List<MovementModifier> modifiers = new();
 
-        private Vector3 moveInput;            // set by states, flat world direction, length 0..1
-        private Vector3? velocityOverride;    // dash
-        private Vector3 externalVelocity;     // knockback, impulses
+        private Vector3 moveInput; // set by states, flat world direction, length 0..1
+        private Vector3? velocityOverride; // dash
+        private Vector3 externalVelocity; // knockback, impulses
         private bool gravityEnabled = true;
         private bool jumpRequested;
 
@@ -55,7 +69,8 @@ namespace PlayerSystem
             get
             {
                 float m = 1f;
-                foreach (var mod in modifiers) m *= mod.SpeedMultiplier;
+                foreach (var mod in modifiers)
+                    m *= mod.SpeedMultiplier;
                 return m;
             }
         }
@@ -64,7 +79,9 @@ namespace PlayerSystem
         {
             get
             {
-                foreach (var mod in modifiers) if (mod.BlockJump) return true;
+                foreach (var mod in modifiers)
+                    if (mod.BlockJump)
+                        return true;
                 return false;
             }
         }
@@ -84,12 +101,14 @@ namespace PlayerSystem
         /// <summary>Returns false if not allowed (in the air or blocked by a modifier).</summary>
         public bool TryJump()
         {
-            if (!CanJump) return false;
-            jumpRequested = true;     // applied in FixedUpdate
+            if (!CanJump)
+                return false;
+            jumpRequested = true; // applied in FixedUpdate
             return true;
         }
 
         public void SetVelocityOverride(Vector3 velocity) => velocityOverride = velocity;
+
         public void ClearVelocityOverride() => velocityOverride = null;
 
         public void SetGravityEnabled(bool enabled) => gravityEnabled = enabled;
@@ -99,7 +118,8 @@ namespace PlayerSystem
 
         public void AddModifier(MovementModifier mod)
         {
-            if (!modifiers.Contains(mod)) modifiers.Add(mod);
+            if (!modifiers.Contains(mod))
+                modifiers.Add(mod);
         }
 
         public void RemoveModifier(MovementModifier mod) => modifiers.Remove(mod);
@@ -138,7 +158,8 @@ namespace PlayerSystem
 
             // Fade knockback / impulses toward zero.
             externalVelocity = Vector3.Lerp(externalVelocity, Vector3.zero, externalDamping * dt);
-            if (externalVelocity.sqrMagnitude < 0.0001f) externalVelocity = Vector3.zero;
+            if (externalVelocity.sqrMagnitude < 0.0001f)
+                externalVelocity = Vector3.zero;
 
             Vector3 velocity;
             if (velocityOverride.HasValue)
@@ -176,16 +197,19 @@ namespace PlayerSystem
         {
             Vector3? facing = null;
             foreach (var mod in modifiers)
-                if (mod.FacingDirection.HasValue) facing = mod.FacingDirection;
+                if (mod.FacingDirection.HasValue)
+                    facing = mod.FacingDirection;
 
             if (!facing.HasValue)
             {
                 Vector3 flat = velocityOverride.HasValue ? velocity : moveInput;
                 flat.y = 0f;
-                if (flat.sqrMagnitude > 0.001f) facing = flat;
+                if (flat.sqrMagnitude > 0.001f)
+                    facing = flat;
             }
 
-            if (!facing.HasValue) return;
+            if (!facing.HasValue)
+                return;
 
             Quaternion target = Quaternion.LookRotation(facing.Value.normalized, Vector3.up);
             rb.MoveRotation(Quaternion.RotateTowards(rb.rotation, target, turnSpeed * dt));
@@ -193,8 +217,12 @@ namespace PlayerSystem
 
         private bool CheckGround()
         {
-            return Physics.CheckSphere(transform.position + groundCheckOffset, groundCheckRadius,
-                groundMask, QueryTriggerInteraction.Ignore);
+            return Physics.CheckSphere(
+                transform.position + groundCheckOffset,
+                groundCheckRadius,
+                groundMask,
+                QueryTriggerInteraction.Ignore
+            );
         }
 
         private void OnDrawGizmosSelected()

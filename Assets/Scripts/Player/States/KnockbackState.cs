@@ -12,7 +12,8 @@ namespace PlayerSystem
         private float duration;
         private float timer;
 
-        public KnockbackState(Player player) : base(player, "Knockback") { }
+        public KnockbackState(Player player)
+            : base(player, "Knockback") { }
 
         public void Setup(Vector3 velocity, float duration)
         {
@@ -31,7 +32,7 @@ namespace PlayerSystem
         {
             timer -= dt;
             if (timer <= 0f)
-                Events.RaiseKnockbackFinished();   // Link -> Normal
+                Events.RaiseKnockbackFinished(); // Link -> Normal
         }
     }
 }

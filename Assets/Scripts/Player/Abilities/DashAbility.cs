@@ -8,9 +8,14 @@ namespace PlayerSystem
     /// </summary>
     public class DashAbility : MonoBehaviour
     {
-        [SerializeField] private float speed = 20f;
-        [SerializeField] private float duration = 0.5f;
-        [SerializeField] private float cooldown = 3f;
+        [SerializeField]
+        private float speed = 20f;
+
+        [SerializeField]
+        private float duration = 0.5f;
+
+        [SerializeField]
+        private float cooldown = 3f;
 
         private Player player;
 
@@ -29,7 +34,8 @@ namespace PlayerSystem
 
         private void Update()
         {
-            if (CooldownRemaining > 0f) CooldownRemaining -= Time.deltaTime;
+            if (CooldownRemaining > 0f)
+                CooldownRemaining -= Time.deltaTime;
         }
 
         internal void Begin(Vector3 direction)

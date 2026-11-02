@@ -12,7 +12,8 @@ namespace PlayerSystem
         protected PlayerInputReader Input => player.Input;
         protected PlayerEvents Events => player.Events;
 
-        protected PlayerState(Player player, string name) : base(name)
+        protected PlayerState(Player player, string name)
+            : base(name)
         {
             this.player = player;
             SetEnter(OnEnter);
@@ -23,7 +24,9 @@ namespace PlayerSystem
         public virtual bool AllowsAttack => false;
 
         protected virtual void OnEnter() { }
+
         protected virtual void OnExit() { }
+
         public virtual void Tick(float dt) { }
     }
 }

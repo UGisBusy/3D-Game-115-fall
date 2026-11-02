@@ -10,7 +10,8 @@ namespace PlayerSystem
     {
         private float timer;
 
-        public DashState(Player player) : base(player, "Dashing") { }
+        public DashState(Player player)
+            : base(player, "Dashing") { }
 
         /// <summary>Flat dash direction, read by Dashable objects to check which side was hit.</summary>
         public Vector3 Direction { get; private set; }
@@ -20,7 +21,7 @@ namespace PlayerSystem
             Direction = Input.CameraForwardFlat;
             timer = player.Dash.Duration;
 
-            player.Dash.Begin(Direction);   // starts cooldown, raises DashStarted (candle, VFX)
+            player.Dash.Begin(Direction); // starts cooldown, raises DashStarted (candle, VFX)
             Motor.SetGravityEnabled(false);
             Motor.SetVelocityOverride(Direction * player.Dash.Speed);
         }
@@ -29,7 +30,7 @@ namespace PlayerSystem
         {
             timer -= dt;
             if (timer <= 0f)
-                Events.RaiseDashFinished();   // Link -> Normal
+                Events.RaiseDashFinished(); // Link -> Normal
         }
 
         protected override void OnExit()

@@ -5,7 +5,8 @@ namespace PlayerSystem
     /// </summary>
     public class DeadState : PlayerState
     {
-        public DeadState(Player player) : base(player, "Dead") { }
+        public DeadState(Player player)
+            : base(player, "Dead") { }
 
         protected override void OnEnter()
         {

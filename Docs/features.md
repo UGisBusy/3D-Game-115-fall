@@ -80,7 +80,7 @@ NOTIFY CHANGE:
       - press Shift, Player Dash Camera's forward
         - enter dash mode, set high velocity, disable control and gravity for 0.5 sec.
         - after 0.5 sec, activate control and gravity, exit dash mode
-      - when in dash mode, Player invisible 
+      - when in dash mode, Player invincible 
       - dash have 3 sec cooldown
         
     - Interaction
@@ -91,12 +91,12 @@ NOTIFY CHANGE:
 
     - Damage
       - Player has max x HP, when HP=0, Player die
-      - when Player hurt, HP-x, if not die Player invisible for x sec
+      - when Player hurt, HP-x, if not die Player invincible for x sec
       - when Player die, press space to respawn Player
       - when Player knockback, knockback source push Player
     
     - Spawn
-      - when Player spawn, Player invisible for x sec
+      - when Player spawn, Player invincible for x sec
       - reset Camera, Facing, Movement, Dash, HP
       - Player spawn at active Checkpoint (DUP)
     
@@ -160,7 +160,7 @@ NOTIFY CHANGE:
           - Obj move into Player, Obj push Player
         - Type: Gate
           - in shut state, Obj Block Player
-          - in open state, Obj is invisible
+          - in open state, Obj is invincible
 
         - Player move into Independent Env Obj, block Player
         - Player dash into Independent Env Obj, block Player

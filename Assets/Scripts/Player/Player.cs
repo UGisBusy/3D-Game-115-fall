@@ -4,7 +4,7 @@ namespace PlayerSystem
 {
     /// <summary>
     /// Facade of the Player. Owns HP, invincibility, spawn/reset, the state machine, and wires the pieces together.
-    /// Other systems talk to the Player only through this class (TakeHit, Heal, Kill, Spawn, Events).
+    /// Other systems talk to the Player only through this class (TakeHit, Heal, Kill, Spawn); gameplay events go through the static PlayerEvents.
     /// </summary>
     [RequireComponent(typeof(Rigidbody), typeof(PlayerMotor), typeof(PlayerInputReader))]
     [RequireComponent(typeof(DashAbility))]
@@ -32,7 +32,7 @@ namespace PlayerSystem
         public PlayerInputReader Input { get; private set; }
         public DashAbility Dash { get; private set; }
         public BowAbility Bow { get; private set; } // optional, only in combat level
-        public PlayerEvents Events { get; } = new();
+        public PlayerTransitions Transitions { get; } = new();
 
         // --- States ---
         public NormalState Normal { get; private set; }
@@ -97,29 +97,29 @@ namespace PlayerSystem
             Knockback = new KnockbackState(this);
             Dead = new DeadState(this);
 
-            Normal.AddLink(new Link(Dashing, Events.DashRequestedWrapper));
-            Normal.AddLink(new Link(Knockback, Events.KnockedBackWrapper));
-            Normal.AddLink(new Link(Dead, Events.DiedWrapper));
+            Normal.AddLink(new Link(Dashing, Transitions.DashRequestedWrapper));
+            Normal.AddLink(new Link(Knockback, Transitions.KnockedBackWrapper));
+            Normal.AddLink(new Link(Dead, Transitions.DiedWrapper));
 
-            Dashing.AddLink(new Link(Normal, Events.DashFinishedWrapper));
-            Dashing.AddLink(new Link(Dead, Events.DiedWrapper));
+            Dashing.AddLink(new Link(Normal, Transitions.DashFinishedWrapper));
+            Dashing.AddLink(new Link(Dead, Transitions.DiedWrapper));
 
-            Knockback.AddLink(new Link(Knockback, Events.KnockedBackWrapper));
-            Knockback.AddLink(new Link(Normal, Events.KnockbackFinishedWrapper));
-            Knockback.AddLink(new Link(Dead, Events.DiedWrapper));
+            Knockback.AddLink(new Link(Knockback, Transitions.KnockedBackWrapper));
+            Knockback.AddLink(new Link(Normal, Transitions.KnockbackFinishedWrapper));
+            Knockback.AddLink(new Link(Dead, Transitions.DiedWrapper));
 
             stateMachine = new StateMachine();
         }
 
         // ---------------- Public API ----------------
 
-        /// <summary>Called by LevelManager (or on Start for testing). Resets everything and places the Player.</summary>
+        // Called by LevelManager (or on Start for testing). Resets everything and places the Player.
         public void Spawn(Vector3 position, Quaternion rotation)
         {
-            stateMachine.EnterState(Normal); // exits the old state first (e.g. ends a dash)
+            stateMachine.EnterState(Normal);
 
             Hp = maxHp;
-            Events.RaiseHpChanged(Hp, maxHp);
+            PlayerEvents.RaiseHpChanged(Hp, maxHp);
 
             Motor.ResetMotor();
             Motor.Teleport(position, rotation);
@@ -128,18 +128,18 @@ namespace PlayerSystem
                 Bow.ResetBow();
 
             invincibleTimer = spawnInvincibleTime;
-            Events.RaiseSpawned();
+            PlayerEvents.RaiseSpawned();
         }
 
-        /// <summary>Damage + optional knockback. Ignored while invincible or dead.</summary>
+        // Damage + optional knockback
         public void TakeHit(HitInfo hit)
         {
-            if (IsDead || IsInvincible)
+            if (IsDead || (!hit.IsForced && IsInvincible))
                 return;
 
             Hp = Mathf.Max(0, Hp - hit.Damage);
-            Events.RaiseHpChanged(Hp, maxHp);
-            Events.RaiseHurt(hit);
+            PlayerEvents.RaiseHpChanged(Hp, maxHp);
+            PlayerEvents.RaiseHurt(hit);
 
             if (Hp == 0)
             {
@@ -152,7 +152,7 @@ namespace PlayerSystem
             if (hit.KnockbackVelocity != Vector3.zero)
             {
                 Knockback.Setup(hit.KnockbackVelocity, hit.KnockbackDuration);
-                Events.RaiseKnockedBack();
+                Transitions.RaiseKnockedBack();
             }
         }
 
@@ -161,17 +161,18 @@ namespace PlayerSystem
             if (IsDead)
                 return;
             Hp = Mathf.Min(maxHp, Hp + amount);
-            Events.RaiseHpChanged(Hp, maxHp);
+            PlayerEvents.RaiseHpChanged(Hp, maxHp);
         }
 
-        /// <summary>Instant death (fall off platform, HP reached 0).</summary>
+        // Instant death
         public void Kill()
         {
             if (IsDead)
                 return;
             Hp = 0;
-            Events.RaiseHpChanged(Hp, maxHp);
-            Events.RaiseDied(); // Link moves the state machine to Dead
+            PlayerEvents.RaiseHpChanged(Hp, maxHp);
+            Transitions.RaiseDied();
+            PlayerEvents.RaiseDied();
         }
     }
 }

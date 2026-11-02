@@ -4,7 +4,7 @@ namespace PlayerSystem
 {
     /// <summary>
     /// Dash data + cooldown. DashState does the movement; this class only owns tuning and cooldown.
-    /// Raises DashStarted / DashEnded on player.Events (Candle fuel - 1, VFX, sound).
+    /// Raises DashStarted / DashEnded on the global PlayerEvents (Candle fuel - 1, VFX, sound).
     /// </summary>
     public class DashAbility : MonoBehaviour
     {
@@ -42,13 +42,13 @@ namespace PlayerSystem
         {
             IsDashing = true;
             CooldownRemaining = cooldown;
-            player.Events.RaiseDashStarted(direction);
+            PlayerEvents.RaiseDashStarted(direction);
         }
 
         internal void End()
         {
             IsDashing = false;
-            player.Events.RaiseDashEnded();
+            PlayerEvents.RaiseDashEnded();
         }
 
         public void ResetCooldown()

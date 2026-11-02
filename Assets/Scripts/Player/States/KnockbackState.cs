@@ -32,7 +32,7 @@ namespace PlayerSystem
         {
             timer -= dt;
             if (timer <= 0f)
-                Events.RaiseKnockbackFinished(); // Link -> Normal
+                Transitions.RaiseKnockbackFinished(); // Link -> Normal
         }
     }
 }

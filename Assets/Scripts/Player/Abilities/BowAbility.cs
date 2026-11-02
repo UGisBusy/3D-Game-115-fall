@@ -6,7 +6,7 @@ namespace PlayerSystem
     /// Bow charge/fire (combat level only; add this component only there).
     /// While charging it adds a MovementModifier: slow move, no jump, face camera forward.
     /// Works in any state that AllowsAttack, so it is not a state itself.
-    /// Raises ArrowsChanged / ArrowFired on player.Events.
+    /// Raises ArrowsChanged / ArrowFired on the global PlayerEvents.
     /// </summary>
     public class BowAbility : MonoBehaviour
     {
@@ -77,14 +77,14 @@ namespace PlayerSystem
 
             Charge01 = 0f;
             Arrows--;
-            player.Events.RaiseArrowsChanged(Arrows);
-            player.Events.RaiseArrowFired(pos, dir);
+            PlayerEvents.RaiseArrowsChanged(Arrows);
+            PlayerEvents.RaiseArrowFired(pos, dir);
         }
 
         public void AddArrows(int amount)
         {
             Arrows = Mathf.Min(maxArrows, Arrows + amount);
-            player.Events.RaiseArrowsChanged(Arrows);
+            PlayerEvents.RaiseArrowsChanged(Arrows);
         }
 
         public void ResetBow()

@@ -17,7 +17,7 @@ namespace PlayerSystem
         public override void Tick(float dt)
         {
             if (Input.JumpPressed)
-                Events.RaiseRespawnRequested();
+                PlayerEvents.RaiseRespawnRequested();
         }
     }
 }

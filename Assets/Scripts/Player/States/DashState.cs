@@ -30,7 +30,7 @@ namespace PlayerSystem
         {
             timer -= dt;
             if (timer <= 0f)
-                Events.RaiseDashFinished(); // Link -> Normal
+                Transitions.RaiseDashFinished(); // Link -> Normal
         }
 
         protected override void OnExit()

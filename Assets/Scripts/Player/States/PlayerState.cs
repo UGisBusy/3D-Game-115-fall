@@ -10,7 +10,7 @@ namespace PlayerSystem
         protected readonly Player player;
         protected PlayerMotor Motor => player.Motor;
         protected PlayerInputReader Input => player.Input;
-        protected PlayerEvents Events => player.Events;
+        protected PlayerTransitions Transitions => player.Transitions;
 
         protected PlayerState(Player player, string name)
             : base(name)

@@ -20,7 +20,7 @@ namespace PlayerSystem
                 Motor.TryJump(); // Motor refuses if in the air or a modifier blocks jumping
 
             if (Input.DashPressed && player.Dash.CanDash)
-                Events.RaiseDashRequested(); // Link -> Dashing
+                Transitions.RaiseDashRequested(); // Link -> Dashing
         }
 
         protected override void OnExit()

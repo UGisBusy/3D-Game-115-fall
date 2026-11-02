@@ -12,10 +12,10 @@ namespace PlayerSystem
         private float speed = 15f;
 
         [SerializeField]
-        private float duration = 0.5f;
+        private float duration = 0.25f;
 
         [SerializeField]
-        private float cooldown = 3f;
+        private float cooldown = 2f;
 
         private Player player;
 

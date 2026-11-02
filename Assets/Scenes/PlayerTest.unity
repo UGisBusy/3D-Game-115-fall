@@ -604,8 +604,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerSystem.DashAbility
   speed: 15
-  duration: 0.5
-  cooldown: 3
+  duration: 0.25
+  cooldown: 2
 --- !u!114 &803157021
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -637,7 +637,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerSystem.PlayerMotor
   moveSpeed: 4.5
   turnSpeed: 720
-  jumpVelocity: 8
+  jumpVelocity: 7.5
   gravity: -20
   maxFallSpeed: -22.5
   groundCheckOffset: {x: 0, y: 0.05, z: 0}
@@ -645,6 +645,7 @@ MonoBehaviour:
   groundMask:
     serializedVersion: 2
     m_Bits: 55
+  maxStepHeight: 0.25
   externalDamping: 8
 --- !u!54 &803157023
 Rigidbody:
@@ -811,7 +812,6 @@ GameObject:
   - component: {fileID: 1925599030}
   - component: {fileID: 1925599033}
   - component: {fileID: 1925599032}
-  - component: {fileID: 1925599031}
   m_Layer: 20
   m_Name: Cube
   m_TagString: Untagged
@@ -834,27 +834,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2070837826}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &1925599031
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1925599029}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!23 &1925599032
 MeshRenderer:
   m_ObjectHideFlags: 0

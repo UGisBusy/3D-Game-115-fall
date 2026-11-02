@@ -28,7 +28,7 @@ namespace PlayerSystem
 
         [Header("Jump & Gravity")]
         [SerializeField]
-        private float jumpVelocity = 8f;
+        private float jumpVelocity = 7.5f;
 
         [SerializeField]
         private float gravity = -20f;
@@ -46,6 +46,10 @@ namespace PlayerSystem
         [SerializeField]
         private LayerMask groundMask;
 
+        [Header("Step")]
+        [SerializeField]
+        private float maxStepHeight = 0.25f;
+
         [Header("External Forces")]
         [SerializeField]
         private float externalDamping = 8f; // how fast knockback/impulses fade
@@ -58,6 +62,9 @@ namespace PlayerSystem
         private Vector3 externalVelocity; // knockback, impulses
         private bool gravityEnabled = true;
         private bool jumpRequested;
+
+        private readonly List<ContactPoint> contactBuffer = new();
+        private readonly List<Vector3> blockingNormals = new(); // flat normals of too-high contacts, from the last physics step
 
         // --- Read-only state ---
         public bool IsGrounded { get; private set; }
@@ -147,6 +154,7 @@ namespace PlayerSystem
             rb.position = position;
             rb.rotation = rotation;
             transform.SetPositionAndRotation(position, rotation);
+            blockingNormals.Clear(); // contacts from the old position no longer apply
         }
 
         // ---------------- Simulation ----------------
@@ -189,8 +197,50 @@ namespace PlayerSystem
                 velocity = new Vector3(horizontal.x, vertical, horizontal.z);
             }
 
-            rb.linearVelocity = velocity;
-            ApplyFacing(velocity, dt);
+            // Contacts were collected after the last physics step; use them once, then clear.
+            rb.linearVelocity = RemoveBlockedMovement(velocity);
+            blockingNormals.Clear();
+            ApplyFacing(velocity, dt); // face where we wanted to go, not the blocked result
+        }
+
+        // ---------------- Step limit ----------------
+
+        private void OnCollisionEnter(Collision collision) => CollectBlockingContacts(collision);
+
+        private void OnCollisionStay(Collision collision) => CollectBlockingContacts(collision);
+
+        private void CollectBlockingContacts(Collision collision)
+        {
+            // Keep pushing Movable objects (non-kinematic rigidbodies).
+            if (collision.rigidbody != null && !collision.rigidbody.isKinematic)
+                return;
+
+            collision.GetContacts(contactBuffer);
+            foreach (ContactPoint contact in contactBuffer)
+            {
+                if (contact.point.y - rb.position.y <= maxStepHeight)
+                    continue; // low edge: allowed to step up onto it
+
+                Vector3 n = contact.normal; // points from the obstacle toward the Player
+                n.y = 0f;
+                if (n.sqrMagnitude > 0.0001f)
+                    blockingNormals.Add(n.normalized);
+            }
+        }
+
+        // Removes the part of the horizontal velocity that goes into a too-high contact.
+        private Vector3 RemoveBlockedMovement(Vector3 v)
+        {
+            foreach (Vector3 n in blockingNormals)
+            {
+                float into = v.x * n.x + v.z * n.z;
+                if (into < 0f)
+                {
+                    v.x -= into * n.x;
+                    v.z -= into * n.z;
+                }
+            }
+            return v;
         }
 
         private void ApplyFacing(Vector3 velocity, float dt)

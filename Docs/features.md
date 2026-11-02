@@ -78,10 +78,10 @@ NOTIFY CHANGE:
         
     - Dash
       - press right click, Player Dash Camera's forward
-        - enter dash mode, set high velocity, disable control and gravity for 0.5 sec.
-        - after 0.5 sec, activate control and gravity, exit dash mode
+        - enter dash mode, set high velocity, disable control and gravity for 0.25 sec.
+        - after 0.25 sec, activate control and gravity, exit dash mode
       - when in dash mode, Player invincible 
-      - dash have 3 sec cooldown
+      - dash have 2 sec cooldown
         
     - Interaction
       - vs Env Obj

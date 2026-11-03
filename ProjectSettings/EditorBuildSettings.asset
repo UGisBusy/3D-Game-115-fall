@@ -5,12 +5,18 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
-    path: Assets/Scenes/SampleScene.unity
-    guid: 99c9720ab356a0642a771bea13969a05
   - enabled: 1
     path: Assets/Scenes/Menu.unity
     guid: ba798033715f4914aa5fdf805c6ab0b0
+  - enabled: 1
+    path: Assets/Scenes/ObstacleLevel.unity
+    guid: 266798f0428ccd34094da7b39466441b
+  - enabled: 1
+    path: Assets/Scenes/PuzzleLevel.unity
+    guid: 39415dd7634445e43bf175c1a100af2c
+  - enabled: 1
+    path: Assets/Scenes/CombatLevel.unity
+    guid: 37b35a2140c4b0a4eaddb28bf66b6e99
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

@@ -118,6 +118,18 @@ namespace PlayerSystem
 
         public void ClearVelocityOverride() => velocityOverride = null;
 
+        // Ends the override but keeps some momentum (dash exit).
+        // Horizontal part fades like an impulse; vertical part becomes the current y velocity, then gravity takes over.
+        public void ClearVelocityOverride(Vector3 carryVelocity)
+        {
+            velocityOverride = null;
+            externalVelocity += new Vector3(carryVelocity.x, 0f, carryVelocity.z);
+
+            Vector3 v = rb.linearVelocity;
+            v.y = carryVelocity.y;
+            rb.linearVelocity = v;
+        }
+
         public void SetGravityEnabled(bool enabled) => gravityEnabled = enabled;
 
         // Adds a velocity that fades over time (knockback, blade push).

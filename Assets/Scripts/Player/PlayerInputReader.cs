@@ -38,6 +38,7 @@ namespace PlayerSystem
             }
         }
 
+        public Vector3 CameraForward => cameraTransform.forward; // includes pitch
         public Vector3 CameraForwardFlat => Flatten(cameraTransform.forward);
         public Vector3 CameraRightFlat => Flatten(cameraTransform.right);
 

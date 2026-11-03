@@ -3,7 +3,7 @@ using UnityEngine;
 namespace PlayerSystem
 {
     /// <summary>
-    /// Dash toward camera forward: fixed velocity, no control, no gravity, invincible (see Player.IsInvincible).
+    /// Dash toward camera forward: fixed velocity, no control, no gravity, invincible.
     /// Raises DashFinished after DashAbility.Duration.
     /// </summary>
     public class DashState : PlayerState
@@ -21,7 +21,7 @@ namespace PlayerSystem
             Direction = Input.CameraForwardFlat;
             timer = player.Dash.Duration;
 
-            player.Dash.Begin(Direction); // starts cooldown, raises DashStarted (candle, VFX)
+            player.Dash.Begin(Direction); // starts cooldown, raises DashStarted
             Motor.SetGravityEnabled(false);
             Motor.SetVelocityOverride(Direction * player.Dash.Speed);
         }

@@ -4,7 +4,7 @@ namespace PlayerSystem
 {
     /// <summary>
     /// Dash data + cooldown. DashState does the movement; this class only owns tuning and cooldown.
-    /// Raises DashStarted / DashEnded on the global PlayerEvents (Candle fuel - 1, VFX, sound).
+    /// Raises DashStarted / DashEnded on the global PlayerEvents.
     /// </summary>
     public class DashAbility : MonoBehaviour
     {

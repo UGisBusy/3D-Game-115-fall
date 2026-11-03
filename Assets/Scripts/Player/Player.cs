@@ -21,11 +21,12 @@ namespace PlayerSystem
         private float spawnInvincibleTime = 2f;
 
         [Header("Debug")]
-        [Tooltip(
-            "Spawn at the current position on Start. Turn off when a LevelManager spawns the Player."
-        )]
+        // "Spawn at the current position on Start. Turn off when a LevelManager spawns the Player."
         [SerializeField]
         private bool spawnOnStart = true;
+
+        [SerializeField]
+        private string currentStateName;
 
         // --- Components ---
         public PlayerMotor Motor { get; private set; }
@@ -108,7 +109,7 @@ namespace PlayerSystem
             Knockback.AddLink(new Link(Normal, Transitions.KnockbackFinishedWrapper));
             Knockback.AddLink(new Link(Dead, Transitions.DiedWrapper));
 
-            stateMachine = new StateMachine();
+            stateMachine = new StateMachine(state => currentStateName = state.Name);
         }
 
         // ---------------- Public API ----------------

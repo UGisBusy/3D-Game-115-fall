@@ -16,6 +16,7 @@ namespace PlayerSystem
 
         public override void Tick(float dt)
         {
+            // TODO: Space (jump button) request respawn
             if (Input.JumpPressed)
                 PlayerEvents.RaiseRespawnRequested();
         }

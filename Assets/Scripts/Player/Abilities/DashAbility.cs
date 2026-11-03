@@ -17,7 +17,9 @@ namespace PlayerSystem
         [SerializeField]
         private float cooldown = 2f;
 
-        [Tooltip("Part of the dash velocity kept when the dash ends. 0 = stop dead, 1 = keep full speed.")]
+        [Tooltip(
+            "Part of the dash velocity kept when the dash ends. 0 = stop dead, 1 = keep full speed."
+        )]
         [SerializeField, Range(0f, 1f)]
         private float exitSpeedRatio = 0.2f;
 

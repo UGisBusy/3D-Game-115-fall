@@ -46,7 +46,9 @@ namespace PlayerSystem
 
         protected override void OnExit()
         {
-            Motor.ClearVelocityOverride(Direction * (player.Dash.Speed * player.Dash.ExitSpeedRatio));
+            Motor.ClearVelocityOverride(
+                Direction * (player.Dash.Speed * player.Dash.ExitSpeedRatio)
+            );
             Motor.SetGravityEnabled(true);
             player.Dash.End();
         }

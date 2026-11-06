@@ -13,6 +13,8 @@ DECISION:
 NOTIFY CHANGE:
 - candle mechanic
 - combat level need to defeat all
+- combat level wave: next Wave spawn after current Wave cleared (no more timed overlapping Waves)
+- combat level respawn: clear Enemy and Collectible, restart current Wave
 
 
 - UI and Game Flow
@@ -273,8 +275,8 @@ NOTIFY CHANGE:
 
     - Enemy Wave
       - x total Waves
-      - spawn next Wave every x second
-      - if no enemy, spawn next Wave after x second
+      - only one Wave active at a time
+      - next Wave spawn x second after current Wave cleared (no Enemy left)
       - load Wave Info in Waves File
 
       - Wave Info:
@@ -283,7 +285,13 @@ NOTIFY CHANGE:
           - enemy formation
           - enemy type
       
-      - When last wave and no Enemy, Star Collectible spawn
+      - When last Wave cleared, Star Collectible spawn
+
+    - Player Respawn
+      - when Player respawn:
+        - clear all Enemy and Collectible
+        - spawn Player at center
+        - restart current Wave after x second
 
 
 - Art TODO

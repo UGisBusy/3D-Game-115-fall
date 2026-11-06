@@ -63,6 +63,16 @@ namespace PlayerSystem
             attackAction.action.Disable();
         }
 
+        // Turns the whole Player action map (move, jump, dash, attack, camera) on or off, e.g. while paused.
+        public void SetEnabled(bool enabled)
+        {
+            InputActionMap map = moveAction.action.actionMap;
+            if (enabled)
+                map.Enable();
+            else
+                map.Disable();
+        }
+
         private static Vector3 Flatten(Vector3 v)
         {
             v.y = 0f;

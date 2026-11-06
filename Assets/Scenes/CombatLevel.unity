@@ -129,6 +129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 114135226}
   - component: {fileID: 114135227}
+  - component: {fileID: 114135228}
   m_Layer: 0
   m_Name: CollectibleSpawn_NE
   m_TagString: Untagged
@@ -145,7 +146,7 @@ Transform:
   m_GameObject: {fileID: 114135225}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 8.333333, y: 0, z: 8.333333}
+  m_LocalPosition: {x: 8.333333, y: 0.5, z: 8.333333}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -172,6 +173,23 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &114135228
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 114135225}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d8f28d0d7479e94a9d87e90cb332e25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CollectibleSpot
+  spawnDelay: 10
+  spawnOffset: {x: 0, y: 0, z: 0}
+  entries:
+  - prefab: {fileID: 1798717083468362189, guid: a975afdb946ab5a45bf0501547dc0a94, type: 3}
+    weight: 1
 --- !u!1 &211552417
 GameObject:
   m_ObjectHideFlags: 0
@@ -941,6 +959,7 @@ GameObject:
   m_Component:
   - component: {fileID: 769024632}
   - component: {fileID: 769024633}
+  - component: {fileID: 769024634}
   m_Layer: 0
   m_Name: CollectibleSpawn_SW
   m_TagString: Untagged
@@ -957,7 +976,7 @@ Transform:
   m_GameObject: {fileID: 769024631}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -8.333333, y: 0, z: -8.333333}
+  m_LocalPosition: {x: -8.333333, y: 0.5, z: -8.333333}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -984,6 +1003,23 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &769024634
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 769024631}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d8f28d0d7479e94a9d87e90cb332e25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CollectibleSpot
+  spawnDelay: 10
+  spawnOffset: {x: 0, y: 0, z: 0}
+  entries:
+  - prefab: {fileID: 1798717083468362189, guid: a975afdb946ab5a45bf0501547dc0a94, type: 3}
+    weight: 1
 --- !u!1 &800251321
 GameObject:
   m_ObjectHideFlags: 0
@@ -1209,6 +1245,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1062231983}
   - component: {fileID: 1062231984}
+  - component: {fileID: 1062231985}
   m_Layer: 0
   m_Name: CollectibleSpawn_SE
   m_TagString: Untagged
@@ -1225,7 +1262,7 @@ Transform:
   m_GameObject: {fileID: 1062231982}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 8.333333, y: 0, z: -8.333333}
+  m_LocalPosition: {x: 8.333333, y: 0.5, z: -8.333333}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1252,6 +1289,23 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &1062231985
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1062231982}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d8f28d0d7479e94a9d87e90cb332e25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CollectibleSpot
+  spawnDelay: 10
+  spawnOffset: {x: 0, y: 0, z: 0}
+  entries:
+  - prefab: {fileID: 1798717083468362189, guid: a975afdb946ab5a45bf0501547dc0a94, type: 3}
+    weight: 1
 --- !u!1 &1079037918
 GameObject:
   m_ObjectHideFlags: 0
@@ -1980,6 +2034,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1457315024}
   - component: {fileID: 1457315025}
+  - component: {fileID: 1457315026}
   m_Layer: 0
   m_Name: CollectibleSpawn_NW
   m_TagString: Untagged
@@ -1996,7 +2051,7 @@ Transform:
   m_GameObject: {fileID: 1457315023}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -8.333333, y: 0, z: 8.333333}
+  m_LocalPosition: {x: -8.333333, y: 0.5, z: 8.333333}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2023,6 +2078,23 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &1457315026
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1457315023}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d8f28d0d7479e94a9d87e90cb332e25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CollectibleSpot
+  spawnDelay: 10
+  spawnOffset: {x: 0, y: 0, z: 0}
+  entries:
+  - prefab: {fileID: 1798717083468362189, guid: a975afdb946ab5a45bf0501547dc0a94, type: 3}
+    weight: 1
 --- !u!1 &1513138051
 GameObject:
   m_ObjectHideFlags: 0
@@ -2672,6 +2744,68 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 5, y: 0.2, z: 5}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &1933425932
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1933425934}
+  - component: {fileID: 1933425933}
+  m_Layer: 0
+  m_Name: CombatLevelManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1933425933
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1933425932}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1e575858ac70fe4da34b1ecf8c9380e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CombatLevelManager
+  player: {fileID: 1513138053}
+  playerSpawnPoint: {fileID: 972563121}
+  enemySpawnAreas:
+  - {fileID: 1897393173}
+  - {fileID: 2142143149}
+  - {fileID: 353145069}
+  - {fileID: 681318271}
+  starPrefab: {fileID: 0}
+  starSpawnPoint: {fileID: 1998017290}
+  pauseAction: {fileID: -1112345045921236428, guid: ac3f95e6378bc604994eadfe89ea2b89, type: 3}
+  confirmAction: {fileID: -7333354237639282950, guid: ac3f95e6378bc604994eadfe89ea2b89, type: 3}
+  totalWaves: 3
+  firstWaveDelay: 3
+  waveBreak: 5
+  respawnWaveDelay: 3
+  currentStateName: 
+  debugWave: 0
+  debugEnemies: 0
+--- !u!4 &1933425934
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1933425932}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1964940216
 GameObject:
   m_ObjectHideFlags: 0
@@ -2786,6 +2920,37 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1964940216}
   m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1998017289
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1998017290}
+  m_Layer: 0
+  m_Name: StarSpawn
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1998017290
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1998017289}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 2, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2082833043
 GameObject:
   m_ObjectHideFlags: 0
@@ -2882,6 +3047,7 @@ BoxCollider:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
+  - {fileID: 1933425934}
   - {fileID: 1743336845}
   - {fileID: 1513138052}
   - {fileID: 1655689504}
@@ -2889,5 +3055,6 @@ SceneRoots:
   - {fileID: 2082833044}
   - {fileID: 1208110733}
   - {fileID: 972563121}
+  - {fileID: 1998017290}
   - {fileID: 919019020}
   - {fileID: 973108354}

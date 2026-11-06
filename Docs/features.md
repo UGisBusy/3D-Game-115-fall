@@ -16,6 +16,7 @@ NOTIFY CHANGE:
 - combat level wave: next Wave spawn after current Wave cleared (no more timed overlapping Waves)
 - combat level respawn: clear Enemy and Collectible, restart current Wave
 - combat level Collectible Spot: replace "Spawn Arrow Collectible every x second", spawn Arrow/Heart by weight, max 1 per Spot
+- combat level Wave Info: remove enemy formation, add count and delay; Enemy spawn at random position in area
 
 
 - UI and Game Flow
@@ -286,14 +287,16 @@ NOTIFY CHANGE:
     - Enemy Wave
       - x total Waves
       - only one Wave active at a time
-      - next Wave spawn x second after current Wave cleared (no Enemy left)
+      - next Wave spawn x second after current Wave cleared (no Enemy left, no group waiting to spawn)
       - load Wave Info in Waves File
 
       - Wave Info:
         - enemy groups
-          - spawn area
-          - enemy formation
           - enemy type
+          - spawn area
+          - count
+          - delay after Wave start
+      - Enemy spawn at random position in spawn area, not overlapping
       
       - When last Wave cleared, Star Collectible spawn
 

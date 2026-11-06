@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using PlayerSystem;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -14,7 +13,8 @@ using UnityEngine.InputSystem;
 ///   Pause    --ExitRequested-->   Exit      Pause Menu exit buttons
 ///   Complete --ExitRequested-->   Exit      Enter on Level Complete Screen
 ///
-/// Waves (run in Play): one Wave at a time. When it is cleared, wait waveBreak sec, then start the next.
+/// Waves (run in Play): read from the WaveSet (Waves File); EnemySpawner places the enemies.
+/// One Wave at a time. When it is cleared (nothing alive, no group waiting), wait waveBreak sec, then start the next.
 /// After the last Wave is cleared, the Star spawns.
 /// Respawn: clear Enemies, spawn Player at center, restart the current Wave after respawnWaveDelay sec.
 /// Collectible Spots clear themselves on PlayerEvents.Spawned.
@@ -34,7 +34,7 @@ public class CombatLevelManager : MonoBehaviour
     private Transform playerSpawnPoint;
 
     [SerializeField]
-    private Transform[] enemySpawnAreas;
+    private EnemySpawner enemySpawner;
 
     [SerializeField]
     private Collectible starPrefab;
@@ -51,7 +51,7 @@ public class CombatLevelManager : MonoBehaviour
 
     [Header("Waves")]
     [SerializeField]
-    private int totalWaves = 3; // TODO: read from Waves File
+    private WaveSet waveSet; // the Waves File
 
     [SerializeField]
     private float firstWaveDelay = 3f;
@@ -81,7 +81,6 @@ public class CombatLevelManager : MonoBehaviour
         exitState;
 
     // ---- Wave progress ----
-    private readonly List<GameObject> enemies = new();
     private int currentWave; // 0-based; only goes up when a Wave is cleared
     private bool waveActive;
     private bool allWavesCleared;
@@ -189,12 +188,13 @@ public class CombatLevelManager : MonoBehaviour
 
         UpdateWaves(dt);
         debugWave = currentWave + 1;
-        debugEnemies = enemies.Count;
+        debugEnemies = enemySpawner != null ? enemySpawner.AliveCount : 0;
     }
 
     private void OnRespawnRequested()
     {
-        ClearEnemies();
+        if (enemySpawner != null)
+            enemySpawner.ClearAll();
         SpawnPlayer();
 
         // Same currentWave again; it only goes up when a Wave is cleared.
@@ -270,13 +270,13 @@ public class CombatLevelManager : MonoBehaviour
 
         if (waveActive)
         {
-            if (CountEnemies() > 0)
+            if (enemySpawner != null && !enemySpawner.IsWaveDone)
                 return;
 
             // Wave cleared.
             waveActive = false;
             currentWave++;
-            if (currentWave >= totalWaves)
+            if (currentWave >= TotalWaves)
             {
                 allWavesCleared = true;
                 SpawnStar();
@@ -291,30 +291,23 @@ public class CombatLevelManager : MonoBehaviour
             StartWave(currentWave);
     }
 
+    private int TotalWaves => waveSet != null ? waveSet.Waves.Count : 0;
+
     private void StartWave(int index)
     {
+        if (index >= TotalWaves)
+        {
+            // No Waves File (or it is empty): nothing to fight.
+            Debug.LogWarning($"{nameof(CombatLevelManager)}: no Wave {index + 1} in the Waves File");
+            allWavesCleared = true;
+            SpawnStar();
+            return;
+        }
+
         waveActive = true;
-        Debug.Log($"Wave {index + 1}/{totalWaves} start");
-
-        // TODO: read Wave Info (enemy groups: spawn area, formation, type) from the Waves File,
-        // spawn each enemy in enemySpawnAreas, and add it to the list:
-        //   enemies.Add(Instantiate(enemyPrefab, position, rotation).gameObject);
-        // With no enemies spawned, the Wave counts as cleared on the next frame.
-    }
-
-    // Alive enemies; destroyed (killed) ones are removed from the list.
-    private int CountEnemies()
-    {
-        enemies.RemoveAll(e => e == null);
-        return enemies.Count;
-    }
-
-    private void ClearEnemies()
-    {
-        foreach (GameObject e in enemies)
-            if (e != null)
-                Destroy(e);
-        enemies.Clear();
+        Debug.Log($"Wave {index + 1}/{TotalWaves} start");
+        if (enemySpawner != null)
+            enemySpawner.SpawnWave(waveSet.Waves[index]);
     }
 
     private void SpawnStar()

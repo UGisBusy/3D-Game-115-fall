@@ -1,0 +1,101 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &6896025142521426303
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 880993096176346227, guid: d0dc66e8b88db824199a136da6002951, type: 3}
+      propertyPath: m_Name
+      value: JumpEnemy
+      objectReference: {fileID: 0}
+    - target: {fileID: 2540800020653427795, guid: d0dc66e8b88db824199a136da6002951, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 26b71691a37b57a4ca1a8e03284dfa32, type: 2}
+    - target: {fileID: 3525209071946365721, guid: d0dc66e8b88db824199a136da6002951, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3525209071946365721, guid: d0dc66e8b88db824199a136da6002951, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3525209071946365721, guid: d0dc66e8b88db824199a136da6002951, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3525209071946365721, guid: d0dc66e8b88db824199a136da6002951, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3525209071946365721, guid: d0dc66e8b88db824199a136da6002951, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3525209071946365721, guid: d0dc66e8b88db824199a136da6002951, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3525209071946365721, guid: d0dc66e8b88db824199a136da6002951, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3525209071946365721, guid: d0dc66e8b88db824199a136da6002951, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3525209071946365721, guid: d0dc66e8b88db824199a136da6002951, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3525209071946365721, guid: d0dc66e8b88db824199a136da6002951, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4789019244234779968, guid: d0dc66e8b88db824199a136da6002951, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 26b71691a37b57a4ca1a8e03284dfa32, type: 2}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 880993096176346227, guid: d0dc66e8b88db824199a136da6002951, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -3466197616710953772}
+  m_SourcePrefab: {fileID: 100100000, guid: d0dc66e8b88db824199a136da6002951, type: 3}
+--- !u!1 &6019747930134500620 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 880993096176346227, guid: d0dc66e8b88db824199a136da6002951, type: 3}
+  m_PrefabInstance: {fileID: 6896025142521426303}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &-3466197616710953772
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6019747930134500620}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 317fd636d68617846b7c7938df528998, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::JumpEnemy
+  maxHp: 1
+  moveSpeed: 3
+  turnSpeed: 360
+  contactDamage: 1
+  contactRadius: 0.6
+  contactOffset: {x: 0, y: 0.9, z: 0}
+  contactMask:
+    serializedVersion: 2
+    m_Bits: 1048576
+  knockbackSpeed: 8
+  knockbackUp: 3
+  knockbackDuration: 0.3
+  jumpInterval: 2
+  jumpVelocity: 7

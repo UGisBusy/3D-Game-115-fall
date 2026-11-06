@@ -554,7 +554,7 @@ Transform:
   m_GameObject: {fileID: 353145068}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -10}
+  m_LocalPosition: {x: 0, y: 0.1, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -719,7 +719,7 @@ Transform:
   m_GameObject: {fileID: 681318270}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -10, y: 0, z: 0}
+  m_LocalPosition: {x: -10, y: 0.1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2147,10 +2147,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 776a965e4a970664cb5898aa1ca05d75, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerSystem.Player
-  maxHp: 3
+  maxHp: 100
   hurtInvincibleTime: 1
   spawnInvincibleTime: 2
-  spawnOnStart: 1
+  spawnOnStart: 0
   currentStateName: Normal
 --- !u!114 &1513138054
 MonoBehaviour:
@@ -2691,6 +2691,67 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!1 &1802833525
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1802833527}
+  - component: {fileID: 1802833526}
+  m_Layer: 0
+  m_Name: EnemySpawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1802833526
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1802833525}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b95c28143fb4cda428e383b957f90785, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemySpawner
+  prefabs:
+  - type: 1
+    prefab: {fileID: 2856932194460656441, guid: 68a0c746bc802af449cc22ee429a2234, type: 3}
+  - type: 0
+    prefab: {fileID: 129883107024771093, guid: a7e034b02b6e8a540927792004982898, type: 3}
+  - type: 2
+    prefab: {fileID: 5446251678647723338, guid: b82f2b3ae14b31d45bed080f6099d48b, type: 3}
+  - type: 3
+    prefab: {fileID: 6019747930134500620, guid: b3386b6b008ac974aaf541709cf1a864, type: 3}
+  - type: 4
+    prefab: {fileID: 8617221049661586407, guid: a23c56b4116b49742b996bf1d1860a5a, type: 3}
+  north: {fileID: 1897393174}
+  east: {fileID: 2142143150}
+  south: {fileID: 353145070}
+  west: {fileID: 681318272}
+  minSpacing: 1.5
+  maxTries: 10
+--- !u!4 &1802833527
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1802833525}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1897393172
 GameObject:
   m_ObjectHideFlags: 0
@@ -2717,7 +2778,7 @@ Transform:
   m_GameObject: {fileID: 1897393172}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 0, y: 0, z: 10}
+  m_LocalPosition: {x: 0, y: 0.1, z: 10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2775,16 +2836,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CombatLevelManager
   player: {fileID: 1513138053}
   playerSpawnPoint: {fileID: 972563121}
-  enemySpawnAreas:
-  - {fileID: 1897393173}
-  - {fileID: 2142143149}
-  - {fileID: 353145069}
-  - {fileID: 681318271}
+  enemySpawner: {fileID: 1802833526}
   starPrefab: {fileID: 0}
   starSpawnPoint: {fileID: 1998017290}
   pauseAction: {fileID: -1112345045921236428, guid: ac3f95e6378bc604994eadfe89ea2b89, type: 3}
   confirmAction: {fileID: -7333354237639282950, guid: ac3f95e6378bc604994eadfe89ea2b89, type: 3}
-  totalWaves: 3
+  waveSet: {fileID: 11400000, guid: 02dc4f9e82ba7f24593d7a8beab4799c, type: 2}
   firstWaveDelay: 3
   waveBreak: 5
   respawnWaveDelay: 3
@@ -3016,7 +3073,7 @@ Transform:
   m_GameObject: {fileID: 2142143148}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0.7071068, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 10, y: 0, z: 0}
+  m_LocalPosition: {x: 10, y: 0.1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3048,6 +3105,7 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 1933425934}
+  - {fileID: 1802833527}
   - {fileID: 1743336845}
   - {fileID: 1513138052}
   - {fileID: 1655689504}

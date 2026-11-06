@@ -29,7 +29,7 @@ namespace PlayerSystem
         private Transform firePoint;
 
         [SerializeField]
-        private GameObject arrowPrefab; // TODO: replace with Arrow component/pool
+        private Arrow arrowPrefab;
 
         [Header("Debug")]
         [SerializeField]
@@ -90,9 +90,10 @@ namespace PlayerSystem
 
             Vector3 pos = firePoint != null ? firePoint.position : transform.position;
             if (arrowPrefab != null)
-                Instantiate(arrowPrefab, pos, Quaternion.LookRotation(dir));
-
-            Debug.DrawRay(pos, dir * 10f, Color.red, 1f); // shows the shot in Scene view
+            {
+                Arrow arrow = Instantiate(arrowPrefab, pos, Quaternion.LookRotation(dir));
+                arrow.Launch(dir, gameObject);
+            }
 
             ChargeProgress = 0f;
             Arrows--;

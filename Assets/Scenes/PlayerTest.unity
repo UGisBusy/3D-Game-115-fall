@@ -696,7 +696,7 @@ MonoBehaviour:
   chargeDecayTime: 0.5
   chargeMoveMultiplier: 0.4
   firePoint: {fileID: 1186528256}
-  arrowPrefab: {fileID: 0}
+  arrowPrefab: {fileID: 3897311593025557701, guid: 7cd3057d5b7008f4caefb9ba5db81f9e, type: 3}
   debugChargeProgress: 0
   debugArrows: 0
 --- !u!1 &1078254107

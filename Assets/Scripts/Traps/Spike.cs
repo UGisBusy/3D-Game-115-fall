@@ -95,7 +95,8 @@ namespace TrapSystem
         // For onPlayerTouch spikes, after the first touch the spike stays active forever.
         private void OnTriggerEnter(Collider other)
         {
-            if (toggleType == ToggleType.OnPlayerTouch
+            if (
+                toggleType == ToggleType.OnPlayerTouch
                 && !isActive
                 && other.TryGetComponent(out Player _)
             )
@@ -110,13 +111,11 @@ namespace TrapSystem
         {
             isActive = active;
 
-            float height = active 
-            ? activeScale.y 
-            : inactiveHeight;
+            float height = active ? activeScale.y : inactiveHeight;
 
             transform.localScale = new Vector3(activeScale.x, height, activeScale.z);
             transform.localPosition =
-                activePosition + Vector3.down * ((activeScale.y - height) / 2f); // move down 
+                activePosition + Vector3.down * ((activeScale.y - height) / 2f); // move down
         }
     }
 }

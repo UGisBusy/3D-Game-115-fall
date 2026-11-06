@@ -123,7 +123,11 @@ public class CombatLevelManager : MonoBehaviour
 
     private void BuildStateMachine()
     {
-        startState = new TickState("Start", OnStartEnter, tick: _ => transitions.RaiseStartFinished());
+        startState = new TickState(
+            "Start",
+            OnStartEnter,
+            tick: _ => transitions.RaiseStartFinished()
+        );
         playState = new TickState("Play", OnPlayEnter, OnPlayExit, PlayTick);
         pauseState = new TickState("Pause", OnPauseEnter, OnPauseExit, PauseTick);
         completeState = new TickState("Complete", OnCompleteEnter, tick: CompleteTick);
@@ -298,7 +302,9 @@ public class CombatLevelManager : MonoBehaviour
         if (index >= TotalWaves)
         {
             // No Waves File (or it is empty): nothing to fight.
-            Debug.LogWarning($"{nameof(CombatLevelManager)}: no Wave {index + 1} in the Waves File");
+            Debug.LogWarning(
+                $"{nameof(CombatLevelManager)}: no Wave {index + 1} in the Waves File"
+            );
             allWavesCleared = true;
             SpawnStar();
             return;

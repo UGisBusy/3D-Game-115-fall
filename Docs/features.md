@@ -15,6 +15,7 @@ NOTIFY CHANGE:
 - combat level need to defeat all
 - combat level wave: next Wave spawn after current Wave cleared (no more timed overlapping Waves)
 - combat level respawn: clear Enemy and Collectible, restart current Wave
+- combat level Collectible Spot: replace "Spawn Arrow Collectible every x second", spawn Arrow/Heart by weight, max 1 per Spot
 
 
 - UI and Game Flow
@@ -243,7 +244,7 @@ NOTIFY CHANGE:
       - Player have max x Arrow
       - Collectible Type: Arrow Collectible
         - effect: Player Arrow +1
-      - Spawn Arrow Collectible every x second
+      - Arrow Collectible spawn at Collectible Spot
       - if Player have Arrow, Player can Charge and Fire Bow
       
       - When hold down Left Click:
@@ -264,6 +265,15 @@ NOTIFY CHANGE:
 
       - When Arrow Break, Arrow disappear
       
+    - Collectible Spot
+      - place in level, spawn Collectible on its own
+      - hold max 1 Collectible at a time
+      - when Spot empty (start of level, picked up, or cleared), wait x second, then spawn 1 Collectible
+      - Collectible type is picked randomly by weight
+        - e.g. Arrow 3, Heart 1 => 75% Arrow, 25% Heart
+        - new type = add one more entry to the list
+      - when Player spawn, clear Collectible on Spot and restart timer
+
 
     - Enemy
       - more Enemy type:

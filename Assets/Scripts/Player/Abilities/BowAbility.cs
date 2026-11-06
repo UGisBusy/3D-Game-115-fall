@@ -53,6 +53,16 @@ namespace PlayerSystem
             chargeModifier.SpeedMultiplier = chargeMoveMultiplier;
         }
 
+        private void OnEnable() => LevelEvents.Collected += OnCollected;
+
+        private void OnDisable() => LevelEvents.Collected -= OnCollected;
+
+        private void OnCollected(Collectible collectible)
+        {
+            if (collectible.Type == CollectibleType.Arrow)
+                AddArrows(collectible.Amount);
+        }
+
         // Inspector readout only.
         private void LateUpdate()
         {

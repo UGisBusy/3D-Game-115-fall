@@ -14,6 +14,9 @@ namespace PlayerSystem
         private int maxArrows = 5;
 
         [SerializeField]
+        private int startArrows = 5; // given on every Spawn (respawn refills arrows)
+
+        [SerializeField]
         private float chargeTime = 1f; // seconds to full charge
 
         [SerializeField]
@@ -28,19 +31,33 @@ namespace PlayerSystem
         [SerializeField]
         private GameObject arrowPrefab; // TODO: replace with Arrow component/pool
 
+        [Header("Debug")]
+        [SerializeField]
+        private float debugChargeProgress;
+
+        [SerializeField]
+        private int debugArrows;
+
         private Player player;
         private readonly MovementModifier chargeModifier = new() { BlockJump = true };
         private bool modifierActive;
 
         public int Arrows { get; private set; }
         public int MaxArrows => maxArrows;
-        public float Charge01 { get; private set; }
+        public float ChargeProgress { get; private set; } // 0 = empty, 1 = fully charged
         public bool IsCharging => modifierActive;
 
         private void Awake()
         {
             player = GetComponent<Player>();
             chargeModifier.SpeedMultiplier = chargeMoveMultiplier;
+        }
+
+        // Inspector readout only.
+        private void LateUpdate()
+        {
+            debugChargeProgress = ChargeProgress;
+            debugArrows = Arrows;
         }
 
         // Called by Player every frame.
@@ -53,16 +70,16 @@ namespace PlayerSystem
             {
                 SetModifier(true);
                 chargeModifier.FacingDirection = input.CameraForwardFlat;
-                Charge01 = Mathf.Min(1f, Charge01 + dt / chargeTime);
+                ChargeProgress = Mathf.Min(1f, ChargeProgress + dt / chargeTime);
                 return;
             }
 
             // Released this frame with a full charge -> fire.
-            if (modifierActive && input.AttackReleased && Charge01 >= 1f && allowed)
+            if (modifierActive && input.AttackReleased && ChargeProgress >= 1f && allowed)
                 Fire();
 
             SetModifier(false);
-            Charge01 = Mathf.Max(0f, Charge01 - dt / chargeDecayTime);
+            ChargeProgress = Mathf.Max(0f, ChargeProgress - dt / chargeDecayTime);
         }
 
         private void Fire()
@@ -75,7 +92,9 @@ namespace PlayerSystem
             if (arrowPrefab != null)
                 Instantiate(arrowPrefab, pos, Quaternion.LookRotation(dir));
 
-            Charge01 = 0f;
+            Debug.DrawRay(pos, dir * 10f, Color.red, 1f); // shows the shot in Scene view
+
+            ChargeProgress = 0f;
             Arrows--;
             PlayerEvents.RaiseArrowsChanged(Arrows);
             PlayerEvents.RaiseArrowFired(pos, dir);
@@ -90,8 +109,9 @@ namespace PlayerSystem
         public void ResetBow()
         {
             SetModifier(false);
-            Charge01 = 0f;
-            // Arrow count on respawn is a design decision; keep current value for now.
+            ChargeProgress = 0f;
+            Arrows = Mathf.Min(startArrows, maxArrows);
+            PlayerEvents.RaiseArrowsChanged(Arrows);
         }
 
         private void SetModifier(bool active)

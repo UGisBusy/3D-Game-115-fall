@@ -1,10 +1,11 @@
+using PlayerSystem;
 using UnityEngine;
 
 namespace TrapSystem
 {
     /// <summary>
-    /// Floor trap. Owns its active state, when that state toggles, and showing or hiding the cube.
-    /// Does not own invincibility: it hits every physics step while active, and Player.TakeHit ignores hits during invincibility.
+    /// Floor trap. Owns its active state, when that state toggles, showing or hiding the cube, and its own hit cooldown.
+    /// Does not own invincibility: it reads Player.IsInvincible so a blocked hit doesn't start the cooldown.
     /// </summary>
     [RequireComponent(typeof(BoxCollider), typeof(MeshRenderer))]
     public class Spike : MonoBehaviour
@@ -28,9 +29,14 @@ namespace TrapSystem
         [SerializeField]
         private int damage = 1;
 
+        [Tooltip("Seconds before this spike can hurt the Player again.")]
+        [SerializeField]
+        private float hitCooldown = 4f;
+
         private MeshRenderer meshRenderer;
         private bool isActive;
         private float toggleTimer;
+        private float nextHitTime;
 
         private void Awake()
         {
@@ -57,12 +63,18 @@ namespace TrapSystem
             }
         }
 
-        // Stay instead of Enter: also hurts a Player who stays on the spike or is already there when it activates.
+        // When the player stays inside the spike's trigger, hurt on every hitCooldown seconds. Right now I set it 4 seconds cooldown.
         private void OnTriggerStay(Collider other)
         {
-            if (isActive && other.TryGetComponent(out IDamageable target))
+            if (!isActive || Time.time < nextHitTime)
             {
-                target.TakeHit(HitInfo.Create(damage, gameObject));
+                return;
+            }
+
+            if (other.TryGetComponent(out Player player) && !player.IsInvincible)
+            {
+                player.TakeHit(HitInfo.Create(damage, gameObject));
+                nextHitTime = Time.time + hitCooldown;
             }
         }
 

@@ -4,8 +4,8 @@ using UnityEngine;
 namespace LevelSystem
 {
     /// <summary>
-    /// Spawns the Player in any level. Keeps one Checkpoint active and spawns the Player there, at level start and on respawn.
-    /// I turn off the Player's Spawn On Start we we use the checkpoint to spawn in scenes.
+    /// Spawns the Player in any level. Keeps one Checkpoint active and spawns the Player there, when the level manager asks and on respawn.
+    /// The first Checkpoint is active until the Player touches another one.
     /// </summary>
     public class SpawnManager : MonoBehaviour
     {
@@ -36,10 +36,17 @@ namespace LevelSystem
             }
         }
 
-        private void Start()
+        // Spawn the player at the active checkpoint.
+        public void SpawnPlayer()
         {
-            Activate(checkpoints[0]);
-            SpawnPlayer();
+            // The level's first spawn comes before any Checkpoint is touched.
+            if (activeCheckpoint == null)
+            {
+                Activate(checkpoints[0]);
+            }
+
+            Transform point = activeCheckpoint.transform;
+            player.Spawn(point.position, point.rotation);
         }
 
         // Activate checkpoint when the player touches it.
@@ -52,13 +59,6 @@ namespace LevelSystem
 
             activeCheckpoint = checkpoint;
             activeCheckpoint.SetActive(true);
-        }
-
-        // Spawn the player at the active checkpoint.
-        private void SpawnPlayer()
-        {
-            Transform point = activeCheckpoint.transform;
-            player.Spawn(point.position, point.rotation);
         }
     }
 }

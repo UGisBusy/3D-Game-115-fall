@@ -107,7 +107,7 @@ namespace TrapSystem
             }
         }
 
-        // For onPlayerTouch spikes, after the first touch the spike stays active forever.
+        // For OnPlayerTouch spikes, after the first touch the spike stays active until the Player respawns.
         private void OnTriggerEnter(Collider other)
         {
             if (

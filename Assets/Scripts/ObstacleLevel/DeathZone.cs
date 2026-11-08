@@ -1,7 +1,7 @@
 using PlayerSystem;
 using UnityEngine;
 
-namespace LevelSystem
+namespace ObstacleLevel
 {
     /// <summary>
     /// The death zone area that kills the Player when the Player falls into it.

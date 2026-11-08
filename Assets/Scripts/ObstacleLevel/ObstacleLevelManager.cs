@@ -1,8 +1,9 @@
+using LevelSystem;
 using PlayerSystem;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace LevelSystem
+namespace ObstacleLevel
 {
     /// <summary>
     /// Obstacle level flow. States (event-driven through Links):

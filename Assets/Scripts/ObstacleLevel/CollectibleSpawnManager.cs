@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using PlayerSystem;
 using UnityEngine;
 
-namespace LevelSystem
+namespace ObstacleLevel
 {
     /// <summary>
     /// Spawns the obstacle level's Collectibles, one at each child spot.

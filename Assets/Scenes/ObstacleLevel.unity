@@ -363,17 +363,6 @@ Mesh:
       - serializedVersion: 1
         m_IndexStart: 0
         m_IndexCount: 0
---- !u!114 &14037039 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2454816094789052562, guid: 146fea6b220b564488c24f07fa566702, type: 3}
-  m_PrefabInstance: {fileID: 534534329}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c343ca0d6d7896245bec7f6a935fcfb3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::LevelSystem.Checkpoint
 --- !u!4 &14037043 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6812635753695558261, guid: 146fea6b220b564488c24f07fa566702, type: 3}
@@ -6716,9 +6705,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelSystem.ObstacleLevelManager
   player: {fileID: 1237700997}
-  checkpoints:
-  - {fileID: 1821828752}
-  - {fileID: 14037039}
+  startCheckpoint: {fileID: 1821828752}
 --- !u!4 &592556095
 Transform:
   m_ObjectHideFlags: 0

@@ -5,35 +5,29 @@ namespace LevelSystem
 {
     /// <summary>
     /// Spawns the Player in any level. Keeps one Checkpoint active and spawns the Player there, when the level manager asks and on respawn.
-    /// The first Checkpoint is active until the Player touches another one.
+    /// The start Checkpoint is active until the Player touches another one.
     /// </summary>
     public class SpawnManager : MonoBehaviour
     {
         [SerializeField]
         private Player player;
 
-        [Tooltip("Every Checkpoint in the level. The first one is where the level starts.")]
+        [Tooltip("Where the level starts.")]
         [SerializeField]
-        private Checkpoint[] checkpoints;
+        private Checkpoint startCheckpoint;
 
         private Checkpoint activeCheckpoint;
 
         private void OnEnable()
         {
             PlayerEvents.RespawnRequested += SpawnPlayer;
-            foreach (Checkpoint checkpoint in checkpoints)
-            {
-                checkpoint.Touched += Activate;
-            }
+            LevelEvents.CheckpointTouched += Activate;
         }
 
         private void OnDisable()
         {
             PlayerEvents.RespawnRequested -= SpawnPlayer;
-            foreach (Checkpoint checkpoint in checkpoints)
-            {
-                checkpoint.Touched -= Activate;
-            }
+            LevelEvents.CheckpointTouched -= Activate;
         }
 
         // Spawn the player at the active checkpoint.
@@ -42,7 +36,7 @@ namespace LevelSystem
             // The level's first spawn comes before any Checkpoint is touched.
             if (activeCheckpoint == null)
             {
-                Activate(checkpoints[0]);
+                Activate(startCheckpoint);
             }
 
             Transform point = activeCheckpoint.transform;

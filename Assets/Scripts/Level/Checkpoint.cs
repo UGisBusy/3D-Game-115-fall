@@ -1,4 +1,3 @@
-using System;
 using PlayerSystem;
 using UnityEngine;
 
@@ -17,8 +16,6 @@ namespace LevelSystem
         [SerializeField]
         private Color activeColor = Color.green;
 
-        public event Action<Checkpoint> Touched;
-
         private MeshRenderer meshRenderer;
 
         private void Awake()
@@ -33,7 +30,7 @@ namespace LevelSystem
         {
             if (other.TryGetComponent(out Player _))
             {
-                Touched?.Invoke(this);
+                LevelEvents.RaiseCheckpointTouched(this);
             }
         }
 

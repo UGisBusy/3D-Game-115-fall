@@ -28,9 +28,9 @@ namespace LevelSystem
             meshRenderer.material.color = inactiveColor;
         }
 
-        private void OnEnable() => LevelEvents.CheckpointTouched += Activate;
+        private void OnEnable() => LevelEvents.CheckpointActivated += Activate;
 
-        private void OnDisable() => LevelEvents.CheckpointTouched -= Activate;
+        private void OnDisable() => LevelEvents.CheckpointActivated -= Activate;
 
         // When the player touches inactive checkpoint.
         private void OnTriggerEnter(Collider other)
@@ -38,7 +38,7 @@ namespace LevelSystem
             if (isActive || !other.TryGetComponent(out Player _))
                 return;
 
-            LevelEvents.RaiseCheckpointTouched(this);
+            LevelEvents.RaiseCheckpointActivated(this);
         }
 
         // Update active state

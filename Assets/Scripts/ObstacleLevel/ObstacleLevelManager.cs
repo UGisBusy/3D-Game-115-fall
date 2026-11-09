@@ -25,6 +25,9 @@ namespace ObstacleLevel
         [SerializeField]
         private InputActionReference pauseAction; // Level/Pause (Escape)
 
+        [SerializeField]
+        private Checkpoint startCheckpoint; // TODO: use editor to set it for now, later seq manager should set it
+
         [Header("Debug")]
         [SerializeField]
         private string currentStateName;
@@ -87,10 +90,19 @@ namespace ObstacleLevel
             stateMachine = new StateMachine(state => currentStateName = state.Name);
         }
 
+        // ------------- StartLevel -------------
+        public void StartLevel(Checkpoint startCheckpoint)
+        {
+            // TODO: for later seq manager to call
+            this.startCheckpoint = startCheckpoint;
+            stateMachine.EnterState(startState);
+        }
+
         // ---------------- Start ----------------
 
         private void OnStartEnter()
         {
+            spawnManager.SetActiveCheckpoint(startCheckpoint);
             spawnManager.SpawnPlayer();
         }
 

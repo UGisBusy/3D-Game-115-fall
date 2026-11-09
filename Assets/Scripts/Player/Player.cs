@@ -61,6 +61,16 @@ namespace PlayerSystem
             BuildStateMachine();
         }
 
+        private void OnEnable() => LevelEvents.Collected += OnCollected;
+
+        private void OnDisable() => LevelEvents.Collected -= OnCollected;
+
+        private void OnCollected(Collectible collectible)
+        {
+            if (collectible.Type == CollectibleType.Heart)
+                Heal(collectible.Amount);
+        }
+
         private void Start()
         {
             if (spawnOnStart)

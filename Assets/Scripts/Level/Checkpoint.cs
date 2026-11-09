@@ -18,26 +18,34 @@ namespace LevelSystem
 
         private MeshRenderer meshRenderer;
 
+        private bool isActive = false;
+
         private void Awake()
         {
             meshRenderer = GetComponent<MeshRenderer>();
             GetComponent<BoxCollider>().isTrigger = true; // the Player walks through it
-            SetActive(false);
+            isActive = false;
+            meshRenderer.material.color = inactiveColor;
         }
 
-        // When the player touches the checkpoint.
+        private void OnEnable() => LevelEvents.CheckpointTouched += Activate;
+
+        private void OnDisable() => LevelEvents.CheckpointTouched -= Activate;
+
+        // When the player touches inactive checkpoint.
         private void OnTriggerEnter(Collider other)
         {
-            if (other.TryGetComponent(out Player _))
-            {
-                LevelEvents.RaiseCheckpointTouched(this);
-            }
+            if (isActive || !other.TryGetComponent(out Player _))
+                return;
+
+            LevelEvents.RaiseCheckpointTouched(this);
         }
 
-        // When it's set active, show the color differently.
-        public void SetActive(bool active)
+        // Update active state
+        private void Activate(Checkpoint cp)
         {
-            meshRenderer.material.color = active ? activeColor : inactiveColor;
+            isActive = cp == this;
+            meshRenderer.material.color = isActive ? activeColor : inactiveColor;
         }
     }
 }

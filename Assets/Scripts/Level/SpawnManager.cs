@@ -12,47 +12,31 @@ namespace LevelSystem
         [SerializeField]
         private Player player;
 
-        [Tooltip("Where the level starts.")]
-        [SerializeField]
-        private Checkpoint startCheckpoint;
-
         private Checkpoint activeCheckpoint;
 
         private void OnEnable()
         {
             PlayerEvents.RespawnRequested += SpawnPlayer;
-            LevelEvents.CheckpointTouched += Activate;
+            LevelEvents.CheckpointActivated += SetActiveCheckpoint;
         }
 
         private void OnDisable()
         {
             PlayerEvents.RespawnRequested -= SpawnPlayer;
-            LevelEvents.CheckpointTouched -= Activate;
+            LevelEvents.CheckpointActivated -= SetActiveCheckpoint;
         }
 
         // Spawn the player at the active checkpoint.
         public void SpawnPlayer()
         {
-            // The level's first spawn comes before any Checkpoint is touched.
-            if (activeCheckpoint == null)
-            {
-                Activate(startCheckpoint);
-            }
-
             Transform point = activeCheckpoint.transform;
             player.Spawn(point.position, point.rotation);
         }
 
-        // Activate checkpoint when the player touches it.
-        private void Activate(Checkpoint checkpoint)
+        // Swtich the active checkpoint
+        public void SetActiveCheckpoint(Checkpoint checkpoint)
         {
-            if (activeCheckpoint != null)
-            {
-                activeCheckpoint.SetActive(false);
-            }
-
             activeCheckpoint = checkpoint;
-            activeCheckpoint.SetActive(true);
         }
     }
 }

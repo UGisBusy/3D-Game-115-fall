@@ -6659,6 +6659,7 @@ MonoBehaviour:
   player: {fileID: 1237700997}
   spawnManager: {fileID: 592556094}
   pauseAction: {fileID: -1112345045921236428, guid: ac3f95e6378bc604994eadfe89ea2b89, type: 3}
+  startCheckpoint: {fileID: 1821828752}
   currentStateName: 
 --- !u!4 &586466931
 Transform:
@@ -6705,7 +6706,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelSystem.ObstacleLevelManager
   player: {fileID: 1237700997}
-  startCheckpoint: {fileID: 1821828752}
 --- !u!4 &592556095
 Transform:
   m_ObjectHideFlags: 0

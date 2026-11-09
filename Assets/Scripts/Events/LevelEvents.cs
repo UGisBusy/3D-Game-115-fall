@@ -12,19 +12,19 @@ public static class LevelEvents
     public static event Action<Collectible> Collected;
 
     // Raised when the Player touches a Checkpoint.
-    public static event Action<Checkpoint> CheckpointTouched;
+    public static event Action<Checkpoint> CheckpointActivated;
 
     // ---------- Raise ----------
     public static void RaiseCollected(Collectible collectible) => Collected?.Invoke(collectible);
 
-    public static void RaiseCheckpointTouched(Checkpoint checkpoint) =>
-        CheckpointTouched?.Invoke(checkpoint);
+    public static void RaiseCheckpointActivated(Checkpoint checkpoint) =>
+        CheckpointActivated?.Invoke(checkpoint);
 
     // clear old subscribers at startup
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetStatics()
     {
         Collected = null;
-        CheckpointTouched = null;
+        CheckpointActivated = null;
     }
 }

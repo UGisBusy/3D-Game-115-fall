@@ -94,8 +94,9 @@ MonoBehaviour:
   contactMask:
     serializedVersion: 2
     m_Bits: 1048576
-  knockbackSpeed: 8
-  knockbackUp: 3
+  knockbackSpeed: 14
+  knockbackUp: 4
   knockbackDuration: 0.3
-  jumpInterval: 2
+  jumpInterval: 1.5
   jumpVelocity: 7
+  maxHopSpeed: 12

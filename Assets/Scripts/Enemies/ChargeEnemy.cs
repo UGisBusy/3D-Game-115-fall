@@ -1,3 +1,4 @@
+using PlayerSystem;
 using UnityEngine;
 
 /// <summary>
@@ -6,6 +7,8 @@ using UnityEngine;
 ///   Windup   stop turning, telegraph the charge           (windupTime sec)
 ///   Charging rush straight in the locked direction        (chargeDuration sec), then back to Idle
 /// The Player can sidestep or hide behind a pillar during Windup.
+/// Knockback: while Charging, a strong push to the side of the charge line (the side the Player is on);
+/// otherwise the normal push away, same as other enemies.
 /// </summary>
 public class ChargeEnemy : Enemy
 {
@@ -24,10 +27,13 @@ public class ChargeEnemy : Enemy
     private float windupTime = 0.6f;
 
     [SerializeField]
-    private float chargeSpeed = 12f;
+    private float chargeSpeed = 18f;
 
     [SerializeField]
-    private float chargeDuration = 0.6f;
+    private float chargeDuration = 0.8f; // distance = chargeSpeed * chargeDuration (~14.4m)
+
+    [SerializeField]
+    private float chargeKnockbackSpeed = 20f; // hit while Charging: strongest knockback of all enemies, pushes to the side
 
     private Phase phase;
     private float timer;
@@ -79,5 +85,19 @@ public class ChargeEnemy : Enemy
                 }
                 break;
         }
+    }
+
+    protected override Vector3 GetKnockbackVelocity(Player player)
+    {
+        if (phase != Phase.Charging)
+            return base.GetKnockbackVelocity(player);
+
+        // Push sideways out of the charge line, toward the side the Player is on.
+        Vector3 side = Vector3.Cross(Vector3.up, chargeDirection); // right of the charge
+        Vector3 offset = player.transform.position - transform.position;
+        if (Vector3.Dot(offset, side) < 0f)
+            side = -side;
+
+        return side * chargeKnockbackSpeed + Vector3.up * knockbackUp;
     }
 }

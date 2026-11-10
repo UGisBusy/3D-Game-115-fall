@@ -44,18 +44,25 @@ public abstract class Enemy : MonoBehaviour, IDamageable
     protected LayerMask contactMask; // the Player layer
 
     [SerializeField]
-    protected float knockbackSpeed = 8f;
+    protected float knockbackSpeed = 14f; // push distance ~ speed / Player externalDamping (8) => ~1.75m
 
     [SerializeField]
-    protected float knockbackUp = 3f;
+    protected float knockbackUp = 4f;
 
     [SerializeField]
     protected float knockbackDuration = 0.3f;
 
+    [Header("Pushed")]
+    [SerializeField]
+    protected float pushDamping = 8f; // how fast a push on this enemy fades (same feel as the Player)
+
     private static readonly Collider[] contactBuffer = new Collider[4];
+
+    private float pushedTimer;
 
     public int Hp { get; private set; }
     public bool IsDead => Hp <= 0;
+    public bool IsPushed => pushedTimer > 0f;
 
     protected Rigidbody Rb { get; private set; }
     protected Player Target { get; private set; }
@@ -77,8 +84,29 @@ public abstract class Enemy : MonoBehaviour, IDamageable
     {
         if (IsDead)
             return;
-        Behave(Time.fixedDeltaTime);
+
+        float dt = Time.fixedDeltaTime;
+        if (pushedTimer > 0f)
+        {
+            // Flying from a push: own movement and contact damage are off, the push fades.
+            pushedTimer -= dt;
+            Vector3 v = Rb.linearVelocity;
+            Vector3 flat = Vector3.Lerp(new Vector3(v.x, 0f, v.z), Vector3.zero, pushDamping * dt);
+            Rb.linearVelocity = new Vector3(flat.x, v.y, flat.z);
+            return;
+        }
+
+        Behave(dt);
         CheckContact();
+    }
+
+    // Knocked back without damage (e.g. a Heavy slam). Its own movement stops for `duration`.
+    public void Push(Vector3 velocity, float duration)
+    {
+        if (IsDead)
+            return;
+        Rb.linearVelocity = velocity;
+        pushedTimer = Mathf.Max(pushedTimer, duration);
     }
 
     // Movement / attack pattern of this type. Runs every physics step.
@@ -124,22 +152,35 @@ public abstract class Enemy : MonoBehaviour, IDamageable
         }
     }
 
-    // Player handles invincibility (dash, after hurt), so this can be called every step.
+    // Called every step while touching. An invincible Player (dash, after hurt, after spawn) is not hit,
+    // so OnHitPlayer only runs for hits that land.
     protected virtual void HitPlayer(Player player)
     {
-        Vector3 away = player.transform.position - transform.position;
-        away.y = 0f;
-        away = away.sqrMagnitude > 0.0001f ? away.normalized : transform.forward;
+        if (player.IsDead || player.IsInvincible)
+            return;
 
         player.TakeHit(
             HitInfo.Create(
                 contactDamage,
                 gameObject,
-                knockbackVelocity: away * knockbackSpeed + Vector3.up * knockbackUp,
+                knockbackVelocity: GetKnockbackVelocity(player),
                 knockbackDuration: knockbackDuration
             )
         );
+        OnHitPlayer();
     }
+
+    // Default: push the Player straight away from this enemy. Override for a different push.
+    protected virtual Vector3 GetKnockbackVelocity(Player player)
+    {
+        Vector3 away = player.transform.position - transform.position;
+        away.y = 0f;
+        away = away.sqrMagnitude > 0.0001f ? away.normalized : transform.forward;
+        return away * knockbackSpeed + Vector3.up * knockbackUp;
+    }
+
+    // Runs after this enemy hurts the Player. Override to react (e.g. pause).
+    protected virtual void OnHitPlayer() { }
 
     // ---------------- Helpers for subclasses ----------------
 
@@ -179,7 +220,7 @@ public abstract class Enemy : MonoBehaviour, IDamageable
             QueryTriggerInteraction.Ignore
         );
 
-    private void OnDrawGizmosSelected()
+    protected virtual void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.TransformPoint(contactOffset), contactRadius);

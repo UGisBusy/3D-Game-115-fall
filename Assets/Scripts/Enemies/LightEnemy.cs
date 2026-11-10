@@ -7,6 +7,6 @@ public class LightEnemy : ChaseEnemy
     private void Reset()
     {
         maxHp = 1;
-        moveSpeed = 5f;
+        moveSpeed = 4f;
     }
 }

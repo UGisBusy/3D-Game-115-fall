@@ -15,5 +15,5 @@
   - Jump and land on predicted location
 - Shield
   - Has a shield blocking arrows
-  - Break the shield by dash into it
+  - Break the shield by dash into it, bounces player backward
 

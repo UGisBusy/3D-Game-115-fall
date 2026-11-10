@@ -9,6 +9,9 @@ using UnityEngine;
 /// The Player can sidestep or hide behind a pillar during Windup.
 /// Knockback: while Charging, a strong push to the side of the charge line (the side the Player is on);
 /// otherwise the normal push away, same as other enemies.
+/// Telegraph (optional): a flat child object shown only during Windup, marking the charge path.
+/// On Awake it is sized to chargeTelegraphWidth x charge distance and placed in front of the enemy,
+/// so use a mesh 1 unit wide and long (default Cube or Quad) under the unscaled root.
 /// </summary>
 public class ChargeEnemy : Enemy
 {
@@ -35,9 +38,33 @@ public class ChargeEnemy : Enemy
     [SerializeField]
     private float chargeKnockbackSpeed = 20f; // hit while Charging: strongest knockback of all enemies, pushes to the side
 
+    [SerializeField]
+    private GameObject chargeTelegraph; // optional, shown during Windup
+
+    [SerializeField]
+    private float chargeTelegraphWidth = 1.5f; // ~ body width + contact range
+
     private Phase phase;
     private float timer;
     private Vector3 chargeDirection;
+
+    protected override void Awake()
+    {
+        base.Awake();
+
+        if (chargeTelegraph != null)
+        {
+            // Strip from the enemy's feet forward, as long as the charge goes.
+            float length = chargeSpeed * chargeDuration;
+            Transform t = chargeTelegraph.transform;
+            t.SetLocalPositionAndRotation(
+                new Vector3(0f, t.localPosition.y, length * 0.5f),
+                Quaternion.identity
+            );
+            t.localScale = new Vector3(chargeTelegraphWidth, t.localScale.y, length);
+        }
+        SetTelegraph(false);
+    }
 
     protected override void Start()
     {
@@ -59,7 +86,8 @@ public class ChargeEnemy : Enemy
                 {
                     phase = Phase.Windup;
                     timer = windupTime;
-                    // TODO: telegraph (Art), e.g. flash or shake
+                    SetTelegraph(true);
+                    // TODO: more telegraph (Art), e.g. flash or shake
                 }
                 break;
 
@@ -70,6 +98,7 @@ public class ChargeEnemy : Enemy
                     chargeDirection = transform.forward;
                     chargeDirection.y = 0f;
                     chargeDirection.Normalize();
+                    SetTelegraph(false);
                     phase = Phase.Charging;
                     timer = chargeDuration;
                 }
@@ -99,5 +128,11 @@ public class ChargeEnemy : Enemy
             side = -side;
 
         return side * chargeKnockbackSpeed + Vector3.up * knockbackUp;
+    }
+
+    private void SetTelegraph(bool on)
+    {
+        if (chargeTelegraph != null)
+            chargeTelegraph.SetActive(on);
     }
 }

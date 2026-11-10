@@ -71,7 +71,11 @@ public class EnemyShield : MonoBehaviour, IDamageable
     private void BounceBack(Player player)
     {
         Vector3 back = -player.Dashing.FlatDirection;
-        player.Bounce(back * bounceSpeed + Vector3.up * bounceUp, bounceDuration, bounceInvincibleTime);
+        player.Bounce(
+            back * bounceSpeed + Vector3.up * bounceUp,
+            bounceDuration,
+            bounceInvincibleTime
+        );
     }
 
     public void Break()

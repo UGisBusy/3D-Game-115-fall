@@ -14,23 +14,32 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WaveSet
   waves:
   - groups:
-    - type: 1
-      area: 0
-      count: 1
-      delay: 0
     - type: 0
       area: 0
+      count: 2
+      delay: 0
+    - type: 1
+      area: 1
+      count: 1
+      delay: 2
+    - type: 1
+      area: 3
+      count: 1
+      delay: 2
+  - groups:
+    - type: 2
+      area: 1
       count: 1
       delay: 0
     - type: 2
-      area: 0
+      area: 3
       count: 1
       delay: 0
     - type: 3
-      area: 0
+      area: 1
       count: 1
-      delay: 0
-    - type: 4
-      area: 0
+      delay: 4
+    - type: 3
+      area: 3
       count: 1
-      delay: 0
+      delay: 4

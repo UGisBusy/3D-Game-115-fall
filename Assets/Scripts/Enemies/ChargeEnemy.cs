@@ -3,14 +3,17 @@ using UnityEngine;
 
 /// <summary>
 /// Charge Enemy: stands still and charges periodically.
-///   Idle     stand still, turn toward the Player         (chargeInterval sec)
+///   Idle     stand still, turn toward the Player         (chargeInterval sec; firstChargeDelay after spawn)
 ///   Windup   stop turning, telegraph the charge           (windupTime sec)
-///   Charging rush straight in the locked direction        (chargeDuration sec), then back to Idle
+///   Charging rush straight in the locked direction, then back to Idle
+/// Charge length is picked when the Windup starts:
+///   - Player within one normal charge (chargeSpeed * chargeDuration): normal charge.
+///   - Player farther than that: far charge to the Player + farChargeOvershoot, at most farChargeMaxDistance.
 /// The Player can sidestep or hide behind a pillar during Windup.
 /// Knockback: while Charging, a strong push to the side of the charge line (the side the Player is on);
 /// otherwise the normal push away, same as other enemies.
 /// Telegraph (optional): a flat child object shown only during Windup, marking the charge path.
-/// On Awake it is sized to chargeTelegraphWidth x charge distance and placed in front of the enemy,
+/// It is resized to chargeTelegraphWidth x this charge's length each Windup,
 /// so use a mesh 1 unit wide and long (default Cube or Quad) under the unscaled root.
 /// </summary>
 public class ChargeEnemy : Enemy
@@ -27,13 +30,22 @@ public class ChargeEnemy : Enemy
     private float chargeInterval = 3f;
 
     [SerializeField]
+    private float firstChargeDelay = 1f; // seconds from spawn until the first charge starts (includes windup)
+
+    [SerializeField]
     private float windupTime = 0.6f;
 
     [SerializeField]
     private float chargeSpeed = 18f;
 
     [SerializeField]
-    private float chargeDuration = 0.8f; // distance = chargeSpeed * chargeDuration (~14.4m)
+    private float chargeDuration = 0.8f; // normal charge: distance = chargeSpeed * chargeDuration (~14.4m)
+
+    [SerializeField]
+    private float farChargeOvershoot = 2f; // far charge: distance to the Player + this
+
+    [SerializeField]
+    private float farChargeMaxDistance = 22.5f; // far charge cap, ~3/4 of the 30m combat arena
 
     [SerializeField]
     private float chargeKnockbackSpeed = 20f; // hit while Charging: strongest knockback of all enemies, pushes to the side
@@ -47,22 +59,13 @@ public class ChargeEnemy : Enemy
     private Phase phase;
     private float timer;
     private Vector3 chargeDirection;
+    private float chargeLength; // distance of the current charge
+
+    private float NormalChargeLength => chargeSpeed * chargeDuration;
 
     protected override void Awake()
     {
         base.Awake();
-
-        if (chargeTelegraph != null)
-        {
-            // Strip from the enemy's feet forward, as long as the charge goes.
-            float length = chargeSpeed * chargeDuration;
-            Transform t = chargeTelegraph.transform;
-            t.SetLocalPositionAndRotation(
-                new Vector3(0f, t.localPosition.y, length * 0.5f),
-                Quaternion.identity
-            );
-            t.localScale = new Vector3(chargeTelegraphWidth, t.localScale.y, length);
-        }
         SetTelegraph(false);
     }
 
@@ -70,7 +73,7 @@ public class ChargeEnemy : Enemy
     {
         base.Start();
         phase = Phase.Idle;
-        timer = chargeInterval;
+        timer = Mathf.Max(0f, firstChargeDelay - windupTime);
     }
 
     protected override void Behave(float dt)
@@ -86,6 +89,8 @@ public class ChargeEnemy : Enemy
                 {
                     phase = Phase.Windup;
                     timer = windupTime;
+                    chargeLength = PickChargeLength();
+                    SizeTelegraph(chargeLength);
                     SetTelegraph(true);
                     // TODO: more telegraph (Art), e.g. flash or shake
                 }
@@ -100,7 +105,7 @@ public class ChargeEnemy : Enemy
                     chargeDirection.Normalize();
                     SetTelegraph(false);
                     phase = Phase.Charging;
-                    timer = chargeDuration;
+                    timer = chargeLength / chargeSpeed;
                 }
                 break;
 
@@ -116,6 +121,17 @@ public class ChargeEnemy : Enemy
         }
     }
 
+    // Normal charge if it can reach the Player, otherwise a far charge just past the Player (capped).
+    private float PickChargeLength()
+    {
+        Vector3 d = Target.transform.position - transform.position;
+        d.y = 0f;
+        float distance = d.magnitude;
+        if (distance <= NormalChargeLength)
+            return NormalChargeLength;
+        return Mathf.Min(distance + farChargeOvershoot, farChargeMaxDistance);
+    }
+
     protected override Vector3 GetKnockbackVelocity(Player player)
     {
         if (phase != Phase.Charging)
@@ -128,6 +144,20 @@ public class ChargeEnemy : Enemy
             side = -side;
 
         return side * chargeKnockbackSpeed + Vector3.up * knockbackUp;
+    }
+
+    // Strip from the enemy's feet forward, as long as this charge goes.
+    private void SizeTelegraph(float length)
+    {
+        if (chargeTelegraph == null)
+            return;
+
+        Transform t = chargeTelegraph.transform;
+        t.SetLocalPositionAndRotation(
+            new Vector3(0f, t.localPosition.y, length * 0.5f),
+            Quaternion.identity
+        );
+        t.localScale = new Vector3(chargeTelegraphWidth, t.localScale.y, length);
     }
 
     private void SetTelegraph(bool on)

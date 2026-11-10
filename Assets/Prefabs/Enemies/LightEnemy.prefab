@@ -86,7 +86,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LightEnemy
   maxHp: 1
-  moveSpeed: 4
+  moveSpeed: 3.5
   turnSpeed: 360
   contactDamage: 1
   contactRadius: 0.6

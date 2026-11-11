@@ -211,6 +211,17 @@ public abstract class Enemy : MonoBehaviour, IDamageable
         Rb.MoveRotation(Quaternion.RotateTowards(Rb.rotation, target, turnSpeed * dt));
     }
 
+    // Like TurnTowards but eases in and out: fast when far from the target facing, slowing down
+    // as it gets close. Still never faster than turnSpeed. Higher smoothing = snappier.
+    protected void SmoothTurnTowards(Vector3 flatDirection, float smoothing, float dt)
+    {
+        if (flatDirection.sqrMagnitude < 0.0001f)
+            return;
+        Quaternion target = Quaternion.LookRotation(flatDirection);
+        Quaternion eased = Quaternion.Slerp(Rb.rotation, target, 1f - Mathf.Exp(-smoothing * dt));
+        Rb.MoveRotation(Quaternion.RotateTowards(Rb.rotation, eased, turnSpeed * dt));
+    }
+
     protected bool IsGrounded() =>
         Physics.Raycast(
             transform.position + Vector3.up * 0.1f,

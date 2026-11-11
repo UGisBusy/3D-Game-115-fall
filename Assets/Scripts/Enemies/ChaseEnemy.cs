@@ -18,6 +18,12 @@ public class ChaseEnemy : Enemy
     [SerializeField]
     protected float hitPauseTime = 1f; // seconds to stand still after hitting the Player
 
+    [SerializeField]
+    private float steering = 6f; // how fast the walk direction follows the path, higher = sharper corners
+
+    [SerializeField]
+    private float turnSmoothing = 10f; // how fast the body eases toward its facing, higher = snappier
+
     [Header("Navigation")]
     [SerializeField]
     private float repathInterval = 0.25f; // seconds between path updates
@@ -29,6 +35,7 @@ public class ChaseEnemy : Enemy
     private float navMeshSampleRange = 2f; // how far off the NavMesh a position may be (jumping, pushed)
 
     private float pauseTimer;
+    private Vector3 moveDirection; // smoothed walk direction, flat, length 1 (zero before the first step)
 
     private NavMeshPath path;
     private readonly Vector3[] corners = new Vector3[32];
@@ -56,14 +63,32 @@ public class ChaseEnemy : Enemy
         if (pauseTimer > 0f)
         {
             pauseTimer -= dt;
-            TurnTowards(FlatDirectionToTarget(), dt);
+            SmoothTurnTowards(FlatDirectionToTarget(), turnSmoothing, dt);
             StopMoving();
             return;
         }
 
-        Vector3 dir = ChaseDirection(dt);
-        TurnTowards(dir, dt);
-        Move(dir, moveSpeed);
+        SteerTowards(ChaseDirection(dt), dt);
+        SmoothTurnTowards(moveDirection, turnSmoothing, dt);
+        Move(moveDirection, moveSpeed);
+    }
+
+    // Curves the walk direction toward the wanted one instead of snapping at path corners.
+    private void SteerTowards(Vector3 wanted, float dt)
+    {
+        if (wanted.sqrMagnitude < 0.0001f)
+            return;
+        if (moveDirection.sqrMagnitude < 0.0001f)
+        {
+            moveDirection = wanted; // first step: no curve
+            return;
+        }
+
+        float t = 1f - Mathf.Exp(-steering * dt);
+        float maxRadians = Vector3.Angle(moveDirection, wanted) * Mathf.Deg2Rad * t;
+        moveDirection = Vector3.RotateTowards(moveDirection, wanted, maxRadians, 0f);
+        moveDirection.y = 0f;
+        moveDirection.Normalize();
     }
 
     protected override void OnHitPlayer() => pauseTimer = hitPauseTime;

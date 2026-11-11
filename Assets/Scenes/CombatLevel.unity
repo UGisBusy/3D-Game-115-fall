@@ -119,6 +119,38 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &75626223
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 75626224}
+  m_Layer: 0
+  m_Name: NavMesh
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &75626224
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 75626223}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0, y: 0, z: -0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1512754354}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &114135225
 GameObject:
   m_ObjectHideFlags: 0
@@ -188,7 +220,7 @@ MonoBehaviour:
   spawnDelay: 10
   spawnOffset: {x: 0, y: 0, z: 0}
   entries:
-  - prefab: {fileID: 1798717083468362189, guid: a975afdb946ab5a45bf0501547dc0a94, type: 3}
+  - prefab: {fileID: 1798717083468362189, guid: d48e5e39967d4d4bb4b44596eee9f49e, type: 3}
     weight: 1
 --- !u!1 &211552417
 GameObject:
@@ -1018,7 +1050,7 @@ MonoBehaviour:
   spawnDelay: 10
   spawnOffset: {x: 0, y: 0, z: 0}
   entries:
-  - prefab: {fileID: 1798717083468362189, guid: a975afdb946ab5a45bf0501547dc0a94, type: 3}
+  - prefab: {fileID: 1798717083468362189, guid: d48e5e39967d4d4bb4b44596eee9f49e, type: 3}
     weight: 1
 --- !u!1 &800251321
 GameObject:
@@ -1304,7 +1336,7 @@ MonoBehaviour:
   spawnDelay: 10
   spawnOffset: {x: 0, y: 0, z: 0}
   entries:
-  - prefab: {fileID: 1798717083468362189, guid: a975afdb946ab5a45bf0501547dc0a94, type: 3}
+  - prefab: {fileID: 1798717083468362189, guid: d48e5e39967d4d4bb4b44596eee9f49e, type: 3}
     weight: 1
 --- !u!1 &1079037918
 GameObject:
@@ -2093,8 +2125,72 @@ MonoBehaviour:
   spawnDelay: 10
   spawnOffset: {x: 0, y: 0, z: 0}
   entries:
-  - prefab: {fileID: 1798717083468362189, guid: a975afdb946ab5a45bf0501547dc0a94, type: 3}
+  - prefab: {fileID: 1798717083468362189, guid: d48e5e39967d4d4bb4b44596eee9f49e, type: 3}
     weight: 1
+--- !u!1 &1512754353
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1512754354}
+  - component: {fileID: 1512754355}
+  m_Layer: 0
+  m_Name: NavMesh Surface
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1512754354
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1512754353}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 75626224}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1512754355
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1512754353}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshSurface
+  m_SerializedVersion: 0
+  m_AgentTypeID: 0
+  m_CollectObjects: 0
+  m_Size: {x: 10, y: 10, z: 10}
+  m_Center: {x: 0, y: 2, z: 0}
+  m_LayerMask:
+    serializedVersion: 2
+    m_Bits: 55
+  m_UseGeometry: 0
+  m_DefaultArea: 0
+  m_GenerateLinks: 0
+  m_IgnoreNavMeshAgent: 1
+  m_IgnoreNavMeshObstacle: 1
+  m_OverrideTileSize: 0
+  m_TileSize: 256
+  m_OverrideVoxelSize: 0
+  m_VoxelSize: 0.16666667
+  m_MinRegionArea: 2
+  m_NavMeshData: {fileID: 23800000, guid: e5dab76a31872424b8a4cd47c659704e, type: 2}
+  m_BuildHeightMesh: 0
 --- !u!1 &1513138051
 GameObject:
   m_ObjectHideFlags: 0
@@ -2170,7 +2266,7 @@ MonoBehaviour:
   chargeDecayTime: 0.5
   chargeMoveMultiplier: 0.4
   firePoint: {fileID: 1175163217}
-  arrowPrefab: {fileID: 3897311593025557701, guid: 7cd3057d5b7008f4caefb9ba5db81f9e, type: 3}
+  arrowPrefab: {fileID: 3897311593025557701, guid: 0be20acc7dd6414ebc4ed0106da26174, type: 3}
   debugChargeProgress: 0
   debugArrows: 0
 --- !u!114 &1513138055
@@ -2841,7 +2937,7 @@ MonoBehaviour:
   starSpawnPoint: {fileID: 1998017290}
   pauseAction: {fileID: -1112345045921236428, guid: ac3f95e6378bc604994eadfe89ea2b89, type: 3}
   confirmAction: {fileID: -7333354237639282950, guid: ac3f95e6378bc604994eadfe89ea2b89, type: 3}
-  waveSet: {fileID: 11400000, guid: 02dc4f9e82ba7f24593d7a8beab4799c, type: 2}
+  waveSet: {fileID: 11400000, guid: a60a6baa29bbf7a4d8fd3ad9e0510ff3, type: 2}
   firstWaveDelay: 3
   waveBreak: 5
   respawnWaveDelay: 3
@@ -3116,3 +3212,4 @@ SceneRoots:
   - {fileID: 1998017290}
   - {fileID: 919019020}
   - {fileID: 973108354}
+  - {fileID: 75626224}

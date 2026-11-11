@@ -44,27 +44,38 @@ public abstract class Enemy : MonoBehaviour, IDamageable
     protected LayerMask contactMask; // the Player layer
 
     [SerializeField]
-    protected float knockbackSpeed = 8f;
+    protected float knockbackSpeed = 14f; // push distance ~ speed / Player externalDamping (8) => ~1.75m
 
     [SerializeField]
-    protected float knockbackUp = 3f;
+    protected float knockbackUp = 4f;
 
     [SerializeField]
     protected float knockbackDuration = 0.3f;
 
+    [Header("Pushed")]
+    [SerializeField]
+    protected float pushDamping = 8f; // how fast a push on this enemy fades (same feel as the Player)
+
     private static readonly Collider[] contactBuffer = new Collider[4];
+
+    private float pushedTimer;
 
     public int Hp { get; private set; }
     public bool IsDead => Hp <= 0;
+    public bool IsPushed => pushedTimer > 0f;
 
     protected Rigidbody Rb { get; private set; }
     protected Player Target { get; private set; }
     protected bool HasTarget => Target != null && !Target.IsDead;
 
+    // Optional: animates the model. Null when the enemy has no EnemyVisual.
+    protected EnemyVisual Visual { get; private set; }
+
     protected virtual void Awake()
     {
         Rb = GetComponent<Rigidbody>();
         Rb.freezeRotation = true;
+        Visual = GetComponent<EnemyVisual>();
         Hp = maxHp;
     }
 
@@ -77,8 +88,31 @@ public abstract class Enemy : MonoBehaviour, IDamageable
     {
         if (IsDead)
             return;
-        Behave(Time.fixedDeltaTime);
+
+        float dt = Time.fixedDeltaTime;
+        if (pushedTimer > 0f)
+        {
+            // Flying from a push: own movement and contact damage are off, the push fades.
+            pushedTimer -= dt;
+            Vector3 v = Rb.linearVelocity;
+            Vector3 flat = Vector3.Lerp(new Vector3(v.x, 0f, v.z), Vector3.zero, pushDamping * dt);
+            Rb.linearVelocity = new Vector3(flat.x, v.y, flat.z);
+            return;
+        }
+
+        Behave(dt);
         CheckContact();
+    }
+
+    // Knocked back without damage (e.g. a Heavy slam). Its own movement stops for `duration`.
+    public void Push(Vector3 velocity, float duration)
+    {
+        if (IsDead)
+            return;
+        Rb.linearVelocity = velocity;
+        pushedTimer = Mathf.Max(pushedTimer, duration);
+        if (Visual != null)
+            Visual.PlayHit();
     }
 
     // Movement / attack pattern of this type. Runs every physics step.
@@ -95,6 +129,8 @@ public abstract class Enemy : MonoBehaviour, IDamageable
         // TODO: hurt flash / sound (Art)
         if (Hp == 0)
             Die();
+        else if (Visual != null)
+            Visual.PlayHit();
     }
 
     protected virtual void Die()
@@ -124,22 +160,37 @@ public abstract class Enemy : MonoBehaviour, IDamageable
         }
     }
 
-    // Player handles invincibility (dash, after hurt), so this can be called every step.
+    // Called every step while touching. An invincible Player (dash, after hurt, after spawn) is not hit,
+    // so OnHitPlayer only runs for hits that land.
     protected virtual void HitPlayer(Player player)
     {
-        Vector3 away = player.transform.position - transform.position;
-        away.y = 0f;
-        away = away.sqrMagnitude > 0.0001f ? away.normalized : transform.forward;
+        if (player.IsDead || player.IsInvincible)
+            return;
 
         player.TakeHit(
             HitInfo.Create(
                 contactDamage,
                 gameObject,
-                knockbackVelocity: away * knockbackSpeed + Vector3.up * knockbackUp,
+                knockbackVelocity: GetKnockbackVelocity(player),
                 knockbackDuration: knockbackDuration
             )
         );
+        if (Visual != null)
+            Visual.PlayAttack();
+        OnHitPlayer();
     }
+
+    // Default: push the Player straight away from this enemy. Override for a different push.
+    protected virtual Vector3 GetKnockbackVelocity(Player player)
+    {
+        Vector3 away = player.transform.position - transform.position;
+        away.y = 0f;
+        away = away.sqrMagnitude > 0.0001f ? away.normalized : transform.forward;
+        return away * knockbackSpeed + Vector3.up * knockbackUp;
+    }
+
+    // Runs after this enemy hurts the Player. Override to react (e.g. pause).
+    protected virtual void OnHitPlayer() { }
 
     // ---------------- Helpers for subclasses ----------------
 
@@ -162,12 +213,31 @@ public abstract class Enemy : MonoBehaviour, IDamageable
 
     protected void StopMoving() => Move(Vector3.zero, 0f);
 
+    // Holds an animation (windup, charging, airborne) until set back to None. No-op without EnemyVisual.
+    // duration > 0 stretches the clip to play once over that time.
+    protected void SetHeldAnim(EnemyVisual.Held state, float duration = 0f)
+    {
+        if (Visual != null)
+            Visual.SetHeld(state, duration);
+    }
+
     protected void TurnTowards(Vector3 flatDirection, float dt)
     {
         if (flatDirection.sqrMagnitude < 0.0001f)
             return;
         Quaternion target = Quaternion.LookRotation(flatDirection);
         Rb.MoveRotation(Quaternion.RotateTowards(Rb.rotation, target, turnSpeed * dt));
+    }
+
+    // Like TurnTowards but eases in and out: fast when far from the target facing, slowing down
+    // as it gets close. Still never faster than turnSpeed. Higher smoothing = snappier.
+    protected void SmoothTurnTowards(Vector3 flatDirection, float smoothing, float dt)
+    {
+        if (flatDirection.sqrMagnitude < 0.0001f)
+            return;
+        Quaternion target = Quaternion.LookRotation(flatDirection);
+        Quaternion eased = Quaternion.Slerp(Rb.rotation, target, 1f - Mathf.Exp(-smoothing * dt));
+        Rb.MoveRotation(Quaternion.RotateTowards(Rb.rotation, eased, turnSpeed * dt));
     }
 
     protected bool IsGrounded() =>
@@ -179,7 +249,50 @@ public abstract class Enemy : MonoBehaviour, IDamageable
             QueryTriggerInteraction.Ignore
         );
 
-    private void OnDrawGizmosSelected()
+    private static readonly RaycastHit[] groundHits = new RaycastHit[8];
+
+    // Moves t (e.g. a telegraph child) straight down onto the ground below this enemy, lift above it,
+    // so it stays on the floor even while the enemy is knocked into the air.
+    // Leaves t alone if no ground is found.
+    protected void PlaceOnGround(Transform t, float lift, float maxDistance = 50f)
+    {
+        if (!TryGetGroundY(out float groundY, maxDistance))
+            return;
+        Vector3 p = t.position;
+        p.y = groundY + lift;
+        t.position = p;
+    }
+
+    // Height of the ground straight below this enemy.
+    // Skips the Player, other enemies and this enemy's own children.
+    protected bool TryGetGroundY(out float groundY, float maxDistance = 50f)
+    {
+        int mask = ~(contactMask.value | (1 << gameObject.layer));
+        int count = Physics.RaycastNonAlloc(
+            transform.position + Vector3.up * 0.5f,
+            Vector3.down,
+            groundHits,
+            maxDistance,
+            mask,
+            QueryTriggerInteraction.Ignore
+        );
+
+        groundY = 0f;
+        bool found = false;
+        float closest = float.MaxValue;
+        for (int i = 0; i < count; i++)
+        {
+            RaycastHit h = groundHits[i];
+            if (h.transform.IsChildOf(transform) || h.distance >= closest)
+                continue;
+            closest = h.distance;
+            groundY = h.point.y;
+            found = true;
+        }
+        return found;
+    }
+
+    protected virtual void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.TransformPoint(contactOffset), contactRadius);

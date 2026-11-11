@@ -249,6 +249,49 @@ public abstract class Enemy : MonoBehaviour, IDamageable
             QueryTriggerInteraction.Ignore
         );
 
+    private static readonly RaycastHit[] groundHits = new RaycastHit[8];
+
+    // Moves t (e.g. a telegraph child) straight down onto the ground below this enemy, lift above it,
+    // so it stays on the floor even while the enemy is knocked into the air.
+    // Leaves t alone if no ground is found.
+    protected void PlaceOnGround(Transform t, float lift, float maxDistance = 50f)
+    {
+        if (!TryGetGroundY(out float groundY, maxDistance))
+            return;
+        Vector3 p = t.position;
+        p.y = groundY + lift;
+        t.position = p;
+    }
+
+    // Height of the ground straight below this enemy.
+    // Skips the Player, other enemies and this enemy's own children.
+    protected bool TryGetGroundY(out float groundY, float maxDistance = 50f)
+    {
+        int mask = ~(contactMask.value | (1 << gameObject.layer));
+        int count = Physics.RaycastNonAlloc(
+            transform.position + Vector3.up * 0.5f,
+            Vector3.down,
+            groundHits,
+            maxDistance,
+            mask,
+            QueryTriggerInteraction.Ignore
+        );
+
+        groundY = 0f;
+        bool found = false;
+        float closest = float.MaxValue;
+        for (int i = 0; i < count; i++)
+        {
+            RaycastHit h = groundHits[i];
+            if (h.transform.IsChildOf(transform) || h.distance >= closest)
+                continue;
+            closest = h.distance;
+            groundY = h.point.y;
+            found = true;
+        }
+        return found;
+    }
+
     protected virtual void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;

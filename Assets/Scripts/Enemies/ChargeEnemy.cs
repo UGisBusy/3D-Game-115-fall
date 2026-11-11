@@ -15,6 +15,8 @@ using UnityEngine;
 /// Telegraph (optional): a flat child object shown only during Windup, marking the charge path.
 /// It is resized to chargeTelegraphWidth x this charge's length each Windup,
 /// so use a mesh 1 unit wide and long (default Cube or Quad) under the unscaled root.
+/// While shown it is kept on the ground (its local Y at Awake = height above the ground), even if the
+/// enemy is knocked into the air.
 /// </summary>
 public class ChargeEnemy : Enemy
 {
@@ -58,6 +60,7 @@ public class ChargeEnemy : Enemy
 
     private Phase phase;
     private float timer;
+    private float telegraphLift; // telegraph height above the ground
     private Vector3 chargeDirection;
     private float chargeLength; // distance of the current charge
 
@@ -66,6 +69,8 @@ public class ChargeEnemy : Enemy
     protected override void Awake()
     {
         base.Awake();
+        if (chargeTelegraph != null)
+            telegraphLift = chargeTelegraph.transform.localPosition.y;
         SetTelegraph(false);
     }
 
@@ -157,7 +162,7 @@ public class ChargeEnemy : Enemy
 
         Transform t = chargeTelegraph.transform;
         t.SetLocalPositionAndRotation(
-            new Vector3(0f, t.localPosition.y, length * 0.5f),
+            new Vector3(0f, telegraphLift, length * 0.5f),
             Quaternion.identity
         );
         t.localScale = new Vector3(chargeTelegraphWidth, t.localScale.y, length);
@@ -167,5 +172,12 @@ public class ChargeEnemy : Enemy
     {
         if (chargeTelegraph != null)
             chargeTelegraph.SetActive(on);
+    }
+
+    // After physics moved the body, so it never lags a frame behind.
+    private void LateUpdate()
+    {
+        if (chargeTelegraph != null && chargeTelegraph.activeSelf)
+            PlaceOnGround(chargeTelegraph.transform, telegraphLift);
     }
 }

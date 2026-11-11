@@ -5,12 +5,16 @@ using UnityEngine;
 /// <summary>
 /// Heavy Enemy: higher life, moves slow. Chases the Player.
 ///  - Ground slam: when the Player is within slamTriggerRange, it stops and winds up (slamWindupTime),
-///    then hurts and knocks back the Player if within slamRadius. Then it recovers, and can't slam
+///    then hurts and knocks back the Player if within slamRadius.
+///    The slam only hits along the ground: a flat disk slamRadius wide and slamHeight tall, so a
+///    Player (or enemy) in the air above it is safe. Then it recovers, and can't slam
 ///    again for slamCooldown. The Player can back off during the windup, or dash through it (invincible).
 ///  - The slam also pushes other enemies in range (on this enemy's layer) away, without hurting them.
 ///  - Gets faster as it loses HP: moveSpeed + speedPerHpLost for each HP lost.
 /// Telegraph (optional): a flat child object shown only during the windup. Its X/Z scale is set to
 /// slamRadius * 2 on Awake, so use a mesh 1 unit wide (default Cylinder or Quad) under the unscaled root.
+/// While shown it is kept on the ground (its local Y at Awake = height above the ground), even if the
+/// enemy is knocked into the air.
 /// </summary>
 public class HeavyEnemy : ChaseEnemy
 {
@@ -27,6 +31,9 @@ public class HeavyEnemy : ChaseEnemy
 
     [SerializeField]
     private float slamRadius = 6f; // hit range of the slam, bigger than the trigger range
+
+    [SerializeField]
+    private float slamHeight = 0.3f; // the slam disk's thickness above the ground; jump over it
 
     [SerializeField]
     private float slamWindupTime = 0.8f;
@@ -67,6 +74,7 @@ public class HeavyEnemy : ChaseEnemy
 
     private Phase phase;
     private float timer;
+    private float telegraphLift; // telegraph height above the ground
     private float cooldownLeft;
     private float baseMoveSpeed;
 
@@ -84,6 +92,7 @@ public class HeavyEnemy : ChaseEnemy
 
         if (slamTelegraph != null)
         {
+            telegraphLift = slamTelegraph.transform.localPosition.y;
             Vector3 s = slamTelegraph.transform.localScale;
             slamTelegraph.transform.localScale = new Vector3(slamRadius * 2f, s.y, slamRadius * 2f);
         }
@@ -149,10 +158,15 @@ public class HeavyEnemy : ChaseEnemy
     {
         // TODO: slam VFX / sound / camera shake (Art)
         int enemyMask = 1 << gameObject.layer;
-        int count = Physics.OverlapSphereNonAlloc(
-            transform.position,
-            slamRadius,
+
+        // Flat disk on the ground: a thin box, then keep only what is within slamRadius of the center.
+        float groundY = TryGetGroundY(out float y) ? y : transform.position.y;
+        Vector3 center = new(transform.position.x, groundY + slamHeight * 0.5f, transform.position.z);
+        int count = Physics.OverlapBoxNonAlloc(
+            center,
+            new Vector3(slamRadius, slamHeight * 0.5f, slamRadius),
             slamBuffer,
+            Quaternion.identity,
             contactMask | enemyMask,
             QueryTriggerInteraction.Ignore
         );
@@ -163,6 +177,8 @@ public class HeavyEnemy : ChaseEnemy
         for (int i = 0; i < count; i++)
         {
             Collider col = slamBuffer[i];
+            if (!InSlamDisk(col, center))
+                continue;
 
             Player player = col.GetComponentInParent<Player>();
             if (player != null)
@@ -217,12 +233,42 @@ public class HeavyEnemy : ChaseEnemy
             slamTelegraph.SetActive(on);
     }
 
+    // After physics moved the body, so it never lags a frame behind.
+    private void LateUpdate()
+    {
+        if (slamTelegraph != null && slamTelegraph.activeSelf)
+            PlaceOnGround(slamTelegraph.transform, telegraphLift);
+    }
+
+    // The collider's nearest point to the disk center is within slamRadius (flat distance).
+    private bool InSlamDisk(Collider col, Vector3 center)
+    {
+        Vector3 offset = col.ClosestPoint(center) - center;
+        offset.y = 0f;
+        return offset.sqrMagnitude <= slamRadius * slamRadius;
+    }
+
     protected override void OnDrawGizmosSelected()
     {
         base.OnDrawGizmosSelected();
+        // Slam disk: bottom and top circles.
         Gizmos.color = new Color(1f, 0.5f, 0f);
-        Gizmos.DrawWireSphere(transform.position, slamRadius);
+        Vector3 bottom = transform.position;
+        DrawCircle(bottom, slamRadius);
+        DrawCircle(bottom + Vector3.up * slamHeight, slamRadius);
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, slamTriggerRange);
+    }
+
+    private static void DrawCircle(Vector3 center, float radius, int segments = 48)
+    {
+        Vector3 previous = center + new Vector3(radius, 0f, 0f);
+        for (int i = 1; i <= segments; i++)
+        {
+            float a = i * Mathf.PI * 2f / segments;
+            Vector3 next = center + new Vector3(Mathf.Cos(a) * radius, 0f, Mathf.Sin(a) * radius);
+            Gizmos.DrawLine(previous, next);
+            previous = next;
+        }
     }
 }

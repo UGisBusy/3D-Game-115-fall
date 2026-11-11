@@ -42,6 +42,7 @@ namespace PlayerSystem
         private Player player;
         private readonly MovementModifier chargeModifier = new() { BlockJump = true };
         private bool modifierActive;
+        private MagicCircle chargeCircle; // from arrowPrefab.ChargeCircle, null if it has none
 
         public int Arrows { get; private set; }
         public int MaxArrows => maxArrows;
@@ -56,7 +57,11 @@ namespace PlayerSystem
 
         private void OnEnable() => LevelEvents.Collected += OnCollected;
 
-        private void OnDisable() => LevelEvents.Collected -= OnCollected;
+        private void OnDisable()
+        {
+            LevelEvents.Collected -= OnCollected;
+            ClearChargeCircle();
+        }
 
         private void OnCollected(Collectible collectible)
         {
@@ -82,6 +87,7 @@ namespace PlayerSystem
                 SetModifier(true);
                 chargeModifier.FacingDirection = input.CameraForwardFlat;
                 ChargeProgress = Mathf.Min(1f, ChargeProgress + dt / chargeTime);
+                UpdateChargeCircle(true);
                 return;
             }
 
@@ -91,6 +97,31 @@ namespace PlayerSystem
 
             SetModifier(false);
             ChargeProgress = Mathf.Max(0f, ChargeProgress - dt / chargeDecayTime);
+            UpdateChargeCircle(false);
+        }
+
+        // Spawn the projectile's charge circle when charging starts, keep it in sync,
+        // and remove it once the charge has drained back to 0 (it un-draws on the way).
+        private void UpdateChargeCircle(bool charging)
+        {
+            if (chargeCircle == null)
+            {
+                if (!charging || arrowPrefab == null || arrowPrefab.ChargeCircle == null)
+                    return;
+                chargeCircle = Instantiate(arrowPrefab.ChargeCircle);
+                chargeCircle.Begin(transform);
+            }
+
+            chargeCircle.SetProgress(ChargeProgress);
+            if (!charging && ChargeProgress <= 0f)
+                ClearChargeCircle();
+        }
+
+        private void ClearChargeCircle()
+        {
+            if (chargeCircle != null)
+                Destroy(chargeCircle.gameObject);
+            chargeCircle = null;
         }
 
         private void Fire()
@@ -105,6 +136,11 @@ namespace PlayerSystem
                 Arrow arrow = Instantiate(arrowPrefab, pos, Quaternion.LookRotation(dir));
                 arrow.Launch(dir, gameObject);
             }
+
+            // The circle flares and fades by itself.
+            if (chargeCircle != null)
+                chargeCircle.Release();
+            chargeCircle = null;
 
             ChargeProgress = 0f;
             Arrows--;
@@ -122,6 +158,7 @@ namespace PlayerSystem
         {
             SetModifier(false);
             ChargeProgress = 0f;
+            ClearChargeCircle();
             Arrows = Mathf.Min(startArrows, maxArrows);
             PlayerEvents.RaiseArrowsChanged(Arrows);
         }

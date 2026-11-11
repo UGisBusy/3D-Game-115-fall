@@ -61,6 +61,7 @@ MonoBehaviour:
   - {fileID: 9216400935644610866}
   - {fileID: 5226498867822282524}
   detachedLifetime: 2
+  chargeCircle: {fileID: 7412093581264037755, guid: 2e790419519f4b1b91e95cc0d35584fe, type: 3}
 --- !u!1 &3961755045510375284
 GameObject:
   m_ObjectHideFlags: 0

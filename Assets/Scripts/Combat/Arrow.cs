@@ -42,6 +42,11 @@ public class Arrow : MonoBehaviour
     [SerializeField]
     private float detachedLifetime = 2f;
 
+    [SerializeField]
+    private MagicCircle chargeCircle; // optional, drawn on the ground while the Bow charges this projectile
+
+    public MagicCircle ChargeCircle => chargeCircle;
+
     private static readonly RaycastHit[] hitBuffer = new RaycastHit[8];
 
     private Vector3 direction;

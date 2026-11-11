@@ -104,6 +104,7 @@ public class HeavyEnemy : ChaseEnemy
                     timer = slamWindupTime;
                     StopMoving();
                     SetTelegraph(true);
+                    SetHeldAnim(EnemyVisual.Held.Windup, slamWindupTime); // taunt, stretched until the slam
                     return;
                 }
                 base.Behave(dt);
@@ -116,6 +117,9 @@ public class HeavyEnemy : ChaseEnemy
                 {
                     Slam();
                     SetTelegraph(false);
+                    SetHeldAnim(EnemyVisual.Held.None);
+                    if (Visual != null)
+                        Visual.PlaySpecial(); // the slam itself, plays once
                     phase = Phase.Recover;
                     timer = slamRecoverTime;
                     cooldownLeft = slamCooldown;

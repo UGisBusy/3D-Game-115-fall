@@ -48,6 +48,7 @@ public class JumpEnemy : Enemy
             {
                 airborne = false;
                 StopMoving();
+                SetHeldAnim(EnemyVisual.Held.None);
             }
             return;
         }
@@ -70,6 +71,14 @@ public class JumpEnemy : Enemy
 
         airborne = true;
         timer = jumpInterval;
+        SetHeldAnim(EnemyVisual.Held.Action, AirTime()); // jump clip stretched to end on landing
+    }
+
+    // Time from takeoff to landing on flat ground.
+    private float AirTime()
+    {
+        float gravity = Mathf.Abs(Physics.gravity.y);
+        return gravity > 0f ? 2f * jumpVelocity / gravity : 0f;
     }
 
     // Sets hopDirection and hopSpeed so the jump lands where the Player is predicted to be.
@@ -80,8 +89,7 @@ public class JumpEnemy : Enemy
         if (!HasTarget)
             return; // jump in place
 
-        float gravity = Mathf.Abs(Physics.gravity.y);
-        float airTime = gravity > 0f ? 2f * jumpVelocity / gravity : 0f;
+        float airTime = AirTime();
 
         Vector3 playerVelocity = Target.Motor.Velocity;
         playerVelocity.y = 0f;

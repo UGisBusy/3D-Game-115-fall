@@ -16,4 +16,5 @@
 - Shield
   - Has a shield blocking arrows
   - Break the shield by dash into it, bounces player backward
+  - Stunned for a while after the shield breaks, then runs faster
 

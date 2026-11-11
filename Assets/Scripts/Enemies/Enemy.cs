@@ -68,10 +68,14 @@ public abstract class Enemy : MonoBehaviour, IDamageable
     protected Player Target { get; private set; }
     protected bool HasTarget => Target != null && !Target.IsDead;
 
+    // Optional: animates the model. Null when the enemy has no EnemyVisual.
+    protected EnemyVisual Visual { get; private set; }
+
     protected virtual void Awake()
     {
         Rb = GetComponent<Rigidbody>();
         Rb.freezeRotation = true;
+        Visual = GetComponent<EnemyVisual>();
         Hp = maxHp;
     }
 
@@ -107,6 +111,8 @@ public abstract class Enemy : MonoBehaviour, IDamageable
             return;
         Rb.linearVelocity = velocity;
         pushedTimer = Mathf.Max(pushedTimer, duration);
+        if (Visual != null)
+            Visual.PlayHit();
     }
 
     // Movement / attack pattern of this type. Runs every physics step.
@@ -123,6 +129,8 @@ public abstract class Enemy : MonoBehaviour, IDamageable
         // TODO: hurt flash / sound (Art)
         if (Hp == 0)
             Die();
+        else if (Visual != null)
+            Visual.PlayHit();
     }
 
     protected virtual void Die()
@@ -167,6 +175,8 @@ public abstract class Enemy : MonoBehaviour, IDamageable
                 knockbackDuration: knockbackDuration
             )
         );
+        if (Visual != null)
+            Visual.PlayAttack();
         OnHitPlayer();
     }
 
@@ -202,6 +212,14 @@ public abstract class Enemy : MonoBehaviour, IDamageable
     }
 
     protected void StopMoving() => Move(Vector3.zero, 0f);
+
+    // Holds an animation (windup, charging, airborne) until set back to None. No-op without EnemyVisual.
+    // duration > 0 stretches the clip to play once over that time.
+    protected void SetHeldAnim(EnemyVisual.Held state, float duration = 0f)
+    {
+        if (Visual != null)
+            Visual.SetHeld(state, duration);
+    }
 
     protected void TurnTowards(Vector3 flatDirection, float dt)
     {

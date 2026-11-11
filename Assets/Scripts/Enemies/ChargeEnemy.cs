@@ -92,6 +92,7 @@ public class ChargeEnemy : Enemy
                     chargeLength = PickChargeLength();
                     SizeTelegraph(chargeLength);
                     SetTelegraph(true);
+                    SetHeldAnim(EnemyVisual.Held.Windup);
                     // TODO: more telegraph (Art), e.g. flash or shake
                 }
                 break;
@@ -104,6 +105,7 @@ public class ChargeEnemy : Enemy
                     chargeDirection.y = 0f;
                     chargeDirection.Normalize();
                     SetTelegraph(false);
+                    SetHeldAnim(EnemyVisual.Held.Action);
                     phase = Phase.Charging;
                     timer = chargeLength / chargeSpeed;
                 }
@@ -114,6 +116,7 @@ public class ChargeEnemy : Enemy
                 if (timer <= 0f)
                 {
                     StopMoving();
+                    SetHeldAnim(EnemyVisual.Held.None);
                     phase = Phase.Idle;
                     timer = chargeInterval;
                 }

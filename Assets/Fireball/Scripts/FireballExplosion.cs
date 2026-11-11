@@ -25,29 +25,46 @@ namespace FireballFX
 
         void Start()
         {
-            if (flashLight != null) startIntensity = flashLight.intensity;
-            if (force > 0f) PushRigidbodies();
+            if (flashLight != null)
+                startIntensity = flashLight.intensity;
+            if (force > 0f)
+                PushRigidbodies();
             Destroy(gameObject, lifetime);
         }
 
         void Update()
         {
-            if (flashLight == null || !flashLight.enabled) return;
+            if (flashLight == null || !flashLight.enabled)
+                return;
 
             age += Time.deltaTime;
             float k = 1f - Mathf.Clamp01(age / lightDuration);
             flashLight.intensity = startIntensity * k * k;
-            if (k <= 0f) flashLight.enabled = false;
+            if (k <= 0f)
+                flashLight.enabled = false;
         }
 
         void PushRigidbodies()
         {
             var pushed = new HashSet<Rigidbody>();
-            foreach (Collider c in Physics.OverlapSphere(transform.position, forceRadius, ~0, QueryTriggerInteraction.Ignore))
+            foreach (
+                Collider c in Physics.OverlapSphere(
+                    transform.position,
+                    forceRadius,
+                    ~0,
+                    QueryTriggerInteraction.Ignore
+                )
+            )
             {
                 Rigidbody rb = c.attachedRigidbody;
                 if (rb != null && !rb.isKinematic && pushed.Add(rb))
-                    rb.AddExplosionForce(force, transform.position, forceRadius, 0.3f, ForceMode.Impulse);
+                    rb.AddExplosionForce(
+                        force,
+                        transform.position,
+                        forceRadius,
+                        0.3f,
+                        ForceMode.Impulse
+                    );
             }
         }
     }

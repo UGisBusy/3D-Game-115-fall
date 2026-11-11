@@ -161,7 +161,11 @@ public class HeavyEnemy : ChaseEnemy
 
         // Flat disk on the ground: a thin box, then keep only what is within slamRadius of the center.
         float groundY = TryGetGroundY(out float y) ? y : transform.position.y;
-        Vector3 center = new(transform.position.x, groundY + slamHeight * 0.5f, transform.position.z);
+        Vector3 center = new(
+            transform.position.x,
+            groundY + slamHeight * 0.5f,
+            transform.position.z
+        );
         int count = Physics.OverlapBoxNonAlloc(
             center,
             new Vector3(slamRadius, slamHeight * 0.5f, slamRadius),

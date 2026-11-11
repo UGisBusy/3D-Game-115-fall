@@ -6,7 +6,8 @@ namespace FireballFX
     [RequireComponent(typeof(Light))]
     public class LightFlicker : MonoBehaviour
     {
-        [Range(0f, 1f)] public float amount = 0.3f;
+        [Range(0f, 1f)]
+        public float amount = 0.3f;
         public float speed = 12f;
 
         Light lightSource;

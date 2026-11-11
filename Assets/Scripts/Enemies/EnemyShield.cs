@@ -141,17 +141,24 @@ public class EnemyShield : MonoBehaviour, IDamageable
             Mesh mesh = BuildSectorMesh(k, out Vector3 localCenter);
 
             var shard = new GameObject("ShieldShard", typeof(MeshFilter), typeof(MeshRenderer));
-            shard.transform.SetPositionAndRotation(transform.TransformPoint(localCenter), transform.rotation);
+            shard.transform.SetPositionAndRotation(
+                transform.TransformPoint(localCenter),
+                transform.rotation
+            );
             shard.transform.localScale = transform.lossyScale;
 
-            Vector3 outward = transform.TransformDirection(new Vector3(localCenter.x, localCenter.y, 0f)).normalized;
+            Vector3 outward = transform
+                .TransformDirection(new Vector3(localCenter.x, localCenter.y, 0f))
+                .normalized;
             Vector3 velocity =
                 direction * (shardSpeed * Random.Range(0.7f, 1.3f))
                 + outward * (shardSpread * Random.Range(0.7f, 1.3f))
                 + Vector3.up * shardUp;
             Vector3 spin = Random.onUnitSphere * Random.Range(shardSpin * 0.5f, shardSpin);
 
-            shard.AddComponent<ShieldShard>().Init(mesh, material, velocity, spin, shardLifetime * Random.Range(0.85f, 1.15f));
+            shard
+                .AddComponent<ShieldShard>()
+                .Init(mesh, material, velocity, spin, shardLifetime * Random.Range(0.85f, 1.15f));
         }
     }
 
@@ -168,10 +175,14 @@ public class EnemyShield : MonoBehaviour, IDamageable
         int j = (k + 1) % 6;
         Vector3 cf = new(0f, 0f, faceHalfThickness);
         Vector3 cb = new(0f, 0f, -faceHalfThickness);
-        Vector3 ikf = Corner(innerRadius, k, faceHalfThickness), ijf = Corner(innerRadius, j, faceHalfThickness);
-        Vector3 ikb = Corner(innerRadius, k, -faceHalfThickness), ijb = Corner(innerRadius, j, -faceHalfThickness);
-        Vector3 okf = Corner(outerRadius, k, rimHalfThickness), ojf = Corner(outerRadius, j, rimHalfThickness);
-        Vector3 okb = Corner(outerRadius, k, -rimHalfThickness), ojb = Corner(outerRadius, j, -rimHalfThickness);
+        Vector3 ikf = Corner(innerRadius, k, faceHalfThickness),
+            ijf = Corner(innerRadius, j, faceHalfThickness);
+        Vector3 ikb = Corner(innerRadius, k, -faceHalfThickness),
+            ijb = Corner(innerRadius, j, -faceHalfThickness);
+        Vector3 okf = Corner(outerRadius, k, rimHalfThickness),
+            ojf = Corner(outerRadius, j, rimHalfThickness);
+        Vector3 okb = Corner(outerRadius, k, -rimHalfThickness),
+            ojb = Corner(outerRadius, j, -rimHalfThickness);
 
         Vector3[][] faces =
         {

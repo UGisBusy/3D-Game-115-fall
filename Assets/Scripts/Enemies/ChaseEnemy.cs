@@ -124,8 +124,18 @@ public class ChaseEnemy : Enemy
         cornerIndex = 0;
 
         if (
-            !NavMesh.SamplePosition(transform.position, out NavMeshHit from, navMeshSampleRange, NavMesh.AllAreas)
-            || !NavMesh.SamplePosition(Target.transform.position, out NavMeshHit to, navMeshSampleRange, NavMesh.AllAreas)
+            !NavMesh.SamplePosition(
+                transform.position,
+                out NavMeshHit from,
+                navMeshSampleRange,
+                NavMesh.AllAreas
+            )
+            || !NavMesh.SamplePosition(
+                Target.transform.position,
+                out NavMeshHit to,
+                navMeshSampleRange,
+                NavMesh.AllAreas
+            )
         )
             return;
 

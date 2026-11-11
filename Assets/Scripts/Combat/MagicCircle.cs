@@ -81,12 +81,62 @@ public class MagicCircle : MonoBehaviour
     // Rune strokes in a [-1, 1] box, +y pointing away from the circle center.
     private static readonly Vector2[][] Runes =
     {
-        new[] { V(-0.3f, -0.8f), V(-0.3f, 0.8f), V(-0.3f, 0.75f), V(0.45f, 0.35f), V(-0.3f, 0.25f), V(0.45f, -0.15f) },
-        new[] { V(0f, -0.8f), V(0f, 0.8f), V(0f, 0.1f), V(-0.5f, 0.7f), V(0f, 0.1f), V(0.5f, 0.7f) },
-        new[] { V(-0.35f, 0.8f), V(0.3f, 0.3f), V(0.3f, 0.3f), V(-0.3f, -0.3f), V(-0.3f, -0.3f), V(0.35f, -0.8f) },
-        new[] { V(-0.4f, -0.8f), V(-0.4f, 0.8f), V(0.4f, -0.8f), V(0.4f, 0.8f), V(-0.4f, 0.3f), V(0.4f, -0.3f) },
-        new[] { V(0f, 0.8f), V(0.5f, 0.15f), V(0.5f, 0.15f), V(-0.4f, -0.8f), V(0f, 0.8f), V(-0.5f, 0.15f), V(-0.5f, 0.15f), V(0.4f, -0.8f) },
-        new[] { V(0f, -0.8f), V(0f, 0.8f), V(0f, 0.8f), V(-0.5f, 0.3f), V(0f, 0.8f), V(0.5f, 0.3f) },
+        new[]
+        {
+            V(-0.3f, -0.8f),
+            V(-0.3f, 0.8f),
+            V(-0.3f, 0.75f),
+            V(0.45f, 0.35f),
+            V(-0.3f, 0.25f),
+            V(0.45f, -0.15f),
+        },
+        new[]
+        {
+            V(0f, -0.8f),
+            V(0f, 0.8f),
+            V(0f, 0.1f),
+            V(-0.5f, 0.7f),
+            V(0f, 0.1f),
+            V(0.5f, 0.7f),
+        },
+        new[]
+        {
+            V(-0.35f, 0.8f),
+            V(0.3f, 0.3f),
+            V(0.3f, 0.3f),
+            V(-0.3f, -0.3f),
+            V(-0.3f, -0.3f),
+            V(0.35f, -0.8f),
+        },
+        new[]
+        {
+            V(-0.4f, -0.8f),
+            V(-0.4f, 0.8f),
+            V(0.4f, -0.8f),
+            V(0.4f, 0.8f),
+            V(-0.4f, 0.3f),
+            V(0.4f, -0.3f),
+        },
+        new[]
+        {
+            V(0f, 0.8f),
+            V(0.5f, 0.15f),
+            V(0.5f, 0.15f),
+            V(-0.4f, -0.8f),
+            V(0f, 0.8f),
+            V(-0.5f, 0.15f),
+            V(-0.5f, 0.15f),
+            V(0.4f, -0.8f),
+        },
+        new[]
+        {
+            V(0f, -0.8f),
+            V(0f, 0.8f),
+            V(0f, 0.8f),
+            V(-0.5f, 0.3f),
+            V(0f, 0.8f),
+            V(0.5f, 0.3f),
+        },
     };
 
     private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
@@ -240,12 +290,14 @@ public class MagicCircle : MonoBehaviour
 
     // ---------------- Drawing ----------------
 
-    private static float Window(float p, float start, float end) => Mathf.Clamp01((p - start) / (end - start));
+    private static float Window(float p, float start, float end) =>
+        Mathf.Clamp01((p - start) / (end - start));
 
     // Clockwise from the top. Node k sits at angle (90 - 60k) degrees.
     private static float NodeAngle(int k) => Mathf.Deg2Rad * (90f - 60f * k);
 
-    private static Vector2 Polar(float r, float angle) => new(r * Mathf.Cos(angle), r * Mathf.Sin(angle));
+    private static Vector2 Polar(float r, float angle) =>
+        new(r * Mathf.Cos(angle), r * Mathf.Sin(angle));
 
     // 0..1 position along a clockwise sweep that starts at the top.
     private static float SweepFraction(float angle)
@@ -319,7 +371,15 @@ public class MagicCircle : MonoBehaviour
 
         // Inner circle.
         if (innerSweep > 0f)
-            AddArc(Vector2.zero, InnerRing * R, Mathf.PI * 0.5f, -Mathf.PI * 2f * innerSweep, Mathf.CeilToInt(RingSegments * innerSweep), w, 1f);
+            AddArc(
+                Vector2.zero,
+                InnerRing * R,
+                Mathf.PI * 0.5f,
+                -Mathf.PI * 2f * innerSweep,
+                Mathf.CeilToInt(RingSegments * innerSweep),
+                w,
+                1f
+            );
 
         mesh.Clear();
         mesh.SetVertices(vertices);
@@ -334,7 +394,9 @@ public class MagicCircle : MonoBehaviour
     {
         for (int k = 0; k < 6; k++)
         {
-            float d = Mathf.Abs(Mathf.DeltaAngle(angle * Mathf.Rad2Deg, NodeAngle(k) * Mathf.Rad2Deg)) * Mathf.Deg2Rad;
+            float d =
+                Mathf.Abs(Mathf.DeltaAngle(angle * Mathf.Rad2Deg, NodeAngle(k) * Mathf.Rad2Deg))
+                * Mathf.Deg2Rad;
             if (d * ringRadius < gap)
                 return true;
         }
@@ -358,7 +420,15 @@ public class MagicCircle : MonoBehaviour
         }
     }
 
-    private void AddArc(Vector2 center, float r, float startAngle, float sweepAngle, int segments, float width, float alpha)
+    private void AddArc(
+        Vector2 center,
+        float r,
+        float startAngle,
+        float sweepAngle,
+        int segments,
+        float width,
+        float alpha
+    )
     {
         if (alpha <= 0f || segments <= 0)
             return;
@@ -371,7 +441,14 @@ public class MagicCircle : MonoBehaviour
     }
 
     // Rune strokes are pairs of points; glyph +y points away from the circle center.
-    private void DrawRune(Vector2[] strokes, Vector2 center, float angle, float size, float width, float alpha)
+    private void DrawRune(
+        Vector2[] strokes,
+        Vector2 center,
+        float angle,
+        float size,
+        float width,
+        float alpha
+    )
     {
         Vector2 up = new(Mathf.Cos(angle), Mathf.Sin(angle));
         Vector2 right = new(up.y, -up.x);

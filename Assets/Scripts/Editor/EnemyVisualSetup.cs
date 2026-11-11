@@ -221,7 +221,10 @@ public static class EnemyVisualSetup
             return;
         }
 
-        Mesh mesh = AssetDatabase.LoadAllAssetsAtPath(ShieldMeshPath).OfType<Mesh>().FirstOrDefault();
+        Mesh mesh = AssetDatabase
+            .LoadAllAssetsAtPath(ShieldMeshPath)
+            .OfType<Mesh>()
+            .FirstOrDefault();
         if (mesh == null)
         {
             Debug.LogWarning($"Shield mesh not found: {ShieldMeshPath}");
@@ -272,7 +275,10 @@ public static class EnemyVisualSetup
         mat.SetColor("_BaseColor", ShieldColor);
         mat.SetFloat("_Smoothness", 0.85f); // glassy highlights on the facets
         mat.EnableKeyword("_EMISSION");
-        mat.SetColor("_EmissionColor", new Color(ShieldColor.r, ShieldColor.g, ShieldColor.b) * 0.35f); // soft glow
+        mat.SetColor(
+            "_EmissionColor",
+            new Color(ShieldColor.r, ShieldColor.g, ShieldColor.b) * 0.35f
+        ); // soft glow
 
         AssetDatabase.CreateAsset(mat, ShieldMaterialPath);
         return mat;
@@ -315,7 +321,10 @@ public static class EnemyVisualSetup
 
     // ---------------- Animator ----------------
 
-    private static AnimatorController BuildController(Entry e, out Dictionary<string, string> states)
+    private static AnimatorController BuildController(
+        Entry e,
+        out Dictionary<string, string> states
+    )
     {
         string path = $"{ControllerFolder}/{Path.GetFileNameWithoutExtension(e.enemy)}.controller";
         if (AssetDatabase.LoadAssetAtPath<AnimatorController>(path) != null)
@@ -351,7 +360,9 @@ public static class EnemyVisualSetup
                 continue;
             }
 
-            AnimatorState state = sm.states.Select(s => s.state).FirstOrDefault(s => s.name == clip.name);
+            AnimatorState state = sm
+                .states.Select(s => s.state)
+                .FirstOrDefault(s => s.name == clip.name);
             if (state == null)
             {
                 state = sm.AddState(clip.name);
@@ -409,7 +420,11 @@ public static class EnemyVisualSetup
         {
             var baked = new Mesh();
             smr.BakeMesh(baked, true); // current pose, with the renderer's scale
-            Matrix4x4 m = Matrix4x4.TRS(smr.transform.position, smr.transform.rotation, Vector3.one);
+            Matrix4x4 m = Matrix4x4.TRS(
+                smr.transform.position,
+                smr.transform.rotation,
+                Vector3.one
+            );
             foreach (Vector3 v in baked.vertices)
                 Add(m.MultiplyPoint3x4(v));
             Object.DestroyImmediate(baked);

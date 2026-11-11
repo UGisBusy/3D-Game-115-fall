@@ -121,7 +121,8 @@ public class EnemyVisual : MonoBehaviour
     public void PlayAttack() => PlayOneShot(attackState);
 
     // Special attack (Heavy slam). Falls back to the normal attack if no special state is set.
-    public void PlaySpecial() => PlayOneShot(string.IsNullOrEmpty(specialState) ? attackState : specialState);
+    public void PlaySpecial() =>
+        PlayOneShot(string.IsNullOrEmpty(specialState) ? attackState : specialState);
 
     private void PlayOneShot(string state)
     {

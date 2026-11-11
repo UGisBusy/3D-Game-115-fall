@@ -27,7 +27,13 @@ public class ShieldShard : MonoBehaviour
     private Color baseEmission;
     private Vector3 startScale;
 
-    public void Init(Mesh shardMesh, Material material, Vector3 velocity, Vector3 angularVelocity, float lifetime)
+    public void Init(
+        Mesh shardMesh,
+        Material material,
+        Vector3 velocity,
+        Vector3 angularVelocity,
+        float lifetime
+    )
     {
         mesh = shardMesh;
         this.velocity = velocity;
@@ -39,9 +45,14 @@ public class ShieldShard : MonoBehaviour
         meshRenderer.sharedMaterial = material;
         meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
 
-        baseColor = material != null && material.HasProperty(BaseColorId) ? material.GetColor(BaseColorId) : Color.white;
+        baseColor =
+            material != null && material.HasProperty(BaseColorId)
+                ? material.GetColor(BaseColorId)
+                : Color.white;
         baseEmission =
-            material != null && material.HasProperty(EmissionColorId) ? material.GetColor(EmissionColorId) : Color.black;
+            material != null && material.HasProperty(EmissionColorId)
+                ? material.GetColor(EmissionColorId)
+                : Color.black;
         block = new MaterialPropertyBlock();
         startScale = transform.localScale;
         Apply(0f);

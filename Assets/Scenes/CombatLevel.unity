@@ -2266,7 +2266,7 @@ MonoBehaviour:
   chargeDecayTime: 0.5
   chargeMoveMultiplier: 0.4
   firePoint: {fileID: 1175163217}
-  arrowPrefab: {fileID: 3897311593025557701, guid: 7cd3057d5b7008f4caefb9ba5db81f9e, type: 3}
+  arrowPrefab: {fileID: 3897311593025557701, guid: 0be20acc7dd6414ebc4ed0106da26174, type: 3}
   debugChargeProgress: 0
   debugArrows: 0
 --- !u!114 &1513138055
@@ -2937,7 +2937,7 @@ MonoBehaviour:
   starSpawnPoint: {fileID: 1998017290}
   pauseAction: {fileID: -1112345045921236428, guid: ac3f95e6378bc604994eadfe89ea2b89, type: 3}
   confirmAction: {fileID: -7333354237639282950, guid: ac3f95e6378bc604994eadfe89ea2b89, type: 3}
-  waveSet: {fileID: 11400000, guid: 02dc4f9e82ba7f24593d7a8beab4799c, type: 2}
+  waveSet: {fileID: 11400000, guid: a60a6baa29bbf7a4d8fd3ad9e0510ff3, type: 2}
   firstWaveDelay: 3
   waveBreak: 5
   respawnWaveDelay: 3

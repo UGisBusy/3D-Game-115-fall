@@ -29,6 +29,7 @@ namespace PlayerSystem
         private Transform firePoint;
 
         [SerializeField]
+        [Tooltip("Projectile to shoot. Any prefab with an Arrow component: Prefabs/Combat/Arrow or Prefabs/Combat/Fireball.")]
         private Arrow arrowPrefab;
 
         [Header("Debug")]

@@ -9,6 +9,8 @@ using UnityEngine;
 /// Trigger colliders (collectibles, checkpoints) are ignored.
 ///
 /// Prefab setup: this component + a visual child pointing along +Z. No Rigidbody or Collider needed.
+/// Visual: low poly fireball (Assets/Fireball). On a hit it spawns impactPrefab; the trail children
+/// in detachOnBreak are left behind to fade out instead of vanishing.
 /// </summary>
 public class Arrow : MonoBehaviour
 {
@@ -29,6 +31,16 @@ public class Arrow : MonoBehaviour
 
     [SerializeField]
     private LayerMask hitMask = ~0;
+
+    [Header("Visual")]
+    [SerializeField]
+    private GameObject impactPrefab; // spawned where it hits something (not when it times out)
+
+    [SerializeField]
+    private Transform[] detachOnBreak; // particle children (trail, sparks) that keep fading after the break
+
+    [SerializeField]
+    private float detachedLifetime = 2f;
 
     private static readonly RaycastHit[] hitBuffer = new RaycastHit[8];
 
@@ -65,7 +77,14 @@ public class Arrow : MonoBehaviour
         float step = speed * dt;
         if (FindHit(step, out RaycastHit hit))
         {
+            // A cast that starts inside a collider reports distance 0 and no usable point.
+            bool startedInside = hit.distance <= 0f;
+            Vector3 point = startedInside ? transform.position : hit.point;
+            Vector3 normal = startedInside ? -direction : hit.normal;
+            transform.position += direction * hit.distance;
+
             HandleHit(hit);
+            SpawnImpact(point, normal);
             Break();
             return;
         }
@@ -124,9 +143,29 @@ public class Arrow : MonoBehaviour
             body.AddForce(direction * pushImpulse, ForceMode.Impulse);
     }
 
+    private void SpawnImpact(Vector3 point, Vector3 normal)
+    {
+        // TODO: impact sound (Art)
+        if (impactPrefab != null)
+            Instantiate(impactPrefab, point + normal * 0.05f, Quaternion.LookRotation(normal));
+    }
+
     private void Break()
     {
-        // TODO: VFX / sound hook goes here later (Art).
+        if (detachOnBreak != null)
+        {
+            foreach (Transform t in detachOnBreak)
+            {
+                if (t == null)
+                    continue;
+                t.SetParent(null, true);
+                foreach (var ps in t.GetComponentsInChildren<ParticleSystem>())
+                    ps.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+                foreach (var trail in t.GetComponentsInChildren<TrailRenderer>())
+                    trail.emitting = false;
+                Destroy(t.gameObject, detachedLifetime);
+            }
+        }
         Destroy(gameObject);
     }
 }

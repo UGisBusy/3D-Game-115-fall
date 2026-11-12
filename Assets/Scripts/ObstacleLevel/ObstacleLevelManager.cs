@@ -27,7 +27,7 @@ namespace ObstacleLevel
         private InputActionReference pauseAction; // Level/Pause (Escape)
 
         [SerializeField]
-        private Checkpoint startCheckpoint;
+        private Checkpoint startCheckpoint; // TODO: use editor to set it for now, later seq manager should set it
 
         [Header("Crystals")]
         [Tooltip("Parent of every Crystal in the level.")]
@@ -106,6 +106,7 @@ namespace ObstacleLevel
         // ------------- StartLevel -------------
         public void StartLevel(Checkpoint startCheckpoint)
         {
+            // TODO: for later seq manager to call
             this.startCheckpoint = startCheckpoint;
             stateMachine.EnterState(startState);
         }

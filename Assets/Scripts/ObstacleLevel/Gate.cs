@@ -33,7 +33,14 @@ namespace ObstacleLevel
 
         public void SetOpen(bool open)
         {
-            targetPosition = open ? shutPosition + openOffset : shutPosition;
+            if (open)
+            {
+                targetPosition = shutPosition + openOffset;
+            }
+            else
+            {
+                targetPosition = shutPosition;
+            }
         }
 
         private void FixedUpdate()

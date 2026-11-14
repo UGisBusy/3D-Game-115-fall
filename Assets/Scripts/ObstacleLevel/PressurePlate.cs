@@ -1,13 +1,13 @@
-using PlayerSystem;
 using UnityEngine;
 
 namespace ObstacleLevel
 {
     /// <summary>
-    /// A floor plate that opens its Gate only when the Player or a box is standing on it.
-    ///   Something steps on the plate  -> the Gate opens
-    ///   Plate empty   -> the Gate closed
-    /// Intended mechanic: The Player has to leave the plate to reach the Gate, so a box must hold it down.
+    /// A floor plate that opens its Gate only when a box is standing on it.
+    ///   A box is on the plate   -> the Gate opens
+    ///   No box on the plate     -> the Gate goes back to closed
+    ///   The Player steps on it  -> nothing happens, must be a box to open the Gate
+    /// Intended mechanic: a fully opened Gate stays open, so only a box may open it.
     /// </summary>
     [RequireComponent(typeof(Collider))]
     public class PressurePlate : MonoBehaviour
@@ -15,7 +15,7 @@ namespace ObstacleLevel
         [SerializeField]
         private Gate gate;
 
-        private int weightCount; // how many Players and boxes are on the plate now
+        private int boxCount; // how many boxes are on the plate now
 
         private void Awake()
         {
@@ -24,31 +24,33 @@ namespace ObstacleLevel
 
         private void OnTriggerEnter(Collider other)
         {
-            if (IsWeight(other))
+            if (other.TryGetComponent(out PushableBox _))
             {
-                weightCount++;
-                gate.SetOpen(true);
+                boxCount++;
+                SetGateOpen(true);
             }
         }
 
         private void OnTriggerExit(Collider other)
         {
-            if (IsWeight(other))
+            if (other.TryGetComponent(out PushableBox _))
             {
-                weightCount--;
+                boxCount--;
 
-                if (weightCount == 0) // the Player can leave while a box is still on it
+                if (boxCount == 0) // another box can still be on it
                 {
-                    gate.SetOpen(false);
+                    SetGateOpen(false);
                 }
             }
         }
 
-        private static bool IsWeight(Collider other)
+        // When the gate finishes opening, it destroys itself and stays open.
+        private void SetGateOpen(bool open)
         {
-            return other.TryGetComponent(out Player _)
-                || other.TryGetComponent(out DashableBox _)
-                || other.TryGetComponent(out MovableBox _);
+            if (gate != null)
+            {
+                gate.SetOpen(open);
+            }
         }
     }
 }

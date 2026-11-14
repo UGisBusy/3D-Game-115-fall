@@ -27,7 +27,7 @@ namespace ObstacleLevel
             CrystalCountChanged?.Invoke(collected, total);
         }
 
-        // clear old subscribers at startup
+        // clear the static events when the game reloads
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void ResetStatics()
         {

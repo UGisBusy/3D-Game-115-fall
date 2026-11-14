@@ -4,8 +4,9 @@ namespace ObstacleLevel
 {
     /// <summary>
     /// Independent Env Obj. A gate that blocks the path while it is closed.
-    ///   Closed -> stays at the position it has in the scene, the Player can't pass
-    ///   Open -> slides away by openOffset, then the path is free
+    ///   Closed       -> stay in the place, the Player can't pass
+    ///   Opening      -> slides away by openOffset. If its Plate is empty again in the middle opening process, it closes again
+    ///   Fully open   -> the gate is destroyed and can't respawn again.
     ///   A PressurePlate tells it with SetOpen.
     /// </summary>
     [RequireComponent(typeof(Rigidbody))]
@@ -21,6 +22,7 @@ namespace ObstacleLevel
         private Rigidbody rb;
         private Vector3 shutPosition;
         private Vector3 targetPosition;
+        private bool isOpening;
 
         private void Awake()
         {
@@ -33,6 +35,8 @@ namespace ObstacleLevel
 
         public void SetOpen(bool open)
         {
+            isOpening = open;
+
             if (open)
             {
                 targetPosition = shutPosition + openOffset;
@@ -45,9 +49,17 @@ namespace ObstacleLevel
 
         private void FixedUpdate()
         {
-            rb.MovePosition(
-                Vector3.MoveTowards(rb.position, targetPosition, moveSpeed * Time.fixedDeltaTime)
+            Vector3 next = Vector3.MoveTowards(
+                rb.position,
+                targetPosition,
+                moveSpeed * Time.fixedDeltaTime
             );
+            rb.MovePosition(next);
+
+            if (isOpening && next == targetPosition) // it reached the open position
+            {
+                Destroy(gameObject);
+            }
         }
     }
 }

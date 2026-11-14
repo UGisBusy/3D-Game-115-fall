@@ -1,3 +1,4 @@
+using ObstacleLevel;
 using PlayerSystem;
 using UnityEngine;
 
@@ -108,16 +109,23 @@ namespace TrapSystem
         }
 
         // For OnPlayerTouch spikes, after the first touch the spike stays active until the Player respawns.
+        // The Player or a box sets it off. Collectibles and other things don't.
         private void OnTriggerEnter(Collider other)
         {
-            if (
-                toggleType == ToggleType.OnPlayerTouch
-                && !isActive
-                && other.TryGetComponent(out Player _)
-            )
+            if (toggleType != ToggleType.OnPlayerTouch || isActive)
+            {
+                return;
+            }
+
+            if (other.TryGetComponent(out Player _))
             {
                 SetActive(true);
                 nextHitTime = Time.time + touchGraceTime; // give the player a grace period to escape the spike before it can hurt them
+            }
+            else if (other.TryGetComponent(out PushableBox box))
+            {
+                SetActive(true);
+                box.Break(); // the spikes come out under the box and break it
             }
         }
 

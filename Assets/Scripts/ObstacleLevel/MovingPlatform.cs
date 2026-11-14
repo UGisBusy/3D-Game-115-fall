@@ -9,15 +9,15 @@ namespace ObstacleLevel
     ///   Route          -> start point, destination 1, destination 2, ... then straight back to the start point
     ///   At a point     -> stays there until the Player stands on it, then leaves for the next point
     ///   Travelling     -> goes to the next point with or without the Player, and carries everything standing on it
-    ///   When reachs destination     -> waits for waitTime, then it is "at a point" again
-    ///   Player respawns -> goes back to the start point, to prevent platform stuck.
+    ///   When reachs destination     -> waits for waitTime, then it is moving again to next point if the Player is still standing on it
+    ///   Player respawns -> goes back to the start point, to prevent bugs. Because the player can't call the platform.
     /// Start point     -> initial position.
     /// Carrying: can carry the player and the crates.
     /// </summary>
     [RequireComponent(typeof(Rigidbody), typeof(Collider))]
     public class MovingPlatform : MonoBehaviour
     {
-        private const float RiderCheckHeight = 0.2f; // how far above the top surface still counts as standing on it
+        private const float RiderCheckHeight = 0.2f; // how far above the top surface that counts as standing on it
 
         [Tooltip("The MovingPlatform's destination points to visit.")]
         [SerializeField]
@@ -47,7 +47,7 @@ namespace ObstacleLevel
             rb.isKinematic = true; // independent env obj
             rb.interpolation = RigidbodyInterpolation.Interpolate; // moves in FixedUpdate
 
-            // The destinations are children, so they move together with the platform.
+            // The destinations are the platform's children.
             // Their positions are copied once here, before the platform starts moving.
             route = new Vector3[destinations.Length + 1];
             route[0] = rb.position;
@@ -74,7 +74,7 @@ namespace ObstacleLevel
 
             if (waitTimer > 0f)
             {
-                waitTimer -= Time.fixedDeltaTime;
+                waitTimer -= Time.fixedDeltaTime; // wait when arriving
                 return;
             }
 
@@ -89,13 +89,25 @@ namespace ObstacleLevel
             }
         }
 
-        // Fills riders with every Rigidbody in a thin box right above the top surface.
-        // A box check is used, not collision events, because a resting box falls asleep and sends no events.
+        // Fills riders with everything standing on the platform.
         private void FindRiders()
         {
             riders.Clear();
+            AddRidersOn(platformCollider);
 
-            Bounds bounds = platformCollider.bounds;
+            // Player can also stand on the object that is on the platform (e.g., a crate).
+            // The list grows while it is walked, so those are checked as well.
+            for (int i = 0; i < riders.Count; i++)
+            {
+                AddRidersOn(riders[i].GetComponent<Collider>());
+            }
+        }
+
+        // Adds every Rigidbody in a thin box right above the top surface of ground.
+        // A box check is used, not collision events, because a resting box falls asleep and sends no events.
+        private void AddRidersOn(Collider ground)
+        {
+            Bounds bounds = ground.bounds;
             Vector3 halfSize = new(bounds.extents.x, RiderCheckHeight / 2f, bounds.extents.z);
             Vector3 center = bounds.center + Vector3.up * (bounds.extents.y + halfSize.y);
 
@@ -112,7 +124,7 @@ namespace ObstacleLevel
             {
                 Rigidbody body = buffer[i].attachedRigidbody;
 
-                // Kinematic bodies move on their own (this platform, a Gate), so they are not carried.
+                // Kinematic bodies move on their own (e.g., this platform, a Gate), so they are not carried.
                 if (body != null && !body.isKinematic && !riders.Contains(body))
                 {
                     riders.Add(body);
@@ -158,7 +170,7 @@ namespace ObstacleLevel
             }
         }
 
-        // Moves a rider by the same step the platform moved.
+        // Moves the rider by the same step the platform moved.
         private static void Carry(Rigidbody rider, Vector3 step)
         {
             if (rider.TryGetComponent(out Player _))
@@ -175,7 +187,7 @@ namespace ObstacleLevel
         private void Arrive()
         {
             isTravelling = false;
-            waitTimer = waitTime;
+            waitTimer = waitTime; // add wait time before leaving the point
             targetIndex++;
 
             if (targetIndex == route.Length) // if no destination left, the next point is the start point
@@ -187,6 +199,15 @@ namespace ObstacleLevel
         // To reset the platform when respawned, to prevent no one can reach the platform and stuck.
         private void ResetToStart()
         {
+            // A box it was carrying would be left in the air and could land somewhere out of reach.
+            foreach (Rigidbody rider in riders)
+            {
+                if (rider.TryGetComponent(out PushableBox box))
+                {
+                    box.Break();
+                }
+            }
+
             rb.position = route[0];
             targetIndex = 1;
             waitTimer = 0f;

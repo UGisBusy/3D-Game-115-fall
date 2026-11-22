@@ -1,12 +1,13 @@
+using EffectSystem;
 using UnityEngine;
 
 namespace ObstacleLevel
 {
     /// <summary>
-    /// A floor plate that opens its Gate only when a box is standing on it.
-    ///   A box is on the plate   -> the Gate opens
-    ///   No box on the plate     -> the Gate goes back to closed
-    ///   The Player steps on it  -> nothing happens, must be a box to open the Gate
+    /// A floor plate that opens its Gate only when a box is standing on it. Each plate is made for one box.
+    ///   A box gets on the plate   -> the Gate opens
+    ///   The box leaves the plate  -> the Gate goes back to closed
+    ///   The Player steps on it    -> nothing happens, must be a box to open the Gate
     /// Intended mechanic: a fully opened Gate stays open, so only a box may open it.
     /// </summary>
     [RequireComponent(typeof(Collider))]
@@ -15,7 +16,9 @@ namespace ObstacleLevel
         [SerializeField]
         private Gate gate;
 
-        private int boxCount; // how many boxes are on the plate now
+        [Tooltip("Plays when a box gets on the plate.")]
+        [SerializeField]
+        private Effect pressEffect;
 
         private void Awake()
         {
@@ -26,7 +29,7 @@ namespace ObstacleLevel
         {
             if (other.TryGetComponent(out PushableBox _))
             {
-                boxCount++;
+                pressEffect.Play(transform.position);
                 SetGateOpen(true);
             }
         }
@@ -35,12 +38,7 @@ namespace ObstacleLevel
         {
             if (other.TryGetComponent(out PushableBox _))
             {
-                boxCount--;
-
-                if (boxCount == 0) // another box can still be on it
-                {
-                    SetGateOpen(false);
-                }
+                SetGateOpen(false);
             }
         }
 

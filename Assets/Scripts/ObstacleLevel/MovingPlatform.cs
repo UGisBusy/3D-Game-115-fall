@@ -5,14 +5,16 @@ using UnityEngine;
 namespace ObstacleLevel
 {
     /// <summary>
-    /// Independent Env Obj. A platform that moves along a route of points and carries what stands on it.
-    ///   Route          -> start point, destination 1, destination 2, ... then straight back to the start point
-    ///   At a point     -> stays there until the Player stands on it, then leaves for the next point
-    ///   Travelling     -> goes to the next point with or without the Player, and carries everything standing on it
-    ///   When reachs destination     -> waits for waitTime, then it is moving again to next point if the Player is still standing on it
-    ///   Player respawns -> goes back to the start point, to prevent bugs. Because the player can't call the platform.
-    /// Start point     -> initial position.
-    /// Carrying: can carry the player and the crates.
+    /// Independent Env Obj. A platform that keeps moving along a route of points and carries what stands on it.
+    ///   Level starts   -> waits for startDelay at the start point, then starts its route
+    ///   Route          -> start point, destination 1, destination 2, ... then straight back to the start point, again and again
+    ///   At each point  -> waits for waitTime, then travels to the next point at moveSpeed
+    ///   Travelling     -> carries everything standing on it, with or without the Player
+    /// Start point -> initial position.
+    /// Its position is worked out from a clock, not added up step by step, so it never drifts.
+    /// Platforms whose loops take the same time stay in step forever, and startDelay lines them up
+    /// for jumps from one platform to the next.
+    /// Carrying: can carry the player and the boxes. A wall in a box's way stops the box, the platform goes on without it.
     /// </summary>
     [RequireComponent(typeof(Rigidbody), typeof(Collider))]
     public class MovingPlatform : MonoBehaviour
@@ -24,11 +26,15 @@ namespace ObstacleLevel
         private Transform[] destinations;
 
         [SerializeField]
-        private float moveSpeed = 2f;
+        private float moveSpeed = 4f;
 
         [Tooltip("How long it waits at each point.")]
         [SerializeField]
-        private float waitTime = 3f;
+        private float waitTime = 1f;
+
+        [Tooltip("How long it waits at the start point before it moves for the first time.")]
+        [SerializeField]
+        private float startDelay;
 
         private static readonly Collider[] buffer = new Collider[16];
         private readonly List<Rigidbody> riders = new(); // who stands on it in this physics step
@@ -36,9 +42,9 @@ namespace ObstacleLevel
         private Rigidbody rb;
         private Collider platformCollider;
         private Vector3[] route; // destination points the platform will move to.
-        private int targetIndex = 1; // which point of the route it is going to
-        private float waitTimer;
-        private bool isTravelling; // between two points
+        private float[] travelTimes; // how long each move takes: from route[i] to the next point
+        private float loopTime; // how long the whole route takes, waits included
+        private float clock; // seconds since the level started
 
         private void Awake()
         {
@@ -56,37 +62,70 @@ namespace ObstacleLevel
             {
                 route[i + 1] = destinations[i].position;
             }
-        }
 
-        private void OnEnable()
-        {
-            PlayerEvents.Spawned += ResetToStart;
-        }
+            travelTimes = new float[route.Length];
 
-        private void OnDisable()
-        {
-            PlayerEvents.Spawned -= ResetToStart;
+            for (int i = 0; i < route.Length; i++)
+            {
+                travelTimes[i] = Vector3.Distance(route[i], NextPoint(i)) / moveSpeed;
+                loopTime += waitTime + travelTimes[i];
+            }
         }
 
         private void FixedUpdate()
         {
+            clock += Time.fixedDeltaTime;
+            Vector3 next = PositionAt(clock);
+            Vector3 step = next - rb.position;
+
+            if (step == Vector3.zero)
+            {
+                return; // waiting at a point
+            }
+
+            rb.MovePosition(next);
             FindRiders();
 
-            if (waitTimer > 0f)
+            foreach (Rigidbody rider in riders)
             {
-                waitTimer -= Time.fixedDeltaTime; // wait when arriving
-                return;
+                Carry(rider, step);
+            }
+        }
+
+        // Where the route puts the platform at time t. At each point it first waits, then travels to the next one.
+        private Vector3 PositionAt(float t)
+        {
+            if (t < startDelay)
+            {
+                return route[0];
             }
 
-            if (!isTravelling && IsPlayerRiding())
+            t = (t - startDelay) % loopTime; // time into the current loop
+
+            for (int i = 0; i < route.Length; i++)
             {
-                isTravelling = true; // leave the point
+                if (t < waitTime)
+                {
+                    return route[i];
+                }
+
+                t -= waitTime;
+
+                if (t < travelTimes[i])
+                {
+                    return Vector3.Lerp(route[i], NextPoint(i), t / travelTimes[i]);
+                }
+
+                t -= travelTimes[i];
             }
 
-            if (isTravelling)
-            {
-                Move();
-            }
+            return route[0];
+        }
+
+        // The point after route[i]. After the last destination it is the start point.
+        private Vector3 NextPoint(int i)
+        {
+            return route[(i + 1) % route.Length];
         }
 
         // Fills riders with everything standing on the platform.
@@ -132,86 +171,29 @@ namespace ObstacleLevel
             }
         }
 
-        // Returns true if the Player is standing on the platform.
-        private bool IsPlayerRiding()
-        {
-            foreach (Rigidbody rider in riders)
-            {
-                if (rider.TryGetComponent(out Player _))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        // Platform movement
-        private void Move()
-        {
-            Vector3 target = route[targetIndex];
-            Vector3 next = Vector3.MoveTowards(
-                rb.position,
-                target,
-                moveSpeed * Time.fixedDeltaTime
-            );
-            Vector3 step = next - rb.position;
-
-            rb.MovePosition(next);
-
-            foreach (Rigidbody rider in riders)
-            {
-                Carry(rider, step);
-            }
-
-            if (next == target)
-            {
-                Arrive();
-            }
-        }
-
         // Moves the rider by the same step the platform moved.
-        private static void Carry(Rigidbody rider, Vector3 step)
+        private void Carry(Rigidbody rider, Vector3 step)
         {
             if (rider.TryGetComponent(out Player _))
             {
                 rider.MovePosition(rider.position + step); // keeps the Player's movement smooth
+                return;
             }
-            else
+
+            // A box is placed directly, which skips collisions.
+            Vector3 sideways = new(step.x, 0f, step.z);
+
+            if (
+                sideways != Vector3.zero
+                && rider.TryGetComponent(out PushableBox box)
+                && box.FreeDistance(sideways.normalized, sideways.magnitude, riders)
+                    < sideways.magnitude
+            )
             {
-                rider.transform.position += step; // a box locks its X and Z, so it is placed directly from the transform, not the Rigidbody
-            }
-        }
-
-        // Stops at the point it reached and picks the next one.
-        private void Arrive()
-        {
-            isTravelling = false;
-            waitTimer = waitTime; // add wait time before leaving the point
-            targetIndex++;
-
-            if (targetIndex == route.Length) // if no destination left, the next point is the start point
-            {
-                targetIndex = 0;
-            }
-        }
-
-        // To reset the platform when respawned, to prevent no one can reach the platform and stuck.
-        private void ResetToStart()
-        {
-            // A box it was carrying would be left in the air and could land somewhere out of reach.
-            foreach (Rigidbody rider in riders)
-            {
-                if (rider.TryGetComponent(out PushableBox box))
-                {
-                    box.Break();
-                }
+                step -= sideways;
             }
 
-            rb.position = route[0];
-            targetIndex = 1;
-            waitTimer = 0f;
-            isTravelling = false;
+            rider.transform.position += step; // a box locks its X and Z, so it is placed directly from the transform, not the Rigidbody
         }
     }
 }

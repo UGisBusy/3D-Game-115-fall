@@ -12,6 +12,34 @@ PrefabInstance:
       propertyPath: toggleType
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 77835595968398752, guid: 94dd4788dafa12843821da27e8a3310b, type: 3}
+      propertyPath: touchGraceTime
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 77835595968398752, guid: 94dd4788dafa12843821da27e8a3310b, type: 3}
+      propertyPath: popEffect.sounds.Array.size
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 77835595968398752, guid: 94dd4788dafa12843821da27e8a3310b, type: 3}
+      propertyPath: 'popEffect.sounds.Array.data[0]'
+      value: 
+      objectReference: {fileID: 8300000, guid: 9962bee0035a0bc45a4b501e668706ef, type: 3}
+    - target: {fileID: 77835595968398752, guid: 94dd4788dafa12843821da27e8a3310b, type: 3}
+      propertyPath: 'popEffect.sounds.Array.data[1]'
+      value: 
+      objectReference: {fileID: 8300000, guid: a678ee0e2e46f3540905a59ffb2f317f, type: 3}
+    - target: {fileID: 77835595968398752, guid: 94dd4788dafa12843821da27e8a3310b, type: 3}
+      propertyPath: 'popEffect.sounds.Array.data[2]'
+      value: 
+      objectReference: {fileID: 8300000, guid: f77e76299bd61a445918cc35cf2a5003, type: 3}
+    - target: {fileID: 77835595968398752, guid: 94dd4788dafa12843821da27e8a3310b, type: 3}
+      propertyPath: 'popEffect.sounds.Array.data[3]'
+      value: 
+      objectReference: {fileID: 8300000, guid: 296127f09adca41418968b3b0849bc9d, type: 3}
+    - target: {fileID: 77835595968398752, guid: 94dd4788dafa12843821da27e8a3310b, type: 3}
+      propertyPath: 'popEffect.sounds.Array.data[4]'
+      value: 
+      objectReference: {fileID: 8300000, guid: 276010e6aba83d643bcb9a1f53a93258, type: 3}
     - target: {fileID: 1153767108361862968, guid: 94dd4788dafa12843821da27e8a3310b, type: 3}
       propertyPath: m_Name
       value: HiddenSpikes

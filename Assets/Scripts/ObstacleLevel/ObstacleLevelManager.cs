@@ -1,3 +1,4 @@
+using EffectSystem;
 using LevelSystem;
 using PlayerSystem;
 using UnityEngine;
@@ -13,6 +14,7 @@ namespace ObstacleLevel
     ///   Play  --Completed-->       Complete  Star collected
     /// Pause freezes time and the Player's input. Complete stops the Player's input.
     /// Owns the Crystal count: the Star stays hidden until every Crystal is collected.
+    /// When it appears, the sky changes to starSky, so the Player knows from anywhere in the level.
     /// Respawning is owned by SpawnManager.
     /// </summary>
     public class ObstacleLevelManager : MonoBehaviour
@@ -27,16 +29,21 @@ namespace ObstacleLevel
         private InputActionReference pauseAction; // Level/Pause (Escape)
 
         [SerializeField]
-        private Checkpoint startCheckpoint; // TODO: use editor to set it for now, later seq manager should set it
-
-        [Header("Crystals")]
-        [Tooltip("Parent of every Crystal in the level.")]
-        [SerializeField]
-        private Transform crystals;
+        private Checkpoint startCheckpoint;
 
         [Tooltip("The Star in the scene. Hidden until every Crystal is collected.")]
         [SerializeField]
         private GameObject star;
+
+        [Tooltip(
+            "The sky after every Crystal is collected, so the Player sees the Star has appeared."
+        )]
+        [SerializeField]
+        private Material starSky;
+
+        [Tooltip("Plays on the Star when it appears.")]
+        [SerializeField]
+        private Effect starAppearedEffect;
 
         [Header("Debug")]
         [SerializeField]
@@ -118,7 +125,7 @@ namespace ObstacleLevel
             spawnManager.SetActiveCheckpoint(startCheckpoint);
             spawnManager.SpawnPlayer();
 
-            crystalTotal = crystals.childCount;
+            crystalTotal = CountCrystals();
             crystalCollected = 0;
             star.SetActive(false);
             ObstacleLevelEvents.RaiseCrystalCountChanged(crystalCollected, crystalTotal);
@@ -130,24 +137,49 @@ namespace ObstacleLevel
         private void OnPlayEnter()
         {
             LevelEvents.Collected += OnCollected;
-            ObstacleLevelEvents.CrystalCollected += OnCrystalCollected;
         }
 
         private void OnPlayExit()
         {
             LevelEvents.Collected -= OnCollected;
-            ObstacleLevelEvents.CrystalCollected -= OnCrystalCollected;
         }
 
-        private void OnCrystalCollected()
+        // Counts the Crystals placed in the level. Runs at the start, before any is collected.
+        private static int CountCrystals()
+        {
+            int count = 0;
+
+            foreach (
+                Collectible collectible in FindObjectsByType<Collectible>(FindObjectsSortMode.None)
+            )
+            {
+                if (collectible.Type == CollectibleType.Crystal)
+                {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+
+        private void CollectCrystal()
         {
             crystalCollected++;
             ObstacleLevelEvents.RaiseCrystalCountChanged(crystalCollected, crystalTotal);
 
             if (crystalCollected == crystalTotal) // all Crystals collected
             {
-                star.SetActive(true); // spawn the star
+                RevealStar();
             }
+        }
+
+        // Spawns the Star and changes the sky, so the Player notices it from anywhere.
+        private void RevealStar()
+        {
+            star.SetActive(true);
+            RenderSettings.skybox = starSky;
+            DynamicGI.UpdateEnvironment(); // the light the sky gives the level changes with it
+            starAppearedEffect.Play(star.transform.position);
         }
 
         private void PlayTick(float dt)
@@ -164,6 +196,10 @@ namespace ObstacleLevel
             {
                 transitions.RaiseCompleted();
             }
+            else if (collectible.Type == CollectibleType.Crystal)
+            {
+                CollectCrystal();
+            }
         }
 
         // ---------------- Pause ----------------
@@ -171,12 +207,14 @@ namespace ObstacleLevel
         private void OnPauseEnter()
         {
             Time.timeScale = 0f;
+            AudioListener.pause = true; // sounds that are playing wait too
             player.Input.SetEnabled(false);
         }
 
         private void OnPauseExit()
         {
             Time.timeScale = 1f;
+            AudioListener.pause = false;
             player.Input.SetEnabled(true);
         }
 

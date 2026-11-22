@@ -1,3 +1,4 @@
+using EffectSystem;
 using UnityEngine;
 
 namespace ObstacleLevel
@@ -18,6 +19,14 @@ namespace ObstacleLevel
 
         [SerializeField]
         private float moveSpeed = 4f;
+
+        [Tooltip("Plays when the gate is fully open and disappears.")]
+        [SerializeField]
+        private Effect openedEffect;
+
+        [Tooltip("Plays while the gate is moving, until it is destroyed.")]
+        [SerializeField]
+        private LoopingSound moveSound;
 
         private Rigidbody rb;
         private Vector3 shutPosition;
@@ -49,6 +58,8 @@ namespace ObstacleLevel
 
         private void FixedUpdate()
         {
+            moveSound.SetPlaying(rb.position != targetPosition);
+
             Vector3 next = Vector3.MoveTowards(
                 rb.position,
                 targetPosition,
@@ -58,6 +69,8 @@ namespace ObstacleLevel
 
             if (isOpening && next == targetPosition) // it reached the open position
             {
+                enabled = false; // Destroy waits for the end of the frame, and FixedUpdate can run again before it
+                openedEffect.Play(shutPosition);
                 Destroy(gameObject);
             }
         }

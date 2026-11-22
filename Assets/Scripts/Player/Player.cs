@@ -96,6 +96,7 @@ namespace PlayerSystem
         ///   Normal    --DashRequested-->     Dashing
         ///   Normal    --KnockedBack-->       Knockback
         ///   Dashing   --DashFinished-->      Normal
+        ///   Dashing   --KnockedBack-->       Knockback (Bounce, forced hits; ends the dash)
         ///   Knockback --KnockedBack-->       Knockback (re-hit restarts it)
         ///   Knockback --KnockbackFinished--> Normal
         ///   any alive --Died-->              Dead
@@ -113,6 +114,7 @@ namespace PlayerSystem
             Normal.AddLink(new Link(Dead, Transitions.DiedWrapper));
 
             Dashing.AddLink(new Link(Normal, Transitions.DashFinishedWrapper));
+            Dashing.AddLink(new Link(Knockback, Transitions.KnockedBackWrapper)); // Bounce, forced hits
             Dashing.AddLink(new Link(Dead, Transitions.DiedWrapper));
 
             Knockback.AddLink(new Link(Knockback, Transitions.KnockedBackWrapper));
@@ -165,6 +167,18 @@ namespace PlayerSystem
                 Knockback.Setup(hit.KnockbackVelocity, hit.KnockbackDuration);
                 Transitions.RaiseKnockedBack();
             }
+        }
+
+        // Knockback without damage (e.g. bounced off a breaking shield). Works while dashing and ends the dash.
+        // invincibleTime keeps nearby enemies from hitting right after the bounce.
+        public void Bounce(Vector3 velocity, float duration, float invincibleTime = 0f)
+        {
+            if (IsDead)
+                return;
+
+            invincibleTimer = Mathf.Max(invincibleTimer, invincibleTime);
+            Knockback.Setup(velocity, duration);
+            Transitions.RaiseKnockedBack();
         }
 
         public void Heal(int amount)

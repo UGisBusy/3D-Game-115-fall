@@ -1,0 +1,9 @@
+# Materials for CrossedArrows.obj. Remapped to BTM materials in the import settings.
+newmtl Head
+Kd 1.0 1.0 1.0
+
+newmtl Shaft
+Kd 1.0 0.373 0.0
+
+newmtl Fletch
+Kd 0.943 0.093 0.093

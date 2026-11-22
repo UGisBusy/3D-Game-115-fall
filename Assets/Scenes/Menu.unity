@@ -528,6 +528,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SequenceManager
   uiManager: {fileID: 517781115}
+  backAction: {fileID: -7291034781424860494, guid: ac3f95e6378bc604994eadfe89ea2b89, type: 3}
   currentStateName: None
 --- !u!4 &101722799
 Transform:

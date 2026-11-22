@@ -1,6 +1,6 @@
 {
     "version": 1,
-    "name": "PlayerControls",
+    "name": "InputControls",
     "maps": [
         {
             "name": "Player",
@@ -225,6 +225,35 @@
                     "processors": "",
                     "groups": "",
                     "action": "Confirm",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "Menu",
+            "id": "fcb59c47-f4f4-4972-b012-c63db33c8b69",
+            "actions": [
+                {
+                    "name": "Back",
+                    "type": "Button",
+                    "id": "f2e16e98-607c-4596-ba0e-586081934af1",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false,
+                    "priority": 0
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "0fb8582a-fbdb-4e98-92d5-7fd3af45df4e",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Back",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

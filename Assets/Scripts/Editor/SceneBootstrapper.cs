@@ -1,12 +1,15 @@
 using UnityEditor;
 using UnityEditor.SceneManagement;
-using UnityEngine;
 
+/// <summary>
+/// 3DG > Load Menu Scene: when checked, Play always starts from the Menu scene, whatever scene is open.
+/// Uses Unity's playModeStartScene, so the open scene is never closed or reopened in the editor:
+/// stopping returns to it exactly as it was, and the Inspector never points at destroyed objects.
+/// </summary>
 [InitializeOnLoad]
-public class SceneBootstrapper
+public static class SceneBootstrapper
 {
     private const string keyLoadMenuScene = "3DG/Load Menu Scene";
-    private const string keyPreviousScene = "PreviousScene";
     private const string MenuScene = "Assets/Scenes/Menu.unity";
 
     private static bool isLoadMenuScene
@@ -15,44 +18,17 @@ public class SceneBootstrapper
         set => EditorPrefs.SetBool(keyLoadMenuScene, value);
     }
 
-    private static string PreviousScene
-    {
-        get => EditorPrefs.GetString(keyPreviousScene);
-        set => EditorPrefs.SetString(keyPreviousScene, value);
-    }
-
     static SceneBootstrapper()
     {
-        EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
+        // The asset database may not be ready while scripts load; set it on the next editor tick.
+        EditorApplication.delayCall += ApplyStartScene;
     }
 
-    private static void OnPlayModeStateChanged(PlayModeStateChange playModeStateChange)
+    private static void ApplyStartScene()
     {
-        if (!isLoadMenuScene)
-            return;
-
-        switch (playModeStateChange)
-        {
-            case PlayModeStateChange.ExitingEditMode:
-                PreviousScene = EditorSceneManager.GetActiveScene().path;
-
-                if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
-                {
-                    // The Inspector would keep showing an object of the scene we are closing,
-                    // then throw MissingReferenceException / SerializedObjectNotCreatableException.
-                    Selection.activeObject = null;
-                    EditorSceneManager.OpenScene(MenuScene);
-                }
-                break;
-
-            case PlayModeStateChange.EnteredEditMode:
-                if (!string.IsNullOrEmpty(PreviousScene))
-                {
-                    Selection.activeObject = null;
-                    EditorSceneManager.OpenScene(PreviousScene);
-                }
-                break;
-        }
+        EditorSceneManager.playModeStartScene = isLoadMenuScene
+            ? AssetDatabase.LoadAssetAtPath<SceneAsset>(MenuScene)
+            : null;
     }
 
     // menu items
@@ -60,6 +36,7 @@ public class SceneBootstrapper
     private static void ToggleLoadBootScene()
     {
         isLoadMenuScene = !isLoadMenuScene;
+        ApplyStartScene();
     }
 
     [MenuItem(keyLoadMenuScene, true)]

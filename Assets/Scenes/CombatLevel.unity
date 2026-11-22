@@ -44257,7 +44257,7 @@ MonoBehaviour:
   levelUI: {fileID: 128651551}
   pauseAction: {fileID: -1112345045921236428, guid: ac3f95e6378bc604994eadfe89ea2b89, type: 3}
   confirmAction: {fileID: -7333354237639282950, guid: ac3f95e6378bc604994eadfe89ea2b89, type: 3}
-  waveSet: {fileID: 11400000, guid: a60a6baa29bbf7a4d8fd3ad9e0510ff3, type: 2}
+  waveSet: {fileID: 11400000, guid: 02dc4f9e82ba7f24593d7a8beab4799c, type: 2}
   firstWaveDelay: 3
   waveBreak: 5
   currentStateName: 

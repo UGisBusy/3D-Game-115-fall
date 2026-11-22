@@ -14,11 +14,17 @@ public static class LevelEvents
     // Raised when the Player touches a Checkpoint.
     public static event Action<Checkpoint> CheckpointActivated;
 
+    // Raised by the Level Manager when its Exit state finished (saved, cleaned up).
+    // SequenceManager answers by leaving the level.
+    public static event Action Exited;
+
     // ---------- Raise ----------
     public static void RaiseCollected(Collectible collectible) => Collected?.Invoke(collectible);
 
     public static void RaiseCheckpointActivated(Checkpoint checkpoint) =>
         CheckpointActivated?.Invoke(checkpoint);
+
+    public static void RaiseExited() => Exited?.Invoke();
 
     // clear old subscribers at startup
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
@@ -26,5 +32,6 @@ public static class LevelEvents
     {
         Collected = null;
         CheckpointActivated = null;
+        Exited = null;
     }
 }

@@ -1,61 +1,99 @@
 using System;
+using UnityEngine;
 
 /// <summary>
-/// Level Manager state machine events, shared by all level managers.
-/// Only Links in the level's state machine listen; other systems use the global LevelEvents.
+/// Level Manager state machine events, shared by all level managers (only one level is loaded at a time).
+/// Static so UI buttons (Pause Menu, Fail Screen, Level Complete Screen) can raise them without a ref to the Level Manager.
+/// Links in the level's state machine listen, so a request only has an effect
+/// if the current state has a Link for it (e.g. Continue only from Pause, Retry only from Fail).
+/// Other systems use the global LevelEvents.
 /// </summary>
-public class LevelTransitions
+public static class LevelTransitions
 {
-    public event Action StartFinished;
-    public event Action PauseRequested;
-    public event Action ResumeRequested;
-    public event Action Completed;
-    public event Action ExitRequested;
+    // Fired by Level Manger
+    public static event Action StartFinished; // finish starting
+    public static event Action Failed; // Player died
+    public static event Action Completed; // Star collected
+
+    // Fired by input or UI
+    public static event Action PauseRequested; // ESC
+    public static event Action ContinueRequested; // ESC or Pause Menu Continue Button
+    public static event Action RetryRequested; // Fail Screen Retry Button
+    public static event Action<bool> ExitRequested; // Pause Menu / Fail Screen / Level Complete Screen exit buttons. (save)
+    private static event Action exitTransition; // no-arg version for Link
 
     // ---------- Wrappers for Link ----------
-    public EventWrapper StartFinishedWrapper { get; }
-    public EventWrapper PauseRequestedWrapper { get; }
-    public EventWrapper ResumeRequestedWrapper { get; }
-    public EventWrapper CompletedWrapper { get; }
-    public EventWrapper ExitRequestedWrapper { get; }
-
-    public LevelTransitions()
-    {
-        StartFinishedWrapper = new EventWrapper
+    public static EventWrapper StartFinishedWrapper { get; } =
+        new EventWrapper
         {
             Subscribe = h => StartFinished += h,
             Unsubscribe = h => StartFinished -= h,
         };
-        PauseRequestedWrapper = new EventWrapper
+
+    public static EventWrapper FailedWrapper { get; } =
+        new EventWrapper { Subscribe = h => Failed += h, Unsubscribe = h => Failed -= h };
+
+    public static EventWrapper CompletedWrapper { get; } =
+        new EventWrapper { Subscribe = h => Completed += h, Unsubscribe = h => Completed -= h };
+
+    public static EventWrapper PauseRequestedWrapper { get; } =
+        new EventWrapper
         {
             Subscribe = h => PauseRequested += h,
             Unsubscribe = h => PauseRequested -= h,
         };
-        ResumeRequestedWrapper = new EventWrapper
+
+    public static EventWrapper ContinueRequestedWrapper { get; } =
+        new EventWrapper
         {
-            Subscribe = h => ResumeRequested += h,
-            Unsubscribe = h => ResumeRequested -= h,
+            Subscribe = h => ContinueRequested += h,
+            Unsubscribe = h => ContinueRequested -= h,
         };
-        CompletedWrapper = new EventWrapper
+
+    public static EventWrapper RetryRequestedWrapper { get; } =
+        new EventWrapper
         {
-            Subscribe = h => Completed += h,
-            Unsubscribe = h => Completed -= h,
+            Subscribe = h => RetryRequested += h,
+            Unsubscribe = h => RetryRequested -= h,
         };
-        ExitRequestedWrapper = new EventWrapper
+
+    public static EventWrapper ExitRequestedWrapper { get; } =
+        new EventWrapper
         {
-            Subscribe = h => ExitRequested += h,
-            Unsubscribe = h => ExitRequested -= h,
+            Subscribe = h => exitTransition += h,
+            Unsubscribe = h => exitTransition -= h,
         };
-    }
 
     // ---------- Raise ----------
-    public void RaiseStartFinished() => StartFinished?.Invoke();
+    public static void RaiseStartFinished() => StartFinished?.Invoke();
 
-    public void RaisePauseRequested() => PauseRequested?.Invoke();
+    public static void RaiseFailed() => Failed?.Invoke();
 
-    public void RaiseResumeRequested() => ResumeRequested?.Invoke();
+    public static void RaiseCompleted() => Completed?.Invoke();
 
-    public void RaiseCompleted() => Completed?.Invoke();
+    public static void RaisePauseRequested() => PauseRequested?.Invoke();
 
-    public void RaiseExitRequested() => ExitRequested?.Invoke();
+    public static void RaiseContinueRequested() => ContinueRequested?.Invoke();
+
+    public static void RaiseRetryRequested() => RetryRequested?.Invoke();
+
+    public static void RaiseExitRequested(bool save)
+    {
+        ExitRequested?.Invoke(save);
+        exitTransition?.Invoke();
+    }
+
+    // clear old subscribers at startup
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStatics()
+    {
+        StartFinished = null;
+        PauseRequested = null;
+        ContinueRequested = null;
+        Failed = null;
+        RetryRequested = null;
+        Completed = null;
+        ExitRequested = null;
+        exitTransition = null;
+    }
 }

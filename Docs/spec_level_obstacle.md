@@ -27,7 +27,7 @@ State machine, built with `TickState`, `Link` and `LevelTransitions`.
 |-|-|-|
 | **Start** | Asks `SpawnManager` to spawn the Player at the first Checkpoint. | `StartFinished` → **Play** (next frame) |
 | **Play** | Normal gameplay. Listens to `LevelEvents.Collected`. | ESC: `PauseRequested` → **Pause**<br>Star collected: `Completed` → **Complete** |
-| **Pause** | `Time.timeScale = 0`, Player input off. Both are restored on exit. | ESC: `ResumeRequested` → **Play** |
+| **Pause** | `Time.timeScale = 0`, Player input off. Both are restored on exit. | ESC: `ContinueRequested` → **Play** |
 | **Complete** | Player input off. | TBD |
 
 ## Spawn and Checkpoints

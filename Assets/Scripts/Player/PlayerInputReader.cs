@@ -53,6 +53,7 @@ namespace PlayerSystem
             jumpAction.action.Enable();
             dashAction.action.Enable();
             attackAction.action.Enable();
+            CursorControl.SetLocked(true);
         }
 
         private void OnDisable()
@@ -61,9 +62,11 @@ namespace PlayerSystem
             jumpAction.action.Disable();
             dashAction.action.Disable();
             attackAction.action.Disable();
+            CursorControl.SetLocked(false); // e.g. level unloaded, back to the menu
         }
 
         // Turns the whole Player action map (move, jump, dash, attack, camera) on or off, e.g. while paused.
+        // The cursor follows: locked while the Player can play, shown while input is off.
         public void SetEnabled(bool enabled)
         {
             InputActionMap map = moveAction.action.actionMap;
@@ -71,6 +74,7 @@ namespace PlayerSystem
                 map.Enable();
             else
                 map.Disable();
+            CursorControl.SetLocked(enabled);
         }
 
         private static Vector3 Flatten(Vector3 v)

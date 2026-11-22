@@ -2243,7 +2243,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 776a965e4a970664cb5898aa1ca05d75, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerSystem.Player
-  maxHp: 100
+  maxHp: 3
   hurtInvincibleTime: 1
   spawnInvincibleTime: 2
   spawnOnStart: 0
@@ -2933,17 +2933,17 @@ MonoBehaviour:
   player: {fileID: 1513138053}
   playerSpawnPoint: {fileID: 972563121}
   enemySpawner: {fileID: 1802833526}
-  starPrefab: {fileID: 0}
+  starPrefab: {fileID: 1798717083468362189, guid: c805bb99c7f46fd41bdb18b43e3aabd7, type: 3}
   starSpawnPoint: {fileID: 1998017290}
   pauseAction: {fileID: -1112345045921236428, guid: ac3f95e6378bc604994eadfe89ea2b89, type: 3}
   confirmAction: {fileID: -7333354237639282950, guid: ac3f95e6378bc604994eadfe89ea2b89, type: 3}
   waveSet: {fileID: 11400000, guid: a60a6baa29bbf7a4d8fd3ad9e0510ff3, type: 2}
   firstWaveDelay: 3
   waveBreak: 5
-  respawnWaveDelay: 3
   currentStateName: 
   debugWave: 0
   debugEnemies: 0
+  testCheckpoint: 0
 --- !u!4 &1933425934
 Transform:
   m_ObjectHideFlags: 0

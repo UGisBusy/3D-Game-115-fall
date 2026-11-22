@@ -6,25 +6,23 @@ using UnityEngine.InputSystem;
 /// Combat level flow (template, see Docs/features.md "Level Manager" and "Combat level").
 ///
 /// States (all event-driven through Links):
-///   Start    --StartFinished-->   Play      init level, spawn Player at center
-///   Play     --PauseRequested-->  Pause     ESC
-///   Pause    --ResumeRequested--> Play      ESC or Resume button
-///   Play     --Completed-->       Complete  Star collected
-///   Pause    --ExitRequested-->   Exit      Pause Menu exit buttons
-///   Complete --ExitRequested-->   Exit      Enter on Level Complete Screen
+///   Start    --StartFinished-->     Play      init level, spawn Player at center
+///   Play     --PauseRequested-->    Pause     ESC
+///   Play     --Failed-->            Fail      Player died
+///   Play     --Completed-->         Complete  Star collected
+///   Pause    --ContinueRequested--> Play      ESC or Continue button
+///   Pause    --ExitRequested-->     Exit      Pause Menu exit buttons
+///   Fail     --RetryRequested-->    Play      Retry button (or Enter)
+///   Fail     --ExitRequested-->     Exit      Fail Screen exit button
+///   Complete --ExitRequested-->     Exit      Enter on Level Complete Screen
 ///
 /// Waves (run in Play): read from the WaveSet (Waves File); EnemySpawner places the enemies.
 /// One Wave at a time. When it is cleared (nothing alive, no group waiting), wait waveBreak sec, then start the next.
 /// After the last Wave is cleared, the Star spawns.
-/// Respawn: clear Enemies, spawn Player at center, restart the current Wave after respawnWaveDelay sec.
-/// Collectible Spots clear themselves on PlayerEvents.Spawned.
-///
-/// Setup:
-///  - turn off "Spawn On Start" on the Player; this manager spawns it.
-///  - assign Pause / Confirm from the "Level" action map of PlayerControls.
-///    Pause turns off Player input (move, attack, camera) until resumed.
+/// Retry: clear Enemies, spawn Player at center, restart the failed Wave after firstWaveDelay sec.
+/// Collectible Spots clear themselves on PlayerEvents.Spawned (level start and retry).
 /// </summary>
-public class CombatLevelManager : MonoBehaviour
+public class CombatLevelManager : MonoBehaviour, ILevelManager
 {
     [Header("References")]
     [SerializeField]
@@ -54,13 +52,10 @@ public class CombatLevelManager : MonoBehaviour
     private WaveSet waveSet; // the Waves File
 
     [SerializeField]
-    private float firstWaveDelay = 3f;
+    private float firstWaveDelay = 3f; // seconds after level start / retry before the Wave starts
 
     [SerializeField]
     private float waveBreak = 5f; // seconds between a cleared Wave and the next one
-
-    [SerializeField]
-    private float respawnWaveDelay = 3f; // seconds after respawn before the Wave restarts
 
     [Header("Debug")]
     [SerializeField]
@@ -72,15 +67,19 @@ public class CombatLevelManager : MonoBehaviour
     [SerializeField]
     private int debugEnemies;
 
-    private readonly LevelTransitions transitions = new();
+    [SerializeField]
+    private int testCheckpoint; // start Wave (0-based), only used when this scene is played directly
+
     private StateMachine stateMachine;
     private TickState startState,
         playState,
         pauseState,
+        failState,
         completeState,
         exitState;
 
     // ---- Wave progress ----
+    private int startWave; // 0-based; set by StartLevel from the checkpoint number
     private int currentWave; // 0-based; only goes up when a Wave is cleared
     private bool waveActive;
     private bool allWavesCleared;
@@ -91,23 +90,51 @@ public class CombatLevelManager : MonoBehaviour
     private void Awake()
     {
         BuildStateMachine();
+        SequenceManager.RegisterLevelManager(this);
     }
 
     private void OnEnable()
     {
         SetActionEnabled(pauseAction, true);
         SetActionEnabled(confirmAction, true);
+
+        LevelTransitions.ExitRequested += OnExitRequested;
     }
 
     private void OnDisable()
     {
         SetActionEnabled(pauseAction, false);
         SetActionEnabled(confirmAction, false);
+
+        LevelTransitions.ExitRequested -= OnExitRequested;
     }
 
     private void Start()
     {
+        // Normally SequenceManager calls StartLevel. Without it (scene played directly
+        // in the editor) start on our own so the level can still be tested alone.
+        if (!SequenceManager.IsRunning)
+            StartLevel(testCheckpoint);
+    }
+
+    // Called by SequenceManager once the scene finished loading (spec: Start State).
+    // checkpoint = Wave to start at (0-based), 0 = from the beginning.
+    public void StartLevel(int checkpoint)
+    {
+        startWave = ClampWave(checkpoint);
         stateMachine.EnterState(startState);
+    }
+
+    private int ClampWave(int wave)
+    {
+        int lastWave = Mathf.Max(TotalWaves - 1, 0);
+        if (wave >= 0 && wave <= lastWave)
+            return wave;
+
+        Debug.LogWarning(
+            $"{nameof(CombatLevelManager)}: checkpoint {wave} is not a Wave (0..{lastWave}), clamped"
+        );
+        return Mathf.Clamp(wave, 0, lastWave);
     }
 
     private void Update()
@@ -117,6 +144,7 @@ public class CombatLevelManager : MonoBehaviour
 
     private void OnDestroy()
     {
+        SequenceManager.UnregisterLevelManager(this);
         stateMachine?.ExitState(); // runs exit actions: unsubscribes events, restores time scale and input
         Time.timeScale = 1f;
     }
@@ -126,41 +154,39 @@ public class CombatLevelManager : MonoBehaviour
         startState = new TickState(
             "Start",
             OnStartEnter,
-            tick: _ => transitions.RaiseStartFinished()
+            tick: _ => LevelTransitions.RaiseStartFinished()
         );
         playState = new TickState("Play", OnPlayEnter, OnPlayExit, PlayTick);
         pauseState = new TickState("Pause", OnPauseEnter, OnPauseExit, PauseTick);
-        completeState = new TickState("Complete", OnCompleteEnter, tick: CompleteTick);
+        failState = new TickState("Fail", OnFailEnter, OnFailExit, FailTick);
+        completeState = new TickState("Complete", OnCompleteEnter, OnCompleteExit, CompleteTick);
         exitState = new TickState("Exit", OnExitEnter);
 
-        startState.AddLink(new Link(playState, transitions.StartFinishedWrapper));
-        playState.AddLink(new Link(pauseState, transitions.PauseRequestedWrapper));
-        playState.AddLink(new Link(completeState, transitions.CompletedWrapper));
-        pauseState.AddLink(new Link(playState, transitions.ResumeRequestedWrapper));
-        pauseState.AddLink(new Link(exitState, transitions.ExitRequestedWrapper));
-        completeState.AddLink(new Link(exitState, transitions.ExitRequestedWrapper));
+        startState.AddLink(new Link(playState, LevelTransitions.StartFinishedWrapper));
+
+        playState.AddLink(new Link(pauseState, LevelTransitions.PauseRequestedWrapper));
+        playState.AddLink(new Link(failState, LevelTransitions.FailedWrapper));
+        playState.AddLink(new Link(completeState, LevelTransitions.CompletedWrapper));
+
+        pauseState.AddLink(new Link(playState, LevelTransitions.ContinueRequestedWrapper));
+        pauseState.AddLink(new Link(exitState, LevelTransitions.ExitRequestedWrapper));
+
+        failState.AddLink(new Link(playState, LevelTransitions.RetryRequestedWrapper));
+        failState.AddLink(new Link(exitState, LevelTransitions.ExitRequestedWrapper));
+
+        completeState.AddLink(new Link(exitState, LevelTransitions.ExitRequestedWrapper));
 
         stateMachine = new StateMachine(state => currentStateName = state.Name);
     }
 
-    // ---------------- Public API (for UI buttons) ----------------
-
-    // Pause Menu: Resume Button
-    public void Resume() => transitions.RaiseResumeRequested();
-
-    // Pause Menu / Level Complete Screen: exit buttons
-    public void ExitLevel(bool save)
-    {
-        saveOnExit = save;
-        transitions.RaiseExitRequested();
-    }
+    // Raised right before the Exit transition, so OnExitEnter reads the right value.
+    private void OnExitRequested(bool save) => saveOnExit = save;
 
     // ---------------- Start ----------------
 
     private void OnStartEnter()
     {
-        // TODO: SequenceManager should init the Level Manager (spec: Start State).
-        currentWave = 0;
+        currentWave = startWave;
         waveActive = false;
         allWavesCleared = false;
         waveTimer = firstWaveDelay;
@@ -171,14 +197,14 @@ public class CombatLevelManager : MonoBehaviour
 
     private void OnPlayEnter()
     {
-        // Runs again when resuming from Pause, so only subscribe here; no resets.
-        PlayerEvents.RespawnRequested += OnRespawnRequested;
+        // Runs again when continuing from Pause / retrying from Fail, so only subscribe here; no resets.
+        PlayerEvents.Died += OnPlayerDied;
         LevelEvents.Collected += OnCollected;
     }
 
     private void OnPlayExit()
     {
-        PlayerEvents.RespawnRequested -= OnRespawnRequested;
+        PlayerEvents.Died -= OnPlayerDied;
         LevelEvents.Collected -= OnCollected;
     }
 
@@ -186,7 +212,7 @@ public class CombatLevelManager : MonoBehaviour
     {
         if (PausePressed())
         {
-            transitions.RaisePauseRequested();
+            LevelTransitions.RaisePauseRequested();
             return;
         }
 
@@ -195,24 +221,12 @@ public class CombatLevelManager : MonoBehaviour
         debugEnemies = enemySpawner != null ? enemySpawner.AliveCount : 0;
     }
 
-    private void OnRespawnRequested()
-    {
-        if (enemySpawner != null)
-            enemySpawner.ClearAll();
-        SpawnPlayer();
-
-        // Same currentWave again; it only goes up when a Wave is cleared.
-        if (!allWavesCleared)
-        {
-            waveActive = false;
-            waveTimer = respawnWaveDelay;
-        }
-    }
+    private void OnPlayerDied() => LevelTransitions.RaiseFailed();
 
     private void OnCollected(Collectible collectible)
     {
         if (collectible.Type == CollectibleType.Star)
-            transitions.RaiseCompleted();
+            LevelTransitions.RaiseCompleted();
     }
 
     // ---------------- Pause ----------------
@@ -234,22 +248,63 @@ public class CombatLevelManager : MonoBehaviour
     private void PauseTick(float dt)
     {
         if (PausePressed())
-            transitions.RaiseResumeRequested();
+            LevelTransitions.RaiseContinueRequested();
     }
+
+    // ---------------- Fail ----------------
+
+    private void OnFailEnter()
+    {
+        Time.timeScale = 0f;
+        SetPlayerInputEnabled(false);
+
+        // Only listen while in Fail, so a stray Retry can't respawn mid-fight.
+        // The Fail -> Play Link subscribed first, so this runs after Fail exit restored time and input.
+        LevelTransitions.RetryRequested += OnRetryRequested;
+        // TODO: show Fail Screen (Retry / Exit buttons).
+        Debug.Log("Combat level failed");
+    }
+
+    private void OnFailExit()
+    {
+        LevelTransitions.RetryRequested -= OnRetryRequested;
+        Time.timeScale = 1f;
+        SetPlayerInputEnabled(true);
+        // TODO: hide Fail Screen.
+    }
+
+    private void FailTick(float dt)
+    {
+        // Enter retries, until the Fail Screen has its buttons.
+        if (WasPressed(confirmAction))
+            LevelTransitions.RaiseRetryRequested();
+    }
+
+    private void OnRetryRequested() => RestartCurrentWave();
 
     // ---------------- Complete ----------------
 
     private void OnCompleteEnter()
     {
-        Debug.Log("Combat level complete");
+        // Freeze the world (enemies, collectible spots, fireballs) behind the Level Complete Screen.
+        Time.timeScale = 0f;
+        SetPlayerInputEnabled(false);
         // TODO: show Level Complete Screen.
+        Debug.Log("Combat level complete");
+    }
+
+    private void OnCompleteExit()
+    {
+        Time.timeScale = 1f;
+        SetPlayerInputEnabled(true);
+        // TODO: hide Level Complete Screen.
     }
 
     private void CompleteTick(float dt)
     {
-        // Spec: press Enter to go back to Level Select.
+        // Spec: press Enter to go back to Main Menu.
         if (WasPressed(confirmAction))
-            ExitLevel(save: false);
+            LevelTransitions.RaiseExitRequested(save: false);
     }
 
     // ---------------- Exit ----------------
@@ -261,8 +316,10 @@ public class CombatLevelManager : MonoBehaviour
         {
             // TODO: write Save File.
         }
-        // TODO: cleanup, tell SequenceManager to go to Level Select.
         Debug.Log($"Exit combat level (save: {saveOnExit})");
+
+        // SequenceManager unloads this scene and goes to Main Menu.
+        LevelEvents.RaiseExited();
     }
 
     // ---------------- Waves ----------------
@@ -328,6 +385,23 @@ public class CombatLevelManager : MonoBehaviour
     }
 
     // ---------------- Helpers ----------------
+
+    private void RestartCurrentWave()
+    {
+        if (enemySpawner != null)
+            enemySpawner.ClearAll();
+
+        // Player.Spawn raises PlayerEvents.Spawned: every CollectibleSpot removes its item and
+        // restarts its timer, and every fireball (Arrow) in flight is removed.
+        SpawnPlayer();
+
+        // Same currentWave again (the failed one); it only goes up when a Wave is cleared.
+        if (!allWavesCleared)
+        {
+            waveActive = false;
+            waveTimer = firstWaveDelay;
+        }
+    }
 
     private void SpawnPlayer()
     {

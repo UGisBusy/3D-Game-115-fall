@@ -7,10 +7,10 @@ namespace ObstacleLevel
 {
     /// <summary>
     /// Obstacle level flow. States (event-driven through Links):
-    ///   Start --StartFinished-->   Play      spawn the Player at the first Checkpoint
-    ///   Play  --PauseRequested-->  Pause     ESC
-    ///   Pause --ResumeRequested--> Play      ESC
-    ///   Play  --Completed-->       Complete  Star collected
+    ///   Start --StartFinished-->     Play      spawn the Player at the first Checkpoint
+    ///   Play  --PauseRequested-->    Pause     ESC
+    ///   Pause --ContinueRequested--> Play      ESC
+    ///   Play  --Completed-->         Complete  Star collected
     /// Pause freezes time and the Player's input. Complete stops the Player's input.
     /// Respawning is owned by SpawnManager.
     /// </summary>
@@ -32,7 +32,6 @@ namespace ObstacleLevel
         [SerializeField]
         private string currentStateName;
 
-        private readonly LevelTransitions transitions = new();
         private StateMachine stateMachine;
         private TickState startState,
             playState,
@@ -76,16 +75,16 @@ namespace ObstacleLevel
             startState = new TickState(
                 "Start",
                 OnStartEnter,
-                tick: _ => transitions.RaiseStartFinished()
+                tick: _ => LevelTransitions.RaiseStartFinished()
             );
             playState = new TickState("Play", OnPlayEnter, OnPlayExit, PlayTick);
             pauseState = new TickState("Pause", OnPauseEnter, OnPauseExit, PauseTick);
             completeState = new TickState("Complete", OnCompleteEnter);
 
-            startState.AddLink(new Link(playState, transitions.StartFinishedWrapper));
-            playState.AddLink(new Link(pauseState, transitions.PauseRequestedWrapper));
-            playState.AddLink(new Link(completeState, transitions.CompletedWrapper));
-            pauseState.AddLink(new Link(playState, transitions.ResumeRequestedWrapper));
+            startState.AddLink(new Link(playState, LevelTransitions.StartFinishedWrapper));
+            playState.AddLink(new Link(pauseState, LevelTransitions.PauseRequestedWrapper));
+            playState.AddLink(new Link(completeState, LevelTransitions.CompletedWrapper));
+            pauseState.AddLink(new Link(playState, LevelTransitions.ContinueRequestedWrapper));
 
             stateMachine = new StateMachine(state => currentStateName = state.Name);
         }
@@ -123,7 +122,7 @@ namespace ObstacleLevel
         {
             if (pauseAction.action.WasPressedThisFrame())
             {
-                transitions.RaisePauseRequested();
+                LevelTransitions.RaisePauseRequested();
             }
         }
 
@@ -131,7 +130,7 @@ namespace ObstacleLevel
         {
             if (collectible.Type == CollectibleType.Star)
             {
-                transitions.RaiseCompleted();
+                LevelTransitions.RaiseCompleted();
             }
         }
 
@@ -153,7 +152,7 @@ namespace ObstacleLevel
         {
             if (pauseAction.action.WasPressedThisFrame())
             {
-                transitions.RaiseResumeRequested();
+                LevelTransitions.RaiseContinueRequested();
             }
         }
 

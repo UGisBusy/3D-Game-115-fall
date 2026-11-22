@@ -42,9 +42,6 @@ namespace CameraSystem
         [SerializeField, Range(-89f, 89f)]
         private float maxXRotation = 70f;
 
-        [SerializeField]
-        private bool lockCursor = true;
-
         [Header("Zoom")]
         [SerializeField]
         private float distance = 4f;
@@ -121,8 +118,6 @@ namespace CameraSystem
 
             lookAction.action.Enable();
             zoomAction.action.Enable();
-            if (lockCursor)
-                SetCursorLocked(true);
         }
 
         private void OnDisable()
@@ -133,8 +128,6 @@ namespace CameraSystem
             if (zoomAction != null)
                 zoomAction.action.Disable();
             SetModelHidden(false);
-            if (lockCursor)
-                SetCursorLocked(false);
         }
 
         private void LateUpdate()
@@ -142,13 +135,10 @@ namespace CameraSystem
             if (target == null)
                 return;
 
-            HandleCursor();
-            if (!lockCursor || Cursor.lockState == CursorLockMode.Locked)
-            {
-                HandleRotation();
-                HandleZoom();
-            }
-            zoom = Mathf.SmoothDamp(zoom, zoomTarget, ref zoomVelocity, zoomSmoothTime);
+            // While the Player input is off (Pause, Fail, Complete) look / zoom read 0.
+            HandleRotation();
+            HandleZoom();
+            zoom =Mathf.SmoothDamp(zoom, zoomTarget, ref zoomVelocity, zoomSmoothTime);
 
             Vector3 pivot = target.position + pivotOffset;
             Quaternion rotation = Quaternion.Euler(pitch, yaw, 0f);
@@ -199,12 +189,6 @@ namespace CameraSystem
             SetModelHidden(wasHidden);
         }
 
-        public void SetCursorLocked(bool locked)
-        {
-            Cursor.lockState = locked ? CursorLockMode.Locked : CursorLockMode.None;
-            Cursor.visible = !locked;
-        }
-
         // ---------------- Internals ----------------
 
         private void HandleRotation()
@@ -226,21 +210,6 @@ namespace CameraSystem
                     minDistance,
                     maxDistance
                 );
-        }
-
-        private void HandleCursor()
-        {
-            if (!lockCursor)
-                return;
-
-            if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
-                SetCursorLocked(false);
-            else if (
-                Cursor.lockState != CursorLockMode.Locked
-                && Mouse.current != null
-                && Mouse.current.leftButton.wasPressedThisFrame
-            )
-                SetCursorLocked(true);
         }
 
         // How far the camera can go from the pivot along dir before hitting something.

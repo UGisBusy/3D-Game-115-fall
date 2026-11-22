@@ -12,12 +12,18 @@ public class SequenceManager : MonoBehaviour
     [SerializeField]
     string currentStateName = "None";
 
+    [SerializeField]
+    int resumeCheckpoint; // TODO: read from Save File; checkpoint used by the Start From Checkpoint buttons
+
     static SequenceManager instance;
 
     // Menu scene's MenuUIManager registers itself here, null while Menu scene is not loaded.
     // Static so it works no matter whose Awake runs first.
     // Menu states must only be entered after the Menu scene finished loading.
     static MenuUIManager menuUI;
+
+    // Level scene's Level Manager registers itself here, null while no level is loaded.
+    static ILevelManager levelManager;
 
     StateMachine stateMachine;
     State mainMenuState,
@@ -28,6 +34,7 @@ public class SequenceManager : MonoBehaviour
 
     // set by MenuEvents.LevelStartRequested, read when entering gameState
     LevelId selectedLevel;
+    int selectedCheckpoint; // 0 = start from the beginning
 
     private void Awake()
     {
@@ -68,6 +75,18 @@ public class SequenceManager : MonoBehaviour
             menuUI = null;
     }
 
+    // ---------- Level Manager registration ----------
+    // false when a level scene is played directly in the editor; the Level Manager then starts itself
+    public static bool IsRunning => instance != null;
+
+    public static void RegisterLevelManager(ILevelManager manager) => levelManager = manager;
+
+    public static void UnregisterLevelManager(ILevelManager manager)
+    {
+        if (levelManager == manager)
+            levelManager = null;
+    }
+
     private void OnDestroy()
     {
         if (instance != this)
@@ -84,9 +103,7 @@ public class SequenceManager : MonoBehaviour
     private void OnLevelStartRequested(LevelId level, bool fromCheckpoint)
     {
         selectedLevel = level;
-
-        // TODO: start from checkpoint, for now Resume starts the level from the start too
-        // if (fromCheckpoint)
+        selectedCheckpoint = fromCheckpoint ? resumeCheckpoint : 0;
     }
 
     private void SetStates()
@@ -94,7 +111,7 @@ public class SequenceManager : MonoBehaviour
         mainMenuState = new State("Main Menu", EnterMainMenu, ExitMenus);
         levelSelectState = new State("Level Select", EnterLevelSelect, ExitMenus);
         saveLoadState = new State("Save Load", EnterSaveLoad, ExitMenus);
-        gameState = new State("Game", EnterGame);
+        gameState = new State("Game", EnterGame, ExitGame);
         exitState = new State("Exit", enter: ExitApp);
 
         mainMenuState.AddLink(new Link(levelSelectState, MenuEvents.PlayRequestedWrapper));
@@ -118,27 +135,62 @@ public class SequenceManager : MonoBehaviour
     {
         menuUI.ShowMainMenu();
         backAction.action.Enable();
+        CursorControl.SetLocked(false);
     }
 
     private void EnterLevelSelect()
     {
         menuUI.ShowLevelSelect();
         backAction.action.Enable();
+        CursorControl.SetLocked(false);
     }
 
     private void EnterSaveLoad()
     {
         menuUI.ShowSaveLoad();
         backAction.action.Enable();
+        CursorControl.SetLocked(false);
     }
 
     private void EnterGame()
     {
+        LevelEvents.Exited += OnLevelExited;
+
         // async: we are inside a button / input callback here, so don't load synchronously
-        SceneManager.LoadSceneAsync(GetSceneName(selectedLevel));
+        SceneManager.LoadSceneAsync(GetSceneName(selectedLevel)).completed += _ => StartLevel();
+    }
+
+    // Level Manager registers in its Awake, which has run by the time loading completed.
+    private void StartLevel()
+    {
+        if (levelManager == null)
+        {
+            Debug.LogWarning($"Sequence Manager: {selectedLevel} level has no registered Level Manager");
+            return;
+        }
+
+        levelManager.StartLevel(selectedCheckpoint);
+    }
+
+    private void ExitGame()
+    {
+        LevelEvents.Exited -= OnLevelExited;
+    }
+
+    private void OnLevelExited()
+    {
+        // stay in gameState while loading, but don't react to a second Exited
+        LevelEvents.Exited -= OnLevelExited;
+
+        // Menu states need menuUI, which registers in the Menu scene's Awake,
+        // so only enter Main Menu after the scene finished loading.
+        SceneManager.LoadSceneAsync(MenuSceneName).completed += _ =>
+            stateMachine.EnterState(mainMenuState);
     }
 
     // must match scene names in Build Settings
+    private const string MenuSceneName = "Menu";
+
     private static string GetSceneName(LevelId level)
     {
         return level switch

@@ -3,6 +3,9 @@ using UnityEngine.InputSystem;
 
 public class SequenceManager : MonoBehaviour
 {
+    [SerializeField]
+    MenuUIManager uiManager;
+
     [Header("Debug")]
     [SerializeField]
     string currentStateName = "None";
@@ -27,6 +30,9 @@ public class SequenceManager : MonoBehaviour
         instance = this;
         DontDestroyOnLoad(gameObject);
 
+        if (uiManager == null)
+            throw new System.NullReferenceException("Sequence Manager has no UI Manager");
+
         stateMachine = new StateMachine((newState) => currentStateName = newState.ToString());
     }
 
@@ -35,6 +41,7 @@ public class SequenceManager : MonoBehaviour
         SetStates();
         SetLinks();
 
+        uiManager.HideAll();
         stateMachine.EnterState(mainMenuState);
     }
 
@@ -58,6 +65,18 @@ public class SequenceManager : MonoBehaviour
         saveLoadState.AddLink(new InputLink(gameState, advanceStateAction));
         gameState.AddLink(new InputLink(exitState, advanceStateAction));
     }
+
+    private void EnterMainMenu() { }
+
+    private void ExitMainMenu() { }
+
+    private void EnterLevelSelect() { }
+
+    private void ExitLevelSelect() { }
+
+    private void EnterSaveLoad() { }
+
+    private void ExitSaveLoad() { }
 
     private void ExitApp()
     {

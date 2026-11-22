@@ -91,9 +91,9 @@ public class SequenceManager : MonoBehaviour
 
     private void SetStates()
     {
-        mainMenuState = new State("Main Menu", EnterMainMenu, ExitMainMenu);
-        levelSelectState = new State("Level Select", EnterLevelSelect, ExitLevelSelect);
-        saveLoadState = new State("Save Load", EnterSaveLoad, ExitSaveLoad);
+        mainMenuState = new State("Main Menu", EnterMainMenu, ExitMenus);
+        levelSelectState = new State("Level Select", EnterLevelSelect, ExitMenus);
+        saveLoadState = new State("Save Load", EnterSaveLoad, ExitMenus);
         gameState = new State("Game", EnterGame);
         exitState = new State("Exit", enter: ExitApp);
 
@@ -108,16 +108,16 @@ public class SequenceManager : MonoBehaviour
         saveLoadState.AddLink(new Link(mainMenuState, MenuEvents.BackRequestedWrapper));
     }
 
+    private void ExitMenus()
+    {
+        menuUI.HideAll();
+        backAction.action.Disable();
+    }
+
     private void EnterMainMenu()
     {
         menuUI.ShowMainMenu();
         backAction.action.Enable();
-    }
-
-    private void ExitMainMenu()
-    {
-        menuUI.HideAll();
-        backAction.action.Disable();
     }
 
     private void EnterLevelSelect()
@@ -126,22 +126,10 @@ public class SequenceManager : MonoBehaviour
         backAction.action.Enable();
     }
 
-    private void ExitLevelSelect()
-    {
-        menuUI.HideAll();
-        backAction.action.Disable();
-    }
-
     private void EnterSaveLoad()
     {
         menuUI.ShowSaveLoad();
         backAction.action.Enable();
-    }
-
-    private void ExitSaveLoad()
-    {
-        menuUI.HideAll();
-        backAction.action.Disable();
     }
 
     private void EnterGame()

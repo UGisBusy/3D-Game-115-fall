@@ -37,12 +37,20 @@ public class SceneBootstrapper
                 PreviousScene = EditorSceneManager.GetActiveScene().path;
 
                 if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+                {
+                    // The Inspector would keep showing an object of the scene we are closing,
+                    // then throw MissingReferenceException / SerializedObjectNotCreatableException.
+                    Selection.activeObject = null;
                     EditorSceneManager.OpenScene(MenuScene);
+                }
                 break;
 
             case PlayModeStateChange.EnteredEditMode:
                 if (!string.IsNullOrEmpty(PreviousScene))
+                {
+                    Selection.activeObject = null;
                     EditorSceneManager.OpenScene(PreviousScene);
+                }
                 break;
         }
     }

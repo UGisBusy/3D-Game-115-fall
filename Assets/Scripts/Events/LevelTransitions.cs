@@ -17,10 +17,9 @@ public static class LevelTransitions
 
     // Fired by input or UI
     public static event Action PauseRequested; // ESC
-    public static event Action ContinueRequested; // ESC or Pause Menu Continue Button
-    public static event Action RetryRequested; // Fail Screen Retry Button
-    public static event Action<bool> ExitRequested; // Pause Menu / Fail Screen / Level Complete Screen exit buttons. (save)
-    private static event Action exitTransition; // no-arg version for Link
+    public static event Action ContinueRequested; // ESC or Pause Screen Continue Button
+    public static event Action RetryRequested; // Enter or Fail Screen Retry Button
+    public static event Action ExitRequested; // Enter on Complete Screen or any Back To Menu Button
 
     // ---------- Wrappers for Link ----------
     public static EventWrapper StartFinishedWrapper { get; } =
@@ -60,8 +59,8 @@ public static class LevelTransitions
     public static EventWrapper ExitRequestedWrapper { get; } =
         new EventWrapper
         {
-            Subscribe = h => exitTransition += h,
-            Unsubscribe = h => exitTransition -= h,
+            Subscribe = h => ExitRequested += h,
+            Unsubscribe = h => ExitRequested -= h,
         };
 
     // ---------- Raise ----------
@@ -77,11 +76,7 @@ public static class LevelTransitions
 
     public static void RaiseRetryRequested() => RetryRequested?.Invoke();
 
-    public static void RaiseExitRequested(bool save)
-    {
-        ExitRequested?.Invoke(save);
-        exitTransition?.Invoke();
-    }
+    public static void RaiseExitRequested() => ExitRequested?.Invoke();
 
     // clear old subscribers at startup
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
@@ -94,6 +89,5 @@ public static class LevelTransitions
         RetryRequested = null;
         Completed = null;
         ExitRequested = null;
-        exitTransition = null;
     }
 }

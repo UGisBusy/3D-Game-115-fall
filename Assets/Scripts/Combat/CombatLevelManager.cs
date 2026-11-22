@@ -10,11 +10,12 @@ using UnityEngine.InputSystem;
 ///   Play     --PauseRequested-->    Pause     ESC
 ///   Play     --Failed-->            Fail      Player died
 ///   Play     --Completed-->         Complete  Star collected
-///   Pause    --ContinueRequested--> Play      ESC or Continue button
-///   Pause    --ExitRequested-->     Exit      Pause Menu exit buttons
-///   Fail     --RetryRequested-->    Play      Retry button (or Enter)
-///   Fail     --ExitRequested-->     Exit      Fail Screen exit button
-///   Complete --ExitRequested-->     Exit      Enter on Level Complete Screen
+///   Pause    --ContinueRequested--> Play      ESC or Continue Button
+///   Pause    --ExitRequested-->     Exit      Back To Menu Button
+///   Fail     --RetryRequested-->    Play      Enter or Retry Button
+///   Fail     --ExitRequested-->     Exit      Back To Menu Button
+///   Complete --ExitRequested-->     Exit      Enter or Back To Menu Button
+/// Pause / Fail Save Button: LevelEvents.SaveRequested (no state change).
 ///
 /// Waves (run in Play): read from the WaveSet (Waves File); EnemySpawner places the enemies.
 /// One Wave at a time. When it is cleared (nothing alive, no group waiting), wait waveBreak sec, then start the next.
@@ -39,6 +40,9 @@ public class CombatLevelManager : MonoBehaviour, ILevelManager
 
     [SerializeField]
     private Transform starSpawnPoint; // usually the center
+
+    [SerializeField]
+    private LevelUIManager levelUI; // Pause / Fail / Complete screens
 
     [Header("Input")]
     [SerializeField]
@@ -85,10 +89,11 @@ public class CombatLevelManager : MonoBehaviour, ILevelManager
     private bool allWavesCleared;
     private float waveTimer;
 
-    private bool saveOnExit;
-
     private void Awake()
     {
+        if (levelUI == null)
+            throw new System.NullReferenceException("Combat Level Manager has no Level UI Manager");
+
         BuildStateMachine();
         SequenceManager.RegisterLevelManager(this);
     }
@@ -97,16 +102,12 @@ public class CombatLevelManager : MonoBehaviour, ILevelManager
     {
         SetActionEnabled(pauseAction, true);
         SetActionEnabled(confirmAction, true);
-
-        LevelTransitions.ExitRequested += OnExitRequested;
     }
 
     private void OnDisable()
     {
         SetActionEnabled(pauseAction, false);
         SetActionEnabled(confirmAction, false);
-
-        LevelTransitions.ExitRequested -= OnExitRequested;
     }
 
     private void Start()
@@ -179,9 +180,6 @@ public class CombatLevelManager : MonoBehaviour, ILevelManager
         stateMachine = new StateMachine(state => currentStateName = state.Name);
     }
 
-    // Raised right before the Exit transition, so OnExitEnter reads the right value.
-    private void OnExitRequested(bool save) => saveOnExit = save;
-
     // ---------------- Start ----------------
 
     private void OnStartEnter()
@@ -235,14 +233,16 @@ public class CombatLevelManager : MonoBehaviour, ILevelManager
     {
         Time.timeScale = 0f;
         SetPlayerInputEnabled(false);
-        // TODO: show Pause Menu.
+        LevelEvents.SaveRequested += OnSaveRequested; // saving is allowed in Pause and Fail only
+        levelUI.ShowPause();
     }
 
     private void OnPauseExit()
     {
+        LevelEvents.SaveRequested -= OnSaveRequested;
         Time.timeScale = 1f;
         SetPlayerInputEnabled(true);
-        // TODO: hide Pause Menu.
+        HideScreens();
     }
 
     private void PauseTick(float dt)
@@ -261,21 +261,23 @@ public class CombatLevelManager : MonoBehaviour, ILevelManager
         // Only listen while in Fail, so a stray Retry can't respawn mid-fight.
         // The Fail -> Play Link subscribed first, so this runs after Fail exit restored time and input.
         LevelTransitions.RetryRequested += OnRetryRequested;
-        // TODO: show Fail Screen (Retry / Exit buttons).
+        LevelEvents.SaveRequested += OnSaveRequested;
+        levelUI.ShowFail();
         Debug.Log("Combat level failed");
     }
 
     private void OnFailExit()
     {
         LevelTransitions.RetryRequested -= OnRetryRequested;
+        LevelEvents.SaveRequested -= OnSaveRequested;
         Time.timeScale = 1f;
         SetPlayerInputEnabled(true);
-        // TODO: hide Fail Screen.
+        HideScreens();
     }
 
     private void FailTick(float dt)
     {
-        // Enter retries, until the Fail Screen has its buttons.
+        // Fail Screen: Enter retries.
         if (WasPressed(confirmAction))
             LevelTransitions.RaiseRetryRequested();
     }
@@ -289,7 +291,7 @@ public class CombatLevelManager : MonoBehaviour, ILevelManager
         // Freeze the world (enemies, collectible spots, fireballs) behind the Level Complete Screen.
         Time.timeScale = 0f;
         SetPlayerInputEnabled(false);
-        // TODO: show Level Complete Screen.
+        levelUI.ShowComplete();
         Debug.Log("Combat level complete");
     }
 
@@ -297,14 +299,23 @@ public class CombatLevelManager : MonoBehaviour, ILevelManager
     {
         Time.timeScale = 1f;
         SetPlayerInputEnabled(true);
-        // TODO: hide Level Complete Screen.
+        HideScreens();
     }
 
     private void CompleteTick(float dt)
     {
         // Spec: press Enter to go back to Main Menu.
         if (WasPressed(confirmAction))
-            LevelTransitions.RaiseExitRequested(save: false);
+            LevelTransitions.RaiseExitRequested();
+    }
+
+    // ---------------- Save ----------------
+
+    // Save Button on Pause / Fail Screen. Checkpoint = current Wave (the failed one when in Fail).
+    private void OnSaveRequested()
+    {
+        // TODO: overwrite the Save File with checkpoint currentWave for the Combat level.
+        Debug.Log($"Save combat level at checkpoint {currentWave}");
     }
 
     // ---------------- Exit ----------------
@@ -312,11 +323,7 @@ public class CombatLevelManager : MonoBehaviour, ILevelManager
     private void OnExitEnter()
     {
         Time.timeScale = 1f;
-        if (saveOnExit)
-        {
-            // TODO: write Save File.
-        }
-        Debug.Log($"Exit combat level (save: {saveOnExit})");
+        Debug.Log("Exit combat level");
 
         // SequenceManager unloads this scene and goes to Main Menu.
         LevelEvents.RaiseExited();
@@ -432,5 +439,12 @@ public class CombatLevelManager : MonoBehaviour, ILevelManager
     {
         if (player != null)
             player.Input.SetEnabled(enabled);
+    }
+
+    // State exits also run from OnDestroy, where the UI may already be destroyed (scene unload).
+    private void HideScreens()
+    {
+        if (levelUI != null)
+            levelUI.HideAll();
     }
 }

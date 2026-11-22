@@ -14,9 +14,12 @@ public static class LevelEvents
     // Raised when the Player touches a Checkpoint.
     public static event Action<Checkpoint> CheckpointActivated;
 
-    // Raised by the Level Manager when its Exit state finished (saved, cleaned up).
+    // Raised by the Level Manager when its Exit state finished cleaning up.
     // SequenceManager answers by leaving the level.
     public static event Action Exited;
+
+    // Raised by the Save Button (Pause / Fail Screen). The Level Manager saves (overwrites) if it allows saving now.
+    public static event Action SaveRequested;
 
     // ---------- Raise ----------
     public static void RaiseCollected(Collectible collectible) => Collected?.Invoke(collectible);
@@ -26,6 +29,8 @@ public static class LevelEvents
 
     public static void RaiseExited() => Exited?.Invoke();
 
+    public static void RaiseSaveRequested() => SaveRequested?.Invoke();
+
     // clear old subscribers at startup
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetStatics()
@@ -33,5 +38,6 @@ public static class LevelEvents
         Collected = null;
         CheckpointActivated = null;
         Exited = null;
+        SaveRequested = null;
     }
 }

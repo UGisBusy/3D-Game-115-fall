@@ -1,12 +1,10 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class SequenceManager : MonoBehaviour
 {
-    [SerializeField]
-    MenuUIManager uiManager;
-
     [SerializeField]
     InputActionReference backAction; // Menu/Back (Escape)
 
@@ -15,12 +13,21 @@ public class SequenceManager : MonoBehaviour
     string currentStateName = "None";
 
     static SequenceManager instance;
+
+    // Menu scene's MenuUIManager registers itself here, null while Menu scene is not loaded.
+    // Static so it works no matter whose Awake runs first.
+    // Menu states must only be entered after the Menu scene finished loading.
+    static MenuUIManager menuUI;
+
     StateMachine stateMachine;
     State mainMenuState,
         levelSelectState,
         saveLoadState,
         gameState,
         exitState;
+
+    // set by MenuEvents.LevelStartRequested, read when entering gameState
+    LevelId selectedLevel;
 
     private void Awake()
     {
@@ -34,9 +41,6 @@ public class SequenceManager : MonoBehaviour
         instance = this;
         DontDestroyOnLoad(gameObject);
 
-        if (uiManager == null)
-            throw new System.NullReferenceException("Sequence Manager has no UI Manager");
-
         if (backAction == null)
             throw new System.NullReferenceException("Sequence Manager has no Back Action");
 
@@ -44,14 +48,24 @@ public class SequenceManager : MonoBehaviour
 
         // backAction is only enabled while in a menu state
         backAction.action.performed += OnBackPerformed;
+
+        // raised right before LevelStartRequestedWrapper moves us into gameState
+        MenuEvents.LevelStartRequested += OnLevelStartRequested;
     }
 
     private void Start()
     {
         SetStates();
-
-        uiManager.HideAll();
         stateMachine.EnterState(mainMenuState);
+    }
+
+    // ---------- Menu UI registration ----------
+    public static void RegisterMenuUI(MenuUIManager ui) => menuUI = ui;
+
+    public static void UnregisterMenuUI(MenuUIManager ui)
+    {
+        if (menuUI == ui)
+            menuUI = null;
     }
 
     private void OnDestroy()
@@ -61,17 +75,26 @@ public class SequenceManager : MonoBehaviour
 
         backAction.action.performed -= OnBackPerformed;
         backAction.action.Disable();
+        MenuEvents.LevelStartRequested -= OnLevelStartRequested;
         instance = null;
     }
 
     private void OnBackPerformed(InputAction.CallbackContext _) => MenuEvents.RaiseBackRequested();
+
+    private void OnLevelStartRequested(LevelId level, bool fromCheckpoint)
+    {
+        selectedLevel = level;
+
+        // TODO: start from checkpoint, for now Resume starts the level from the start too
+        // if (fromCheckpoint)
+    }
 
     private void SetStates()
     {
         mainMenuState = new State("Main Menu", EnterMainMenu, ExitMainMenu);
         levelSelectState = new State("Level Select", EnterLevelSelect, ExitLevelSelect);
         saveLoadState = new State("Save Load", EnterSaveLoad, ExitSaveLoad);
-        gameState = new State("Game");
+        gameState = new State("Game", EnterGame);
         exitState = new State("Exit", enter: ExitApp);
 
         mainMenuState.AddLink(new Link(levelSelectState, MenuEvents.PlayRequestedWrapper));
@@ -87,38 +110,55 @@ public class SequenceManager : MonoBehaviour
 
     private void EnterMainMenu()
     {
-        uiManager.ShowMainMenu();
+        menuUI.ShowMainMenu();
         backAction.action.Enable();
     }
 
     private void ExitMainMenu()
     {
-        uiManager.HideAll();
+        menuUI.HideAll();
         backAction.action.Disable();
     }
 
     private void EnterLevelSelect()
     {
-        uiManager.ShowLevelSelect();
+        menuUI.ShowLevelSelect();
         backAction.action.Enable();
     }
 
     private void ExitLevelSelect()
     {
-        uiManager.HideAll();
+        menuUI.HideAll();
         backAction.action.Disable();
     }
 
     private void EnterSaveLoad()
     {
-        uiManager.ShowSaveLoad();
+        menuUI.ShowSaveLoad();
         backAction.action.Enable();
     }
 
     private void ExitSaveLoad()
     {
-        uiManager.HideAll();
+        menuUI.HideAll();
         backAction.action.Disable();
+    }
+
+    private void EnterGame()
+    {
+        // async: we are inside a button / input callback here, so don't load synchronously
+        SceneManager.LoadSceneAsync(GetSceneName(selectedLevel));
+    }
+
+    // must match scene names in Build Settings
+    private static string GetSceneName(LevelId level)
+    {
+        return level switch
+        {
+            LevelId.Obstacle => "ObstacleLevel",
+            LevelId.Combat => "CombatLevel",
+            _ => throw new System.ArgumentOutOfRangeException(nameof(level), level, null),
+        };
     }
 
     private void ExitApp() => StartCoroutine(ExitAppNextFrame());

@@ -36,9 +36,15 @@ public class MenuUIManager : MonoBehaviour
     [SerializeField]
     private Button CombatResumeButton;
 
+    [SerializeField]
+    private Button LevelSelectBackButton;
+
     [Header("Save Load Menu")]
     [SerializeField]
     private GameObject SaveLoadPanel;
+
+    [SerializeField]
+    private Button SaveLoadBackButton;
 
     // TODO: Save Load UI
 
@@ -75,10 +81,59 @@ public class MenuUIManager : MonoBehaviour
         if (CombatResumeButton == null)
             throw new System.NullReferenceException("Menu UI Manager has no Combat Resume Button");
 
+        if (LevelSelectBackButton == null)
+            throw new System.NullReferenceException(
+                "Menu UI Manager has no Level Select Back Button"
+            );
+
         // Save Load Menu UI elements checks
         if (SaveLoadPanel == null)
             throw new System.NullReferenceException("Menu UI Manager has no Save Load Panel");
+
+        if (SaveLoadBackButton == null)
+            throw new System.NullReferenceException("Menu UI Manager has no Save Load Back Button");
+
+        BindButtons();
+
+        // SequenceManager outlives this scene, so it can't hold a serialized ref to us
+        SequenceManager.RegisterMenuUI(this);
     }
+
+    private void OnDestroy()
+    {
+        SequenceManager.UnregisterMenuUI(this);
+    }
+
+    // Buttons live and die with this scene, so listeners are never removed.
+    private void BindButtons()
+    {
+        // Main Menu
+        PlayButton.onClick.AddListener(MenuEvents.RaisePlayRequested);
+        LoadButton.onClick.AddListener(MenuEvents.RaiseLoadRequested);
+        ExitButton.onClick.AddListener(MenuEvents.RaiseExitRequested);
+
+        // Level Select Menu
+        ObstacleStartButton.onClick.AddListener(OnObstacleStartClicked);
+        ObstacleResumeButton.onClick.AddListener(OnObstacleResumeClicked);
+        CombatStartButton.onClick.AddListener(OnCombatStartClicked);
+        CombatResumeButton.onClick.AddListener(OnCombatResumeClicked);
+        LevelSelectBackButton.onClick.AddListener(MenuEvents.RaiseBackRequested);
+
+        // Save Load Menu
+        SaveLoadBackButton.onClick.AddListener(MenuEvents.RaiseBackRequested);
+    }
+
+    private void OnObstacleStartClicked() =>
+        MenuEvents.RaiseLevelStartRequested(LevelId.Obstacle, fromCheckpoint: false);
+
+    private void OnObstacleResumeClicked() =>
+        MenuEvents.RaiseLevelStartRequested(LevelId.Obstacle, fromCheckpoint: true);
+
+    private void OnCombatStartClicked() =>
+        MenuEvents.RaiseLevelStartRequested(LevelId.Combat, fromCheckpoint: false);
+
+    private void OnCombatResumeClicked() =>
+        MenuEvents.RaiseLevelStartRequested(LevelId.Combat, fromCheckpoint: true);
 
     public void ShowMainMenu() => ShowOnly(MainMenuPanel);
 

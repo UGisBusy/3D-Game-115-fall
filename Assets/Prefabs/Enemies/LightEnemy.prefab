@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1001 &695773470671986892
+--- !u!1001 &1961306884625675338
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -125,15 +125,15 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a4ec793513574cd49719c4055b630e2b, type: 3}
---- !u!4 &7037194175208741844 stripped
+--- !u!4 &8302727449107271506 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7498142190150400792, guid: a4ec793513574cd49719c4055b630e2b, type: 3}
-  m_PrefabInstance: {fileID: 695773470671986892}
+  m_PrefabInstance: {fileID: 1961306884625675338}
   m_PrefabAsset: {fileID: 0}
---- !u!95 &7359897379669119302 stripped
+--- !u!95 &8409223110606112192 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 8035681660144644490, guid: a4ec793513574cd49719c4055b630e2b, type: 3}
-  m_PrefabInstance: {fileID: 695773470671986892}
+  m_PrefabInstance: {fileID: 1961306884625675338}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &3142446271677974346
 PrefabInstance:
@@ -195,6 +195,14 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 797ffc7cc5466584c979ba8dfbb9f627, type: 2}
+    - target: {fileID: 7716491579739359181, guid: d0dc66e8b88db824199a136da6002951, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.713
+      objectReference: {fileID: 0}
+    - target: {fileID: 7716491579739359181, guid: d0dc66e8b88db824199a136da6002951, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 2.12
+      objectReference: {fileID: 0}
     - target: {fileID: 8468975198081965908, guid: d0dc66e8b88db824199a136da6002951, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -204,7 +212,7 @@ PrefabInstance:
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 3525209071946365721, guid: d0dc66e8b88db824199a136da6002951, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 7037194175208741844}
+      addedObject: {fileID: 8302727449107271506}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 880993096176346227, guid: d0dc66e8b88db824199a136da6002951, type: 3}
       insertIndex: -1
@@ -266,7 +274,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee76c067b47f11a47955ca7723ac78da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyVisual
-  animator: {fileID: 7359897379669119302}
+  animator: {fileID: 8409223110606112192}
   idleState: IdleBattle
   moveState: RunFWD
   attackState: Attack01

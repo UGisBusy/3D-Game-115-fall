@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4540122494664442609}
   - component: {fileID: 1160044276915920074}
   - component: {fileID: 1798717083468362189}
+  - component: {fileID: 5619343900043134367}
   m_Layer: 0
   m_Name: CollectibleHeart
   m_TagString: Untagged
@@ -69,6 +70,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Collectible
   type: 1
   amount: 1
+--- !u!114 &5619343900043134367
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 10261011148680234}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84c6a96fd5abf9d46982b163105ebd4e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UISystem.MinimapIcon
+  sprite: {fileID: 4606908045521496030, guid: e85f61f1a2c63e1439d41225f21ac171, type: 3}
+  color: {r: 0.9, g: 0.25, b: 0.3, a: 1}
+  keepOnEdge: 0
 --- !u!1 &1242192044887938036
 GameObject:
   m_ObjectHideFlags: 0

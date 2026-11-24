@@ -40103,7 +40103,18 @@ MonoBehaviour:
   player: {fileID: 1237700997}
   spawnManager: {fileID: 592556094}
   pauseAction: {fileID: -1112345045921236428, guid: ac3f95e6378bc604994eadfe89ea2b89, type: 3}
-  startCheckpoint: {fileID: 1343160973}
+  checkpoints:
+  - {fileID: 1343160973}
+  - {fileID: 731000000}
+  - {fileID: 731000001}
+  - {fileID: 731000002}
+  - {fileID: 731000003}
+  - {fileID: 731000004}
+  - {fileID: 731000005}
+  - {fileID: 731000006}
+  - {fileID: 731000007}
+  - {fileID: 731000008}
+  - {fileID: 731000009}
   star: {fileID: 1797983363}
   starSky: {fileID: 2100000, guid: 6e00f8b39315691449f256740a5cb862, type: 2}
   starAppearedEffect:
@@ -151087,6 +151098,116 @@ Mesh:
       - serializedVersion: 1
         m_IndexStart: 0
         m_IndexCount: 0
+--- !u!114 &731000000 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2454816094789052562, guid: 146fea6b220b564488c24f07fa566702, type: 3}
+  m_PrefabInstance: {fileID: 471805622}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c343ca0d6d7896245bec7f6a935fcfb3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LevelSystem.Checkpoint
+--- !u!114 &731000001 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2454816094789052562, guid: 146fea6b220b564488c24f07fa566702, type: 3}
+  m_PrefabInstance: {fileID: 193443803}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c343ca0d6d7896245bec7f6a935fcfb3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LevelSystem.Checkpoint
+--- !u!114 &731000002 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2454816094789052562, guid: 146fea6b220b564488c24f07fa566702, type: 3}
+  m_PrefabInstance: {fileID: 1540430298}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c343ca0d6d7896245bec7f6a935fcfb3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LevelSystem.Checkpoint
+--- !u!114 &731000003 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2454816094789052562, guid: 146fea6b220b564488c24f07fa566702, type: 3}
+  m_PrefabInstance: {fileID: 1430608318}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c343ca0d6d7896245bec7f6a935fcfb3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LevelSystem.Checkpoint
+--- !u!114 &731000004 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2454816094789052562, guid: 146fea6b220b564488c24f07fa566702, type: 3}
+  m_PrefabInstance: {fileID: 313684319}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c343ca0d6d7896245bec7f6a935fcfb3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LevelSystem.Checkpoint
+--- !u!114 &731000005 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2454816094789052562, guid: 146fea6b220b564488c24f07fa566702, type: 3}
+  m_PrefabInstance: {fileID: 243342496}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c343ca0d6d7896245bec7f6a935fcfb3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LevelSystem.Checkpoint
+--- !u!114 &731000006 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2454816094789052562, guid: 146fea6b220b564488c24f07fa566702, type: 3}
+  m_PrefabInstance: {fileID: 99515528}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c343ca0d6d7896245bec7f6a935fcfb3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LevelSystem.Checkpoint
+--- !u!114 &731000007 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2454816094789052562, guid: 146fea6b220b564488c24f07fa566702, type: 3}
+  m_PrefabInstance: {fileID: 2067912039}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c343ca0d6d7896245bec7f6a935fcfb3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LevelSystem.Checkpoint
+--- !u!114 &731000008 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2454816094789052562, guid: 146fea6b220b564488c24f07fa566702, type: 3}
+  m_PrefabInstance: {fileID: 1272684772}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c343ca0d6d7896245bec7f6a935fcfb3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LevelSystem.Checkpoint
+--- !u!114 &731000009 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2454816094789052562, guid: 146fea6b220b564488c24f07fa566702, type: 3}
+  m_PrefabInstance: {fileID: 1961503369}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c343ca0d6d7896245bec7f6a935fcfb3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LevelSystem.Checkpoint
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

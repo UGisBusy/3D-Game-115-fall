@@ -16,8 +16,11 @@ namespace ObstacleLevel
     /// Owns the Crystal count: the Star stays hidden until every Crystal is collected.
     /// When it appears, the sky changes to starSky, so the Player knows from anywhere in the level.
     /// Respawning is owned by SpawnManager.
+    /// Where the Player starts:
+    ///  - Launched from the Menu: SequenceManager calls StartLevel(x) (ILevelManager): checkpoints[x], 0 = level start.
+    ///  - Scene played directly in the editor: testStartCheckpoint (empty = checkpoints[0]).
     /// </summary>
-    public class ObstacleLevelManager : MonoBehaviour
+    public class ObstacleLevelManager : MonoBehaviour, ILevelManager
     {
         [SerializeField]
         private Player player;
@@ -29,7 +32,7 @@ namespace ObstacleLevel
         private InputActionReference pauseAction; // Level/Pause (Escape)
 
         [SerializeField]
-        private Checkpoint startCheckpoint; // TODO: use editor to set it for now, later seq manager should set it
+        private Checkpoint[] checkpoints = new Checkpoint[0];
 
         [Tooltip("The Star in the scene. Hidden until every Crystal is collected.")]
         [SerializeField]
@@ -49,8 +52,10 @@ namespace ObstacleLevel
         [SerializeField]
         private string currentStateName;
 
-        private int crystalTotal;
-        private int crystalCollected;
+        [SerializeField]
+        private Checkpoint testStartCheckpoint;
+
+        private Checkpoint spawnCheckpoint; // where this run starts
 
         private int crystalTotal;
         private int crystalCollected;
@@ -63,7 +68,19 @@ namespace ObstacleLevel
 
         private void Awake()
         {
+            if (checkpoints.Length == 0)
+                throw new System.NullReferenceException(
+                    "Obstacle Level Manager has no Checkpoints"
+                );
+
+            for (int i = 0; i < checkpoints.Length; i++)
+                if (checkpoints[i] == null)
+                    throw new System.NullReferenceException(
+                        $"Obstacle Level Manager has no Checkpoint at element {i}"
+                    );
+
             BuildStateMachine();
+            SequenceManager.RegisterLevelManager(this);
         }
 
         private void OnEnable()
@@ -76,10 +93,13 @@ namespace ObstacleLevel
             pauseAction.action.Disable();
         }
 
-        // Start instead of Awake: the Player and Checkpoints must finish their Awake first.
+        // From the Menu, SequenceManager calls StartLevel once the scene has loaded.
+        // Played directly in the editor there is no SequenceManager, so start at testStartCheckpoint.
+        // Start, not Awake: Player and Checkpoints need their Awake first.
         private void Start()
         {
-            stateMachine.EnterState(startState);
+            if (!SequenceManager.IsRunning)
+                StartAt(testStartCheckpoint != null ? testStartCheckpoint : GetCheckpoint(0));
         }
 
         private void Update()
@@ -90,6 +110,7 @@ namespace ObstacleLevel
         // Leaving the scene while paused would keep time frozen, so run the current state's exit.
         private void OnDestroy()
         {
+            SequenceManager.UnregisterLevelManager(this);
             stateMachine.ExitState();
         }
 
@@ -113,18 +134,35 @@ namespace ObstacleLevel
         }
 
         // ------------- StartLevel -------------
-        public void StartLevel(Checkpoint startCheckpoint)
+
+        // Called by SequenceManager once the scene has loaded (spec: Start State). checkpoint = checkpoints index.
+        public void StartLevel(int checkpoint) => StartAt(GetCheckpoint(checkpoint));
+
+        private void StartAt(Checkpoint checkpoint)
         {
-            // TODO: for later seq manager to call
-            this.startCheckpoint = startCheckpoint;
+            spawnCheckpoint = checkpoint;
             stateMachine.EnterState(startState);
+        }
+
+        // Awake made sure the list is filled, so only the number can be wrong (e.g. an old save).
+        private Checkpoint GetCheckpoint(int number)
+        {
+            int last = checkpoints.Length - 1;
+            if (number < 0 || number > last)
+            {
+                Debug.LogWarning(
+                    $"{nameof(ObstacleLevelManager)}: no checkpoint {number} (0..{last}), clamped"
+                );
+                number = Mathf.Clamp(number, 0, last);
+            }
+            return checkpoints[number];
         }
 
         // ---------------- Start ----------------
 
         private void OnStartEnter()
         {
-            spawnManager.SetActiveCheckpoint(startCheckpoint);
+            spawnManager.SetActiveCheckpoint(spawnCheckpoint);
             spawnManager.SpawnPlayer();
 
             crystalTotal = CountCrystals();

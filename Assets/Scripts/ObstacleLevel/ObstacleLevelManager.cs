@@ -229,6 +229,8 @@ namespace ObstacleLevel
             PlayerEvents.Died -= OnPlayerDied;
         }
 
+        // The Fail Screen freezes the level at once; the death effect keeps playing over it
+        // (its Effect has Play While Paused on, in LevelEffects).
         private void OnPlayerDied() => LevelTransitions.RaiseFailed();
 
         // Counts the Crystals placed in the level. Runs at the start, before any is collected.

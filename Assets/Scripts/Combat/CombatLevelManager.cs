@@ -219,6 +219,7 @@ public class CombatLevelManager : MonoBehaviour, ILevelManager
         debugEnemies = enemySpawner != null ? enemySpawner.AliveCount : 0;
     }
 
+    // The Fail Screen freezes the level at once; a death effect with Play While Paused keeps playing over it.
     private void OnPlayerDied() => LevelTransitions.RaiseFailed();
 
     private void OnCollected(Collectible collectible)

@@ -8503,6 +8503,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: f556165cb6c844a4e8ce6708c45a5660, type: 3}
     - {fileID: 8300000, guid: 799e4a559fc93c341b7a3e617e395d04, type: 3}
     volume: 0.8
+    playWhilePaused: 0
   died:
     particles: {fileID: 5642766282230003982, guid: b5c8ca7ed10b61e499cce8ec3b6e2e4c, type: 3}
     sounds:
@@ -8512,36 +8513,43 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 79f2583074e86934688b07e2eadb69ee, type: 3}
     - {fileID: 8300000, guid: 93a072ed61025c34db21012b899369e8, type: 3}
     volume: 0.8
+    playWhilePaused: 1
   spawned:
     particles: {fileID: 9157105887711914197, guid: c4f829cb7dd4b864caf8832ec5b1ee55, type: 3}
     sounds:
     - {fileID: 8300000, guid: db6dbf4082043134ab0732b54bea720d, type: 3}
     volume: 0.8
+    playWhilePaused: 0
   dashed:
     particles: {fileID: 0}
     sounds:
     - {fileID: 8300000, guid: 988606b97bf6f3646863a6deab5b4162, type: 3}
     volume: 0.8
+    playWhilePaused: 0
   heart:
     particles: {fileID: 8771972552311404799, guid: bbf9e36a48d6c5648a13889afab076fd, type: 3}
     sounds:
     - {fileID: 8300000, guid: 1c0f1afa59a059f4c90823b331bf88d3, type: 3}
     volume: 0.8
+    playWhilePaused: 0
   crystal:
     particles: {fileID: 2708598583397607911, guid: 6398d43fe79ea0140913dc5530c646af, type: 3}
     sounds:
     - {fileID: 8300000, guid: c7c6d29dbc20bda479d30d15d9126ddb, type: 3}
     volume: 0.8
+    playWhilePaused: 0
   star:
     particles: {fileID: 8791802859087666345, guid: ae07f2a45f14a82428409cfe410e6002, type: 3}
     sounds:
     - {fileID: 8300000, guid: 6e7487b3c73362149ab958d006aafb62, type: 3}
     volume: 0.8
+    playWhilePaused: 1
   checkpoint:
     particles: {fileID: 1429954232896169633, guid: 83036083a4ebcd34f98131bd3cf6f4d2, type: 3}
     sounds:
     - {fileID: 8300000, guid: 57c7f994156ced74dab2b39f62bbd808, type: 3}
     volume: 0.8
+    playWhilePaused: 0
 --- !u!4 &117907476
 Transform:
   m_ObjectHideFlags: 0
@@ -40981,6 +40989,7 @@ MonoBehaviour:
     sounds:
     - {fileID: 8300000, guid: c7a91cbf3d86a704aaaf96049ea7fca5, type: 3}
     volume: 0.8
+    playWhilePaused: 0
   currentStateName: 
   testStartCheckpoint: {fileID: 1343160973}
 --- !u!4 &586466931

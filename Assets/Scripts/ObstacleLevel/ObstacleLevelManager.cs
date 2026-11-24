@@ -29,7 +29,7 @@ namespace ObstacleLevel
         private InputActionReference pauseAction; // Level/Pause (Escape)
 
         [SerializeField]
-        private Checkpoint startCheckpoint;
+        private Checkpoint startCheckpoint; // TODO: use editor to set it for now, later seq manager should set it
 
         [Tooltip("The Star in the scene. Hidden until every Crystal is collected.")]
         [SerializeField]

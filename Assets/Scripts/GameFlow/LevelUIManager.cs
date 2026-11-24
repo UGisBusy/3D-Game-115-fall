@@ -5,7 +5,7 @@ using UnityEngine.UI;
 /// Helper for Level Managers.
 /// Control the all screen UI in a level scene (Pause Screen, Fail Screen, and Complete Screen).
 /// Buttons only raise LevelTransitions / LevelEvents, so this needs no ref to the Level Manager,
-/// and the same prefab works in every level scene. Keyboard (ESC / Enter) is handled by the Level Manager.
+/// and the same prefab works in every level scene. Keyboard (ESC / Space) is handled by the Level Manager.
 /// </summary>
 public class LevelUIManager : MonoBehaviour
 {

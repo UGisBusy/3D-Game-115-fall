@@ -12,9 +12,9 @@ using UnityEngine.InputSystem;
 ///   Play     --Completed-->         Complete  Star collected
 ///   Pause    --ContinueRequested--> Play      ESC or Continue Button
 ///   Pause    --ExitRequested-->     Exit      Back To Menu Button
-///   Fail     --RetryRequested-->    Play      Enter or Retry Button
+///   Fail     --RetryRequested-->    Play      Space or Retry Button
 ///   Fail     --ExitRequested-->     Exit      Back To Menu Button
-///   Complete --ExitRequested-->     Exit      Enter or Back To Menu Button
+///   Complete --ExitRequested-->     Exit      Space or Back To Menu Button
 /// Pause / Fail Save Button: LevelEvents.SaveRequested (no state change).
 ///
 /// Waves (run in Play): read from the WaveSet (Waves File); EnemySpawner places the enemies.
@@ -49,7 +49,7 @@ public class CombatLevelManager : MonoBehaviour, ILevelManager
     private InputActionReference pauseAction; // Level/Pause (Escape)
 
     [SerializeField]
-    private InputActionReference confirmAction; // Level/Confirm (Enter)
+    private InputActionReference confirmAction; // Level/Confirm (Space)
 
     [Header("Waves")]
     [SerializeField]
@@ -277,7 +277,7 @@ public class CombatLevelManager : MonoBehaviour, ILevelManager
 
     private void FailTick(float dt)
     {
-        // Fail Screen: Enter retries.
+        // Fail Screen: Space retries.
         if (WasPressed(confirmAction))
             LevelTransitions.RaiseRetryRequested();
     }

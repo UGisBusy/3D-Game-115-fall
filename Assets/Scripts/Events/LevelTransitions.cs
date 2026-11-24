@@ -18,8 +18,8 @@ public static class LevelTransitions
     // Fired by input or UI
     public static event Action PauseRequested; // ESC
     public static event Action ContinueRequested; // ESC or Pause Screen Continue Button
-    public static event Action RetryRequested; // Enter or Fail Screen Retry Button
-    public static event Action ExitRequested; // Enter on Complete Screen or any Back To Menu Button
+    public static event Action RetryRequested; // Space or Fail Screen Retry Button
+    public static event Action ExitRequested; // Space on Complete Screen or any Back To Menu Button
 
     // ---------- Wrappers for Link ----------
     public static EventWrapper StartFinishedWrapper { get; } =

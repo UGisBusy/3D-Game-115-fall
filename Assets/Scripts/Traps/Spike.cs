@@ -1,3 +1,4 @@
+using EffectSystem;
 using PlayerSystem;
 using UnityEngine;
 
@@ -44,6 +45,10 @@ namespace TrapSystem
         )]
         [SerializeField]
         private float touchGraceTime = 0.5f; // can be changed anytime
+
+        [Tooltip("Variable for OnPlayerTouch: plays when the hidden spikes pop up.")]
+        [SerializeField]
+        private Effect popEffect;
 
         private bool isActive;
         private float toggleTimer;
@@ -117,6 +122,7 @@ namespace TrapSystem
             )
             {
                 SetActive(true);
+                popEffect.Play(transform.position);
                 nextHitTime = Time.time + touchGraceTime; // give the player a grace period to escape the spike before it can hurt them
             }
         }

@@ -26,7 +26,7 @@ namespace ObstacleLevel
     /// Respawning is owned by SpawnManager.
     /// Where the Player starts:
     ///  - Launched from the Menu: SequenceManager calls StartLevel(x) (ILevelManager): checkpoints[x], 0 = level start.
-    ///  - Scene played directly in the editor: testStartCheckpoint (empty = checkpoints[0]).
+    ///  - Scene played directly in the editor: testCheckpoint (empty = checkpoints[0]).
     /// </summary>
     public class ObstacleLevelManager : MonoBehaviour, ILevelManager
     {
@@ -67,7 +67,7 @@ namespace ObstacleLevel
         private string currentStateName;
 
         [SerializeField]
-        private Checkpoint testStartCheckpoint;
+        private Checkpoint testCheckpoint;
 
         private Checkpoint spawnCheckpoint; // where this run starts
         private int activeCheckpoint; // checkpoints index of the active Checkpoint, -1 = not in the list
@@ -124,12 +124,12 @@ namespace ObstacleLevel
             activeCheckpoint = System.Array.IndexOf(checkpoints, checkpoint);
 
         // From the Menu, SequenceManager calls StartLevel once the scene has loaded.
-        // Played directly in the editor there is no SequenceManager, so start at testStartCheckpoint.
+        // Played directly in the editor there is no SequenceManager, so start at testCheckpoint.
         // Start, not Awake: Player and Checkpoints need their Awake first.
         private void Start()
         {
             if (!SequenceManager.IsRunning)
-                StartAt(testStartCheckpoint != null ? testStartCheckpoint : GetCheckpoint(0));
+                StartAt(testCheckpoint != null ? testCheckpoint : GetCheckpoint(0));
         }
 
         private void Update()

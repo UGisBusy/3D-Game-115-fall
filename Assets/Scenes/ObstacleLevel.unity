@@ -40991,7 +40991,7 @@ MonoBehaviour:
     volume: 0.8
     playWhilePaused: 0
   currentStateName: 
-  testStartCheckpoint: {fileID: 1343160973}
+  testCheckpoint: {fileID: 1343160973}
 --- !u!4 &586466931
 Transform:
   m_ObjectHideFlags: 0

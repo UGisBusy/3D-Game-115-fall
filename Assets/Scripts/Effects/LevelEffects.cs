@@ -76,7 +76,7 @@ namespace EffectSystem
             spawned.Play(PlayerCenter());
         }
 
-        // The burst of air points backward, so the wind is left behind the Player.
+        // The wind streaks blow backward, past the Player.
         private void OnDashStarted(Vector3 direction)
         {
             dashed.Play(PlayerCenter(), Quaternion.LookRotation(-direction));

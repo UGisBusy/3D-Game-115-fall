@@ -9198,7 +9198,7 @@ MonoBehaviour:
     sound: {fileID: 8300000, guid: db6dbf4082043134ab0732b54bea720d, type: 3}
     volume: 0.8
   dashed:
-    particles: {fileID: 8771972552311404799, guid: bbf9e36a48d6c5648a13889afab076fd, type: 3}
+    particles: {fileID: 5361081503003676367, guid: a80c3f9c1595476ca0cf80acbbedf9d4, type: 3}
     sound: {fileID: 8300000, guid: 09d5285a7b110354abcf8bfc9cddcab6, type: 3}
     volume: 0.8
   heart:
@@ -27499,7 +27499,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

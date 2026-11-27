@@ -104,11 +104,11 @@ The HUD (scripts in `UISystem`):
 | Dash ring (bottom left) | Empties when the Player dashes and refills over the 2 s cooldown | `DashAbility.CooldownRemaining` |
 
 ## Effects and Sky
-Every effect is a particle (Cartoon FX Remaster Free) and a sound (Kenney Impact and Interface Sounds), set in the Inspector with `Effect`.
+Every effect is a particle (Cartoon FX Remaster Free; the dash wind is `DashWind`, a short one-shot variant of Vefects Wind VFX URP's wind trails) and a sound (Kenney Impact and Interface Sounds), set in the Inspector with `Effect`.
 
 | When | Played by |
 |-|-|
-| Player is hurt, dies, spawns, dashes (a burst of air left behind the Player, and a whoosh) | `LevelEffects` (listens to `PlayerEvents`) |
+| Player is hurt, dies, spawns, dashes (wind streaks blowing back past the Player, and a whoosh) | `LevelEffects` (listens to `PlayerEvents`) |
 | Heart, Crystal, Star collected | `LevelEffects` (listens to `LevelEvents.Collected`) |
 | Checkpoint activated | `LevelEffects` (listens to `LevelEvents.CheckpointActivated`) |
 | Breakable Wall breaks | `BreakableWall` |

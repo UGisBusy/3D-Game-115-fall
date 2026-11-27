@@ -1,14 +1,15 @@
-using EffectSystem;
+using PlayerSystem;
 using UnityEngine;
 
 namespace ObstacleLevel
 {
     /// <summary>
-    /// A floor plate that opens its Gate only when a box is standing on it. Each plate is made for one box.
-    ///   A box gets on the plate   -> the Gate opens
-    ///   The box leaves the plate  -> the Gate goes back to closed
-    ///   The Player steps on it    -> nothing happens, must be a box to open the Gate
-    /// Intended mechanic: a fully opened Gate stays open, so only a box may open it.
+    /// A floor plate that keeps its Gate open while something presses it.
+    ///   The Player or a box stands on its red pad -> the Gate opens
+    ///   Nothing on the pad anymore               -> the Gate closes again
+    /// Pressed when the Player or one box covers at least pressThreshold of the pad, seen from above
+    /// (its collider is the pad). Touching the edge does nothing.
+    /// To walk through the Gate, the Player has to leave a box on the plate.
     /// </summary>
     [RequireComponent(typeof(Collider))]
     public class PressurePlate : MonoBehaviour
@@ -16,39 +17,79 @@ namespace ObstacleLevel
         [SerializeField]
         private Gate gate;
 
-        [Tooltip("Plays when a box gets on the plate.")]
+        [Tooltip(
+            "How much of the red pad the Player or a box must cover to press it. "
+        )]
         [SerializeField]
-        private Effect pressEffect;
+        [Range(0f, 1f)]
+        private float pressThreshold = 0.5f; // The Player need to cover at most about 50% of the pad.
+
+        private static readonly Collider[] buffer = new Collider[8];
+
+        private Collider area;
+        private bool isPressed;
 
         private void Awake()
         {
-            GetComponent<Collider>().isTrigger = true; // it doesn't block them with a solid collider.
+            area = GetComponent<Collider>();
+            area.isTrigger = true; // it doesn't block them with a solid collider.
         }
 
-        private void OnTriggerEnter(Collider other)
+        // Checked every physics step instead of on trigger enter / exit, so the plate only reacts when its state changes:
+        // a box that switches between sliding and resting, or teleports back after breaking, can't press it twice.
+        private void FixedUpdate()
         {
-            if (other.TryGetComponent(out PushableBox _))
+            bool pressed = IsPressed();
+
+            if (pressed == isPressed)
             {
-                pressEffect.Play(transform.position);
-                SetGateOpen(true);
+                return;
             }
+
+            isPressed = pressed;
+            gate.SetOpen(pressed);
         }
 
-        private void OnTriggerExit(Collider other)
+        // Pressed when the Player or one box covers enough of the pad.
+        private bool IsPressed()
         {
-            if (other.TryGetComponent(out PushableBox _))
+            Bounds pad = area.bounds;
+            int count = Physics.OverlapBoxNonAlloc(
+                pad.center,
+                pad.extents,
+                buffer,
+                Quaternion.identity,
+                Physics.AllLayers,
+                QueryTriggerInteraction.Ignore
+            );
+
+            for (int i = 0; i < count; i++)
             {
-                SetGateOpen(false);
+                Collider other = buffer[i];
+                bool presser =
+                    other.TryGetComponent(out Player _) || other.TryGetComponent(out PushableBox _);
+
+                if (presser && Coverage(other.bounds, pad) >= pressThreshold)
+                {
+                    return true;
+                }
             }
+
+            return false;
         }
 
-        // When the gate finishes opening, it destroys itself and stays open.
-        private void SetGateOpen(bool open)
+        // Seen from above: the share of the pad's area that the other object is over, 0 to 1.
+        private static float Coverage(Bounds other, Bounds pad)
         {
-            if (gate != null)
+            float width = Mathf.Min(other.max.x, pad.max.x) - Mathf.Max(other.min.x, pad.min.x);
+            float depth = Mathf.Min(other.max.z, pad.max.z) - Mathf.Max(other.min.z, pad.min.z);
+
+            if (width <= 0f || depth <= 0f)
             {
-                gate.SetOpen(open);
+                return 0f;
             }
+
+            return width * depth / (pad.size.x * pad.size.z);
         }
     }
 }

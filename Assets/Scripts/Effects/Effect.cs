@@ -1,14 +1,14 @@
 using System;
 using UnityEngine;
 using Object = UnityEngine.Object;
-using Random = UnityEngine.Random;
 
 namespace EffectSystem
 {
     /// <summary>
     /// A particle effect and a sound that play together, set in the Inspector.
-    ///   Play(position) -> the particles appear there and remove themselves when done,
-    ///                     and one of the sounds plays (a random one, so repeats don't sound the same)
+    ///   Play(position) -> the particles appear there and remove themselves when done, and the sound plays
+    ///   Stop()         -> the sound stops (the particles finish on their own)
+    /// Each Effect plays one sound at a time: playing it again restarts the sound instead of stacking a second one.
     /// Either part can be left empty.
     /// </summary>
     [Serializable]
@@ -17,26 +17,51 @@ namespace EffectSystem
         [SerializeField]
         private GameObject particles;
 
-        [Tooltip("One of them is picked at random each time.")]
         [SerializeField]
-        private AudioClip[] sounds;
+        private AudioClip sound;
 
         [SerializeField]
         [Range(0f, 1f)]
         private float volume = 0.8f;
 
+        // Made on the first Play and reused after, so playing again doesn't create a new object every time.
+        private AudioSource source;
+
         public void Play(Vector3 position)
+        {
+            Play(position, Quaternion.identity);
+        }
+
+        // rotation: for particles that have a direction, like dust kicked along a push.
+        public void Play(Vector3 position, Quaternion rotation)
         {
             if (particles != null)
             {
-                Object.Instantiate(particles, position, Quaternion.identity);
+                Object.Instantiate(particles, position, rotation);
             }
 
-            // Played at the camera (where the listener is), so it is always heard at full volume.
-            if (sounds.Length > 0 && Camera.main != null)
+            if (sound == null)
             {
-                AudioClip sound = sounds[Random.Range(0, sounds.Length)];
-                AudioSource.PlayClipAtPoint(sound, Camera.main.transform.position, volume);
+                return;
+            }
+
+            if (source == null) // first Play, or the scene that held it was unloaded
+            {
+                source = new GameObject("Sound " + sound.name).AddComponent<AudioSource>();
+                source.clip = sound;
+                source.playOnAwake = false;
+                source.spatialBlend = 0f; // 2D, so it is always heard at full volume wherever the camera is
+            }
+
+            source.volume = volume;
+            source.Play(); // restarts it if it is still playing
+        }
+
+        public void Stop()
+        {
+            if (source != null)
+            {
+                source.Stop();
             }
         }
     }

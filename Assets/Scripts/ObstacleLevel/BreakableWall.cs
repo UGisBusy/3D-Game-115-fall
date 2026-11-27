@@ -7,7 +7,7 @@ namespace ObstacleLevel
     /// <summary>
     /// Dashable Env Obj. A wall that blocks the path, but can be destroyed by the Player's dash.
     ///   Player walks into it   -> blocked, because it has a solid Collider
-    ///   Player dashes into it  -> the wall is destroyed
+    ///   Player dashes into it  -> the wall is destroyed, and the Player bounces back (the dash ends)
     ///   Player respawns        -> the wall stays destroyed
     /// </summary>
     [RequireComponent(typeof(Collider))]
@@ -15,6 +15,9 @@ namespace ObstacleLevel
     {
         [SerializeField]
         private Effect breakEffect;
+
+        [SerializeField]
+        private DashBounce bounce;
 
         private bool isBroken; // Destroy waits for the end of the frame, and physics can run again before it
 
@@ -32,6 +35,7 @@ namespace ObstacleLevel
             )
             {
                 isBroken = true;
+                bounce.Apply(player);
                 breakEffect.Play(transform.position);
                 Destroy(gameObject);
             }

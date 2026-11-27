@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 1844945140940925696}
   - component: {fileID: 6441725497972397095}
   - component: {fileID: 2454816094789052562}
+  - component: {fileID: 2299034416961856555}
   m_Layer: 0
   m_Name: Checkpoint
   m_TagString: Untagged
@@ -127,3 +128,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LevelSystem.Checkpoint
   inactiveColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   activeColor: {r: 0, g: 1, b: 0, a: 1}
+--- !u!114 &2299034416961856555
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3546922059699852627}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84c6a96fd5abf9d46982b163105ebd4e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UISystem.MinimapIcon
+  sprite: {fileID: 6079303173097937524, guid: 5357ad17f7c24d4e830d43a1d6c517ae, type: 3}
+  color: {r: 1, g: 1, b: 1, a: 1}
+  size: {x: 16, y: 16}
+  turnWithObject: 0
+  useObjectColor: 1
+  keepOnEdge: 0
+  sonar: 0

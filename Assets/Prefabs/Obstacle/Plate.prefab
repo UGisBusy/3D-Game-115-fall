@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 9202748884877342576}
   - component: {fileID: 8609035198469341917}
   - component: {fileID: 3872966072837340207}
+  - component: {fileID: 2138126014658957227}
   m_Layer: 0
   m_Name: Plate
   m_TagString: Untagged
@@ -112,7 +113,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 5, z: 1}
+  m_Size: {x: 0.6666667, y: 5, z: 0.6666667}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &3872966072837340207
 MonoBehaviour:
@@ -127,11 +128,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ObstacleLevel.PressurePlate
   gate: {fileID: 0}
-  pressEffect:
-    particles: {fileID: 0}
-    sounds:
-    - {fileID: 8300000, guid: ba99251c3b4c8cc4cac7b1c795bec846, type: 3}
-    volume: 0.8
+  pressThreshold: 0.5
+--- !u!114 &2138126014658957227
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2676387642979274310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84c6a96fd5abf9d46982b163105ebd4e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UISystem.MinimapIcon
+  sprite: {fileID: 8465928690374247599, guid: 30f9fd12a3b04a4f897e24ee4a97e19b, type: 3}
+  color: {r: 1, g: 1, b: 1, a: 1}
+  size: {x: 20, y: 20}
+  turnWithObject: 0
+  useObjectColor: 0
+  keepOnEdge: 0
+  sonar: 0
 --- !u!1001 &2847015782631286355
 PrefabInstance:
   m_ObjectHideFlags: 0

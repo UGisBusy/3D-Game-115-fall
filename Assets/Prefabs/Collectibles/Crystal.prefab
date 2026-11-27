@@ -82,9 +82,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84c6a96fd5abf9d46982b163105ebd4e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UISystem.MinimapIcon
-  sprite: {fileID: -4080278737599844964, guid: 623654edcaaae8948856d747de769e68, type: 3}
-  color: {r: 0.3, g: 0.9, b: 1, a: 1}
+  sprite: {fileID: 1449460582866803610, guid: 985c544ad6f6438d8f4b871452b914ea, type: 3}
+  color: {r: 1, g: 1, b: 1, a: 1}
+  size: {x: 20, y: 20}
+  turnWithObject: 0
+  useObjectColor: 0
   keepOnEdge: 1
+  sonar: 1
 --- !u!1 &1242192044887938036
 GameObject:
   m_ObjectHideFlags: 0

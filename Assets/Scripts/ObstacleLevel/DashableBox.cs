@@ -5,26 +5,34 @@ using UnityEngine;
 namespace ObstacleLevel
 {
     /// <summary>
-    /// Dashable Env Obj. A big box (boulder) that only a dash can move, a fixed distance at a time, as if it is on a grid.
+    /// Dashable Env Obj. A big box (boulder) that only a dash can move, on a grid counted from its start.
     ///   Player walks into it        -> blocked
-    ///   Player dashes into a side   -> it slides exactly moveDistance away from the Player
-    ///   Something is closer         -> it slides until it touches it and stops there, never into it
+    ///   Player dashes into a side   -> it slides up to moveDistance away to a grid point, and the Player bounces back
+    ///   Something is closer         -> it slides flush against it, never into it
+    ///   It can't move that way      -> it slides back toward the Player instead, this is to prevent it from getting stuck in a corner
     ///   One dash                    -> moves it once at most, even if the Player keeps dashing into it
     ///   It stops over a gap         -> it falls
-    /// Stopping flush against walls and other boulders packs them tightly, so a row of them fills a gap as a bridge.
+    /// Stopping on grid points keeps every boulder lined up with the level's grid, so it drops into a 1-cell pit.
     /// The Player also can stand on it, made this as a step to reach higher places.
     /// </summary>
     public class DashableBox : PushableBox
     {
-        [Tooltip(
-            "How far one dash moves it. Use the boulder's own size, so boulders line up like on a grid."
-        )]
+        [Tooltip("How far one dash moves it, a whole number of grid cells.")]
         [SerializeField]
         private float moveDistance = 2f;
 
-        [Tooltip("Plays when a dash starts moving it.")]
+        [Tooltip(
+            "The level's grid cell: pits and boulder spots are this wide. A boulder stops on grid points counted from its start."
+        )]
+        [SerializeField]
+        private float gridSize = 2f;
+
+        [Tooltip("The effect that plays when a dash starts moving it.")]
         [SerializeField]
         private Effect hitEffect;
+
+        [SerializeField]
+        private DashBounce bounce;
 
         private Vector3 target;
         private float slideSpeed;
@@ -53,23 +61,40 @@ namespace ObstacleLevel
                 return;
             }
 
+            bounce.Apply(player); // also when it is blocked, the dash ends here
+
             Vector3 moveDirection = ToGridDirection(direction);
-            float distance = FreeDistance(moveDirection, moveDistance, null);
+            float distance = SlideDistance(moveDirection);
+
+            if (distance < 0.01f) // stuck against something, so it comes back toward the Player instead
+            {
+                moveDirection = -moveDirection; // opposite direction, toward the Player
+                distance = SlideDistance(moveDirection);
+            }
 
             if (distance < 0.01f)
             {
-                return; // blocked
+                return; // blocked both ways
             }
 
             canBePushed = false; // this dash has moved it, the next push needs a new dash
             target = Body.position + moveDirection * distance;
-            slideSpeed = player.Dash.Speed; // moves as fast as the dash, so the Player doesn't ram it
+            slideSpeed = player.Dash.Speed; // moves as fast as the dash
             isSliding = true;
-            hitEffect.Play(Body.position);
+            hitEffect.Play(Body.position, Quaternion.LookRotation(moveDirection)); // faces the way it slides
 
             // fixed movement
             Body.isKinematic = true;
             Unlock(); // a locked X and Z would stop the slide too
+        }
+
+        // To the furthest grid point within moveDistance.
+        private float SlideDistance(Vector3 moveDirection)
+        {
+            float fromStart = Vector3.Dot(Body.position - StartPosition, moveDirection); // distance from the start and move direction
+            float toGridPoint =
+                Mathf.Floor((fromStart + moveDistance + 0.01f) / gridSize) * gridSize - fromStart; // the next grid point in the move direction
+            return FreeDistance(moveDirection, toGridPoint, null); // the distance to the next grid point
         }
 
         // The push turned into one of the box's own sides

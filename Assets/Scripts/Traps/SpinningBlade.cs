@@ -19,8 +19,17 @@ namespace TrapSystem
         [SerializeField]
         private int damage = 1;
 
+        [Tooltip(
+            "Sideways push away from the blade. It fades out, so the Player travels about pushSpeed / 8 meters."
+        )]
         [SerializeField]
-        private float pushSpeed = 10f;
+        private float pushSpeed = 8f;
+
+        [Tooltip(
+            "Upward bump, so a hit throws the Player up and the Player can recover in the air instead of sliding off."
+        )]
+        [SerializeField]
+        private float pushUp = 6f;
 
         [Tooltip("How long the Player loses control after being pushed.")]
         [SerializeField]
@@ -50,7 +59,8 @@ namespace TrapSystem
             {
                 Vector3 awayFromBlade = -collision.GetContact(0).normal; // check the contact point normal, not the player's position.
                 Vector3 push =
-                    Vector3.ProjectOnPlane(awayFromBlade, Vector3.up).normalized * pushSpeed;
+                    Vector3.ProjectOnPlane(awayFromBlade, Vector3.up).normalized * pushSpeed
+                    + Vector3.up * pushUp;
 
                 player.TakeHit( // Hit and knockback player.
                     HitInfo.Create(

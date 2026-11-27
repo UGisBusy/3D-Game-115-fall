@@ -17,9 +17,7 @@ namespace ObstacleLevel
         [SerializeField]
         private Gate gate;
 
-        [Tooltip(
-            "How much of the red pad the Player or a box must cover to press it. "
-        )]
+        [Tooltip("How much of the red pad the Player or a box must cover to press it. ")]
         [SerializeField]
         [Range(0f, 1f)]
         private float pressThreshold = 0.5f; // The Player need to cover at most about 50% of the pad.

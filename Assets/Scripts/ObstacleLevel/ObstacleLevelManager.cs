@@ -298,10 +298,6 @@ namespace ObstacleLevel
             {
                 CollectCrystal();
             }
-            else if (collectible.Type == CollectibleType.Crystal)
-            {
-                CollectCrystal();
-            }
         }
 
         // ---------------- Pause ----------------

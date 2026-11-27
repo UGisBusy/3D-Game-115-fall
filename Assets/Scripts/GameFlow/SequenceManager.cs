@@ -165,7 +165,9 @@ public class SequenceManager : MonoBehaviour
     {
         if (levelManager == null)
         {
-            Debug.LogWarning($"Sequence Manager: {selectedLevel} level has no registered Level Manager");
+            Debug.LogWarning(
+                $"Sequence Manager: {selectedLevel} level has no registered Level Manager"
+            );
             return;
         }
 

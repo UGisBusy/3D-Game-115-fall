@@ -138,7 +138,7 @@ namespace CameraSystem
             // While the Player input is off (Pause, Fail, Complete) look / zoom read 0.
             HandleRotation();
             HandleZoom();
-            zoom =Mathf.SmoothDamp(zoom, zoomTarget, ref zoomVelocity, zoomSmoothTime);
+            zoom = Mathf.SmoothDamp(zoom, zoomTarget, ref zoomVelocity, zoomSmoothTime);
 
             Vector3 pivot = target.position + pivotOffset;
             Quaternion rotation = Quaternion.Euler(pitch, yaw, 0f);

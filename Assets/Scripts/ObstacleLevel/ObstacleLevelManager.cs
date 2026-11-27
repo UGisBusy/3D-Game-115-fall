@@ -86,10 +86,14 @@ namespace ObstacleLevel
         private void Awake()
         {
             if (levelUI == null)
-                throw new System.NullReferenceException("Obstacle Level Manager has no Level UI Manager");
+                throw new System.NullReferenceException(
+                    "Obstacle Level Manager has no Level UI Manager"
+                );
 
             if (confirmAction == null)
-                throw new System.NullReferenceException("Obstacle Level Manager has no Confirm Action");
+                throw new System.NullReferenceException(
+                    "Obstacle Level Manager has no Confirm Action"
+                );
 
             if (checkpoints.Length == 0)
                 throw new System.NullReferenceException(
@@ -154,7 +158,12 @@ namespace ObstacleLevel
             playState = new TickState("Play", OnPlayEnter, OnPlayExit, PlayTick);
             pauseState = new TickState("Pause", OnPauseEnter, OnPauseExit, PauseTick);
             failState = new TickState("Fail", OnFailEnter, OnFailExit, FailTick);
-            completeState = new TickState("Complete", OnCompleteEnter, OnCompleteExit, CompleteTick);
+            completeState = new TickState(
+                "Complete",
+                OnCompleteEnter,
+                OnCompleteExit,
+                CompleteTick
+            );
             exitState = new TickState("Exit", OnExitEnter);
 
             startState.AddLink(new Link(playState, LevelTransitions.StartFinishedWrapper));

@@ -49,7 +49,9 @@ public class LevelUIManager : MonoBehaviour
             throw new System.NullReferenceException("Level UI Manager has no Pause Panel");
 
         if (PauseContinueButton == null)
-            throw new System.NullReferenceException("Level UI Manager has no Pause Continue Button");
+            throw new System.NullReferenceException(
+                "Level UI Manager has no Pause Continue Button"
+            );
 
         if (PauseSaveButton == null)
             throw new System.NullReferenceException("Level UI Manager has no Pause Save Button");

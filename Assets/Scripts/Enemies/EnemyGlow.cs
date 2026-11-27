@@ -19,7 +19,9 @@ public class EnemyGlow : MonoBehaviour
     [SerializeField]
     private Light glow;
 
-    [Tooltip("Bone of the model the Glow follows. Empty = the bone closest to where Glow is placed.")]
+    [Tooltip(
+        "Bone of the model the Glow follows. Empty = the bone closest to where Glow is placed."
+    )]
     [SerializeField]
     private Transform followBone;
 
@@ -35,14 +37,19 @@ public class EnemyGlow : MonoBehaviour
         // the shield doesn't follow the model's animation, so the moving light would slide a highlight over it.
         // No "Visual" (placeholder model) = light the whole enemy.
         Transform visual = transform.Find("Visual");
-        foreach (Renderer r in (visual != null ? visual : transform).GetComponentsInChildren<Renderer>(true))
+        foreach (
+            Renderer r in (visual != null ? visual : transform).GetComponentsInChildren<Renderer>(
+                true
+            )
+        )
             r.renderingLayerMask |= EnemyRenderingLayerMask;
 
         if (glow == null)
             return;
 
         // The bones are still in the pose the prefab shows, so "closest" matches what was placed.
-        Transform bone = followBone != null ? followBone : FindClosestBone(visual, glow.transform.position);
+        Transform bone =
+            followBone != null ? followBone : FindClosestBone(visual, glow.transform.position);
         if (bone != null)
             glow.transform.SetParent(bone, true); // keep the placed spot, follow the bone from now on
     }
@@ -55,7 +62,9 @@ public class EnemyGlow : MonoBehaviour
 
         Transform closest = null;
         float closestSqr = float.MaxValue;
-        foreach (SkinnedMeshRenderer skinned in visual.GetComponentsInChildren<SkinnedMeshRenderer>(true))
+        foreach (
+            SkinnedMeshRenderer skinned in visual.GetComponentsInChildren<SkinnedMeshRenderer>(true)
+        )
         {
             foreach (Transform bone in skinned.bones)
             {

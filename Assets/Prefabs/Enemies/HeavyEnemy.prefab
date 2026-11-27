@@ -150,6 +150,14 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 6fc9e18693fe94741bf3de5824818091, type: 2}
+    - target: {fileID: 7716491579739359181, guid: d0dc66e8b88db824199a136da6002951, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.679
+      objectReference: {fileID: 0}
+    - target: {fileID: 7716491579739359181, guid: d0dc66e8b88db824199a136da6002951, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 1.667
+      objectReference: {fileID: 0}
     - target: {fileID: 8468975198081965908, guid: d0dc66e8b88db824199a136da6002951, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -162,7 +170,7 @@ PrefabInstance:
       addedObject: {fileID: 7253501456562978359}
     - targetCorrespondingSourceObject: {fileID: 3525209071946365721, guid: d0dc66e8b88db824199a136da6002951, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 495428799202904837}
+      addedObject: {fileID: 4768963631574445991}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 880993096176346227, guid: d0dc66e8b88db824199a136da6002951, type: 3}
       insertIndex: -1
@@ -209,6 +217,7 @@ MonoBehaviour:
   navMeshSampleRange: 2
   slamTriggerRange: 3
   slamRadius: 4
+  slamHeight: 0.3
   slamWindupTime: 1
   slamRecoverTime: 0.6
   slamCooldown: 2
@@ -232,7 +241,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee76c067b47f11a47955ca7723ac78da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyVisual
-  animator: {fileID: 495428799193294049}
+  animator: {fileID: 4768963631567503427}
   idleState: IdleBattle
   moveState: WalkFWD
   attackState: Attack01
@@ -251,7 +260,7 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3525209071946365721, guid: d0dc66e8b88db824199a136da6002951, type: 3}
   m_PrefabInstance: {fileID: 1005575344899538022}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &1304960951455438344
+--- !u!1001 &6256337622507811498
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -424,13 +433,13 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a50dc8fc460c47aa9033b698c00b2133, type: 3}
---- !u!95 &495428799193294049 stripped
+--- !u!95 &4768963631567503427 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 1512148224719975145, guid: a50dc8fc460c47aa9033b698c00b2133, type: 3}
-  m_PrefabInstance: {fileID: 1304960951455438344}
+  m_PrefabInstance: {fileID: 6256337622507811498}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &495428799202904837 stripped
+--- !u!4 &4768963631574445991 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1512148224729488653, guid: a50dc8fc460c47aa9033b698c00b2133, type: 3}
-  m_PrefabInstance: {fileID: 1304960951455438344}
+  m_PrefabInstance: {fileID: 6256337622507811498}
   m_PrefabAsset: {fileID: 0}

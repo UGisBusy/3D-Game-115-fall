@@ -9198,8 +9198,8 @@ MonoBehaviour:
     sound: {fileID: 8300000, guid: db6dbf4082043134ab0732b54bea720d, type: 3}
     volume: 0.8
   dashed:
-    particles: {fileID: 0}
-    sound: {fileID: 8300000, guid: 988606b97bf6f3646863a6deab5b4162, type: 3}
+    particles: {fileID: 8771972552311404799, guid: bbf9e36a48d6c5648a13889afab076fd, type: 3}
+    sound: {fileID: 8300000, guid: 09d5285a7b110354abcf8bfc9cddcab6, type: 3}
     volume: 0.8
   heart:
     particles: {fileID: 8771972552311404799, guid: bbf9e36a48d6c5648a13889afab076fd, type: 3}

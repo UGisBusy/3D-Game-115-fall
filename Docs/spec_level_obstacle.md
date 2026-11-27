@@ -100,7 +100,7 @@ The HUD (scripts in `UISystem`):
 |-|-|-|
 | Hearts (top left) | One heart per HP point; lost HP is faded | `PlayerEvents.HpChanged` |
 | Crystal panel (top left) | `collected / total` and one slot per Crystal, lit when collected | `ObstacleLevelEvents.CrystalCountChanged` |
-| Minimap (top right) | A round radar around the Player, north up, with an arrow for the Player's facing. It shows only floors (grass green) and walls (hedge green) on the sky's blue, with black rings and a crosshair over them; trees, rocks, clouds and other decoration are left out. Icons, each a small top-down picture of the object with a black outline: Crates, Boulders, Plates, Crystals, Checkpoints (grey, green when active), Gates and Breakable Walls (bars that turn like the object), Moving Platforms (white), Hearts and the Star. Sizes are a bit bigger than the real objects so they read clearly. A far Crystal or the Star stays on the edge to show its direction; a Crystal inside the radar sends out sonar rings | At the start it makes one flat shape per static box collider, far below the level where the main camera never looks; a second camera above them draws into a texture. Icons come from `MinimapIcon`. The round mask, rim and dash ring use a sharp 512 px circle sprite |
+| Minimap (top right) | A round radar around the Player, north up, with an arrow (black outline) for the Player's facing. It shows only floors (grass green) and walls (hedge green) on the sky's blue, with black rings and a crosshair over them; trees, rocks, clouds and other decoration are left out. Icons, each a small top-down picture of the object with a black outline: Crates, Boulders, Plates, Crystals, Checkpoints (grey, green when active), Gates and Breakable Walls (bars that turn like the object), Moving Platforms (white), Hearts and the Star. Sizes are a bit bigger than the real objects so they read clearly. A far Crystal or the Star stays on the edge to show its direction; a Crystal inside the radar sends out sonar rings | At the start it makes one flat shape per static box collider, far below the level where the main camera never looks; a second camera above them draws into a texture. Icons come from `MinimapIcon`. The round mask, rim and dash ring use a sharp 512 px circle sprite |
 | Dash ring (bottom left) | Empties when the Player dashes and refills over the 2 s cooldown | `DashAbility.CooldownRemaining` |
 
 ## Effects and Sky
@@ -108,7 +108,7 @@ Every effect is a particle (Cartoon FX Remaster Free) and a sound (Kenney Impact
 
 | When | Played by |
 |-|-|
-| Player is hurt, dies, spawns, dashes (wind whoosh) | `LevelEffects` (listens to `PlayerEvents`) |
+| Player is hurt, dies, spawns, dashes (a burst of air left behind the Player, and a whoosh) | `LevelEffects` (listens to `PlayerEvents`) |
 | Heart, Crystal, Star collected | `LevelEffects` (listens to `LevelEvents.Collected`) |
 | Checkpoint activated | `LevelEffects` (listens to `LevelEvents.CheckpointActivated`) |
 | Breakable Wall breaks | `BreakableWall` |
@@ -120,7 +120,7 @@ Every effect is a particle (Cartoon FX Remaster Free) and a sound (Kenney Impact
 | Player steps on hidden spikes (warning) | `Spike` (sound only) |
 | Hidden spikes pop up | `Spike` (sound only) |
 
-Sounds for the crate, boulder, gate, crystal, wall break and dash are made by me (`Assets/Audio/ObstacleLevel`).
+Sounds for the crate, boulder, gate, crystal and wall break are made by me (`Assets/Audio/ObstacleLevel`). The hidden spike sounds and the dash whoosh are free sounds from Pixabay.
 While paused, all sounds pause too.
 
 Sky: Fantasy Skybox FREE, `FS000_Day_01`.

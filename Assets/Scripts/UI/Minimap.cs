@@ -109,6 +109,8 @@ namespace UISystem
             grid.rectTransform.sizeDelta = Vector2.zero; // covers the whole map, under the icons
             grid.color = gridColor;
 
+            AddOutline(playerArrow.GetComponent<Image>()); // like the icons, so it shows on the sky and the floors
+
             BuildShapes();
         }
 

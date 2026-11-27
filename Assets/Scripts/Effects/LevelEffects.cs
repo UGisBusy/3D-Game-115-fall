@@ -76,9 +76,10 @@ namespace EffectSystem
             spawned.Play(PlayerCenter());
         }
 
+        // The burst of air points backward, so the wind is left behind the Player.
         private void OnDashStarted(Vector3 direction)
         {
-            dashed.Play(PlayerCenter());
+            dashed.Play(PlayerCenter(), Quaternion.LookRotation(-direction));
         }
 
         private void OnCollected(Collectible collectible)

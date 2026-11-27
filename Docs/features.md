@@ -18,6 +18,7 @@ NOTIFY CHANGE:
 - combat level Collectible Spot: replace "Spawn Arrow Collectible every x second", spawn Arrow/Heart by weight, max 1 per Spot
 - combat level Wave Info: remove enemy formation, add count and delay; Enemy spawn at random position in area
 - leaving a level (Level Complete Screen, Pause Menu exit buttons) goes back to Main Menu instead of Level Select Menu
+- level screens confirm with Space instead of Enter (Fail Screen: retry, Level Complete Screen: back to Main Menu)
 
 
 - UI and Game Flow
@@ -53,7 +54,7 @@ NOTIFY CHANGE:
     - Back Button to enter Main Menu
   
   - Level Complete Screen
-    - Press Enter to go back Main Menu
+    - Press Space to go back Main Menu
     - Button to write Level in Save File
     - Button to reset Level in Save File
 

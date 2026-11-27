@@ -16,28 +16,37 @@ Cross a chain of floating islands from the start to the goal. Collect all 5 **Cr
 ## Level Manager
 State machine, built with `TickState`, `Link` and `LevelTransitions`.
 
-| State | Behaviour | Links |
-|-|-|-|
-| **Start** | Asks `SpawnManager` to spawn the Player at the start Checkpoint. Counts the Crystals and hides the Star. | `StartFinished` → **Play** (next frame) |
-| **Play** | Normal gameplay. Listens to `LevelEvents.Collected`. Counts each Crystal and shows the Star when the last one is collected. | ESC: `PauseRequested` → **Pause**<br>Star collected: `Completed` → **Complete** |
-| **Pause** | `Time.timeScale = 0`, Player input off. Both are restored on exit. | ESC: `ResumeRequested` → **Play** |
-| **Complete** | Player input off. | TBD |
+| State        | Behaviour                                                                                                                   | Links                                                                                                                                 |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| **Start**    | Asks `SpawnManager` to spawn the Player at the start Checkpoint. Counts the Crystals and hides the Star.                    | `StartFinished` → **Play** (next frame)                                                                                               |
+| **Play**     | Normal gameplay. Listens to `LevelEvents.Collected`. Counts each Crystal and shows the Star when the last one is collected. | ESC: `PauseRequested` → **Pause**<br>Player dies: `Failed` → **Fail**<br>Star collected: `Completed` → **Complete**                   |
+| **Pause**    | Shows the Pause screen. Time, sounds and Player input stop; all are restored on exit.                                       | ESC or Continue: `ContinueRequested` → **Play**<br>Back To Menu: `ExitRequested` → **Exit**                                           |
+| **Fail**     | Shows the Fail screen. Time, sounds and Player input stop; all are restored on exit.                                        | Space or Retry: `RetryRequested` → **Play**, the Player respawns at the active Checkpoint<br>Back To Menu: `ExitRequested` → **Exit** |
+| **Complete** | Shows the Complete screen. Time, sounds and Player input stop.                                                              | Space or Back To Menu: `ExitRequested` → **Exit**                                                                                     |
+| **Exit**     | Raises `LevelEvents.Exited`; `SequenceManager` goes back to the Main Menu.                                                  | -                                                                                                                                     |
+
+- The Pause, Fail and Complete screens are the shared `LevelUIManager`. Their buttons only raise `LevelTransitions` events, so the UI needs no reference to the Level Manager.
+- The Save button on the Pause and Fail screens raises `LevelEvents.SaveRequested`. For now the Level Manager only logs the active Checkpoint's number (TODO: write the Save File).
+- The cursor shows while Player input is off (Pause, Fail, Complete) and is locked while playing.
 
 ## Spawn and Checkpoints
-- `ObstacleLevelManager` holds the start Checkpoint and gives it to `SpawnManager` when the level starts.
-- Only one Checkpoint is active at a time. Touching a Checkpoint makes it the active one and changes its color to green.
-- When the Player dies and presses Space, the Player respawns at the active Checkpoint (green).
+- `ObstacleLevelManager` has **Checkpoints**: every Checkpoint in the order the Player reaches them. Element 0 is where the level starts.
+- Where the Player starts:
+  - From the Menu: `SequenceManager` calls `StartLevel(x)` and the Player starts at **Checkpoints** element x (Start = 0, Resume = the saved number).
+  - Scene played directly in the editor: at **Test Checkpoint**, or element 0 when it is empty.
+- Only one Checkpoint is active at a time. Touching a Checkpoint makes it the active one and changes its color to green. The Checkpoint the Player starts at turns active as soon as the Player spawns on it.
+- When the Player dies, the Fail screen opens. Retry respawns the Player at the active Checkpoint (green).
 
 ## Death Zone
 - A trigger box under the level. When the Player falls into it, the Player dies.
 - When a box (Crate or Boulder) falls into it, the box is destroyed and goes back to its start position.
 
 ## Collectibles
-| Type | Effect | How it appears |
-|-|-|-|
-| **Heart** | Player HP + 1 (handled by Player) | `CollectibleSpawnManager` spawns one at every child spot. On every Player spawn (level start and every respawn), leftover Hearts are removed and a full set is spawned again. |
-| **Crystal** | Counts toward the Star. A collected Crystal stays collected after a respawn. | Placed by hand. There are 5 in the level. The Level Manager counts them when the level starts. |
-| **Star** | Completes the level | Placed by hand on the Star island. Stays hidden until all Crystals are collected. |
+| Type        | Effect                                                                       | How it appears                                                                                                                                                                |
+| ----------- | ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Heart**   | Player HP + 1 (handled by Player)                                            | `CollectibleSpawnManager` spawns one at every child spot. On every Player spawn (level start and every respawn), leftover Hearts are removed and a full set is spawned again. |
+| **Crystal** | Counts toward the Star. A collected Crystal stays collected after a respawn. | Placed by hand. There are 5 in the level. The Level Manager counts them when the level starts.                                                                                |
+| **Star**    | Completes the level                                                          | Placed by hand on the Star island. Stays hidden until all Crystals are collected.                                                                                             |
 
 The Crystal count for the HUD is sent through `ObstacleLevelEvents`, which holds the events only this level uses.
 
@@ -49,9 +58,9 @@ The Crystal count for the HUD is sent through `ObstacleLevelEvents`, which holds
 ### Crate (Movable) and Boulder (Dashable)
 One base class, `PushableBox`. The two types of box have a different way to move them.
 
-| Prefab | Script | How to move it |
-|-|-|-|
-| `Crate` | `MovableBox` | Pushed by walking or dashing. |
+| Prefab    | Script        | How to move it                                                                                                                                         |
+| --------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `Crate`   | `MovableBox`  | Pushed by walking or dashing.                                                                                                                          |
 | `Boulder` | `DashableBox` | Pushed by a dash only. One dash moves it exactly `moveDistance`, as if it is on a grid. If a wall or another box is closer, it stops flush against it. |
 
 - A box follows the Player's speed and locks in place when nobody pushes it.
@@ -76,11 +85,11 @@ A tray of spikes that acts as one trap: one collider box covers the whole spikes
 - A hit blocked by the Player's invincibility does not start the cooldown. For now.
 - The asset of the spikes is created by myself using probuilder.
 
-| Prefab | Toggle type | Behaviour |
-|-|-|-|
-| `NormalSpikes` | AlwaysActive | Always visible, always hurts. |
-| `PeriodicSpikes` | Periodic | Shows and hides every `toggleInterval` (2 s). |
-| `HiddenSpikes` | OnPlayerTouch | Starts hidden. When the Player steps in, the cones appear and the Player gets `touchGraceTime` to step out before it can hurt. Stays active until the Player respawns, then hides again. |
+| Prefab           | Toggle type   | Behaviour                                                                                                                                                                                |
+| ---------------- | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `NormalSpikes`   | AlwaysActive  | Always visible, always hurts.                                                                                                                                                            |
+| `PeriodicSpikes` | Periodic      | Shows and hides every `toggleInterval` (2 s).                                                                                                                                            |
+| `HiddenSpikes`   | OnPlayerTouch | Starts hidden. When the Player steps in, the cones appear and the Player gets `touchGraceTime` to step out before it can hurt. Stays active until the Player respawns, then hides again. |
 
 
 ### Spinning Blade
@@ -90,32 +99,32 @@ A tray of spikes that acts as one trap: one collider box covers the whole spikes
 ## UI
 The HUD (scripts in `UISystem`):
 
-| Element | Shows | Updated from |
-|-|-|-|
-| Hearts (top left) | One heart per HP point; lost HP is faded | `PlayerEvents.HpChanged` |
-| Crystal panel (top left) | `collected / total` and one slot per Crystal, lit when collected | `ObstacleLevelEvents.CrystalCountChanged` |
-| Minimap (top right) | A round top-down view around the Player, north up, with an arrow for the Player's facing. Hearts and Crystals show as icons; a far Crystal stays on the map's edge to show its direction | A second camera that follows the Player and draws into a texture. Icons come from `MinimapIcon` |
-| Dash ring (bottom left) | Empties when the Player dashes and refills over the 2 s cooldown | `DashAbility.CooldownRemaining` |
+| Element                  | Shows                                                                                                                                                                                    | Updated from                                                                                    |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Hearts (top left)        | One heart per HP point; lost HP is faded                                                                                                                                                 | `PlayerEvents.HpChanged`                                                                        |
+| Crystal panel (top left) | `collected / total` and one slot per Crystal, lit when collected                                                                                                                         | `ObstacleLevelEvents.CrystalCountChanged`                                                       |
+| Minimap (top right)      | A round top-down view around the Player, north up, with an arrow for the Player's facing. Hearts and Crystals show as icons; a far Crystal stays on the map's edge to show its direction | A second camera that follows the Player and draws into a texture. Icons come from `MinimapIcon` |
+| Dash ring (bottom left)  | Empties when the Player dashes and refills over the 2 s cooldown                                                                                                                         | `DashAbility.CooldownRemaining`                                                                 |
 
 ## Effects and Sky
 Every effect is a particle (Cartoon FX Remaster Free) and a sound (Kenney Impact and Interface Sounds), set in the Inspector with `Effect`.
 
-| When | Played by |
-|-|-|
-| Player is hurt, dies, spawns, dashes (wind whoosh) | `LevelEffects` (listens to `PlayerEvents`) |
-| Heart, Crystal, Star collected | `LevelEffects` (listens to `LevelEvents.Collected`) |
-| Checkpoint activated | `LevelEffects` (listens to `LevelEvents.CheckpointActivated`) |
-| Breakable Wall breaks | `BreakableWall` |
-| Boulder is pushed by a dash (rock sliding) | `DashableBox` |
-| Crate is pushed and moving (box sliding, keeps playing) | `MovableBox` with `LoopingSound` |
-| A box comes back after it breaks | `PushableBox` |
-| A box gets on the Plate | `PressurePlate` (sound only) |
-| Gate is moving (stone gate rumble, keeps playing until it is gone) | `Gate` with `LoopingSound` |
-| Gate is fully open | `Gate` |
-| Hidden spikes pop up | `Spike` (sound only) |
+| When                                                               | Played by                                                     |
+| ------------------------------------------------------------------ | ------------------------------------------------------------- |
+| Player is hurt, dies, spawns, dashes (wind whoosh)                 | `LevelEffects` (listens to `PlayerEvents`)                    |
+| Heart, Crystal, Star collected                                     | `LevelEffects` (listens to `LevelEvents.Collected`)           |
+| Checkpoint activated                                               | `LevelEffects` (listens to `LevelEvents.CheckpointActivated`) |
+| Breakable Wall breaks                                              | `BreakableWall`                                               |
+| Boulder is pushed by a dash (rock sliding)                         | `DashableBox`                                                 |
+| Crate is pushed and moving (box sliding, keeps playing)            | `MovableBox` with `LoopingSound`                              |
+| A box comes back after it breaks                                   | `PushableBox`                                                 |
+| A box gets on the Plate                                            | `PressurePlate` (sound only)                                  |
+| Gate is moving (stone gate rumble, keeps playing until it is gone) | `Gate` with `LoopingSound`                                    |
+| Gate is fully open                                                 | `Gate`                                                        |
+| Hidden spikes pop up                                               | `Spike` (sound only)                                          |
 
 Sounds for the crate, boulder, gate, crystal, wall break and dash are made by me (`Assets/Audio/ObstacleLevel`).
-While paused, all sounds pause too.
+While paused (Pause, Fail and Complete screens), all sounds pause too. An `Effect` with **Play While Paused** keeps playing over the frozen level: the death effect uses it, so it plays behind the Fail screen.
 
 Sky: Fantasy Skybox FREE, `FS000_Day_01`.
 
@@ -128,9 +137,11 @@ The Player has to know the Star appeared, wherever they are in the level:
 - A firework and a sound play on the Star.
 
 ## Controls
-Same as the Player (WASD, Space, Right Click dash, mouse camera), plus **ESC** to pause and resume.
+Same as the Player (WASD, Space, Right Click dash, mouse camera), plus:
+- **ESC** to pause and continue.
+- **Space** on the Fail screen to retry, and on the Complete screen to go back to the Main Menu.
 
 ## Planned
-- Pause Menu and Level Complete Screen, shown from the Pause and Complete states.
+- Save File: save and resume the active Checkpoint (and the collected Crystals).
 - Assets for the level.
 - TBD

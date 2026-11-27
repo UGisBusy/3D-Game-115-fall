@@ -17,6 +17,8 @@ NOTIFY CHANGE:
 - combat level respawn: clear Enemy and Collectible, restart current Wave
 - combat level Collectible Spot: replace "Spawn Arrow Collectible every x second", spawn Arrow/Heart by weight, max 1 per Spot
 - combat level Wave Info: remove enemy formation, add count and delay; Enemy spawn at random position in area
+- leaving a level (Level Complete Screen, Pause Menu exit buttons) goes back to Main Menu instead of Level Select Menu
+- level screens confirm with Space instead of Enter (Fail Screen: retry, Level Complete Screen: back to Main Menu)
 
 
 - UI and Game Flow
@@ -39,8 +41,8 @@ NOTIFY CHANGE:
   - Pause Menu
     - Resume Button to resume game and close Pause Menu
     - Respawn Button to respawn Player at checkpoint
-    - Exit To Level Select Button to enter Level Select Menu
-    - Save And Exit To Level Select Button to save and enter Level Select Menu
+    - Exit To Main Menu Button to enter Main Menu
+    - Save And Exit To Main Menu Button to save and enter Main Menu
     - Exit Game Button to close Game
     - Save And Exit Button to save and close Game
     
@@ -52,7 +54,7 @@ NOTIFY CHANGE:
     - Back Button to enter Main Menu
   
   - Level Complete Screen
-    - Press Enter to go back Level Select Screen
+    - Press Space to go back Main Menu
     - Button to write Level in Save File
     - Button to reset Level in Save File
 

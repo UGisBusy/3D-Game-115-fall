@@ -1,3 +1,4 @@
+using PlayerSystem;
 using UnityEngine;
 
 /// <summary>
@@ -11,6 +12,7 @@ using UnityEngine;
 /// Prefab setup: this component + a visual child pointing along +Z. No Rigidbody or Collider needed.
 /// Visual: low poly fireball (Assets/Fireball). On a hit it spawns impactPrefab; the trail children
 /// in detachOnBreak are left behind to fade out instead of vanishing.
+/// On Player spawn (start and every respawn / retry) every arrow in flight is removed.
 /// </summary>
 public class Arrow : MonoBehaviour
 {
@@ -59,6 +61,13 @@ public class Arrow : MonoBehaviour
         direction = transform.forward;
         lifetime = maxLifetime;
     }
+
+    private void OnEnable() => PlayerEvents.Spawned += Clear;
+
+    private void OnDisable() => PlayerEvents.Spawned -= Clear;
+
+    // Remove at once: no hit, no impact, trails go with it.
+    private void Clear() => Destroy(gameObject);
 
     // Called by BowAbility right after spawning. owner is never hit by this arrow.
     public void Launch(Vector3 direction, GameObject owner)

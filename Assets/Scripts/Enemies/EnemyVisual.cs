@@ -11,8 +11,8 @@ using UnityEngine;
 ///   2. One-shot    (PlayHit / PlayAttack / PlaySpecial): plays its clip once, then goes back
 ///   3. Locomotion  move (or run, after SetRunning(true)) / idle, picked by the Rigidbody's horizontal speed
 ///
-/// State names are Animator state names. Tools > 3DG > Setup Enemy Visuals builds the controllers
-/// (states named after their clips) and fills these in. Empty = not used, falls through to the next priority.
+/// State names are Animator state names (Assets/Animations/Enemies/{Enemy}.controller, one state per clip,
+/// named after the clip), set on each enemy prefab. Empty = not used, falls through to the next priority.
 /// </summary>
 [DisallowMultipleComponent]
 public class EnemyVisual : MonoBehaviour

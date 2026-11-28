@@ -9,7 +9,7 @@ namespace UISystem
     ///   Object spawns or is shown -> its icon appears
     ///   Object is destroyed       -> its icon is gone
     /// The icon can turn with the object (long things like Gates lie across the path like in the level),
-    /// and can take the object's own color (a Checkpoint turns green when it is active).
+    /// and the object can change its color (a Checkpoint turns it green when it is active).
     /// </summary>
     public class MinimapIcon : MonoBehaviour
     {
@@ -31,12 +31,6 @@ namespace UISystem
         private bool turnWithObject;
 
         [Tooltip(
-            "On: the icon takes the color of the object's own material instead of Color, so it changes with it."
-        )]
-        [SerializeField]
-        private bool useObjectColor;
-
-        [Tooltip(
             "On: stays on the map's edge when it is far away, to show where it is. Off: hidden."
         )]
         [SerializeField]
@@ -46,8 +40,6 @@ namespace UISystem
         [SerializeField]
         private bool sonar;
 
-        private Renderer objectRenderer;
-
         public Sprite Sprite => sprite;
         public Vector2 Size => size;
         public bool TurnWithObject => turnWithObject;
@@ -56,20 +48,8 @@ namespace UISystem
 
         public Color Color
         {
-            get
-            {
-                if (useObjectColor)
-                {
-                    return objectRenderer.sharedMaterial.color;
-                }
-
-                return color;
-            }
-        }
-
-        private void Awake()
-        {
-            objectRenderer = GetComponent<Renderer>();
+            get => color;
+            set => color = value;
         }
 
         private void OnEnable()

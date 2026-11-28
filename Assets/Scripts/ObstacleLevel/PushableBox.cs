@@ -13,6 +13,7 @@ namespace ObstacleLevel
     ///   It falls off the level -> it breaks in the air
     ///   Something breaks it    -> a break effect, then it respawns at its start, as soon as nothing is in the way there
     ///   Its start is taken     -> it waits out of sight until the start is free, so it never respawns inside a box or the Player
+    ///   Its start              -> a marker on the floor shows it, once the box is moved away
     ///   Player respawns        -> nothing happens, a box stays wherever it is
     /// Each type decides how the Player moves it, in OnPushed and Step.
     /// </summary>
@@ -39,9 +40,11 @@ namespace ObstacleLevel
         // so it fell off the level and breaks in the air, where the Player still sees it.
         private const float FallBreakSpeed = 12f;
 
-        // A broken box waits this far under its start: beyond the main camera's far clip (1000 m),
-        // and above the minimap's radar shapes (2000 m down), so nobody sees it.
+        // A broken box waits this far under its start: beyond the cameras' far clip (1000 m), so nobody sees it.
         private const float WaitDepth = 1500f;
+
+        // The start marker floats this far above the floor, so it doesn't flicker with it.
+        private const float MarkerLift = 0.02f;
 
         private static readonly RaycastHit[] hits = new RaycastHit[8];
         private static readonly Collider[] overlaps = new Collider[8];
@@ -53,6 +56,12 @@ namespace ObstacleLevel
         [Tooltip("Plays where the box respawns.")]
         [SerializeField]
         private Effect respawnEffect;
+
+        [Tooltip(
+            "Placed flat on the floor where the box starts, as big as the box, so the Player sees where it respawns."
+        )]
+        [SerializeField]
+        private GameObject startMarker;
 
         private Rigidbody rb;
         private BoxCollider boxCollider;
@@ -75,6 +84,20 @@ namespace ObstacleLevel
             rb.constraints = Locked;
             rb.interpolation = RigidbodyInterpolation.Interpolate;
             startPosition = rb.position;
+            PlaceStartMarker();
+        }
+
+        // The marker stays at the start: hidden under the box until the box is moved away.
+        // It goes under the box's parent (the island), not the box, so it doesn't move with it.
+        private void PlaceStartMarker()
+        {
+            Bounds box = boxCollider.bounds;
+            Vector3 floor = new(box.center.x, box.min.y + MarkerLift, box.center.z);
+            Quaternion flat =
+                Quaternion.Euler(0f, transform.eulerAngles.y, 0f) * startMarker.transform.rotation;
+
+            GameObject marker = Instantiate(startMarker, floor, flat, transform.parent);
+            marker.transform.localScale = new Vector3(Size.x, Size.z, 1f); // the quad lies flat: its y is the box's z
         }
 
         // Runs after every physics step while something touches the box.

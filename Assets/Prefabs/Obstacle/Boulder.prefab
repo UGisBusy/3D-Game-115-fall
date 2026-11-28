@@ -163,6 +163,7 @@ MonoBehaviour:
     particles: {fileID: 9157105887711914197, guid: c4f829cb7dd4b864caf8832ec5b1ee55, type: 3}
     sound: {fileID: 8300000, guid: 7c086155b65931b44a96583d70c3a96c, type: 3}
     volume: 0.8
+  startMarker: {fileID: 1100000000000000001, guid: a63d7827f39b472c8752f35fa3404df5, type: 3}
   moveDistance: 4
   gridSize: 2
   hitEffect:

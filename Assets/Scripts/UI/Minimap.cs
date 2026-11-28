@@ -6,20 +6,24 @@ using UnityEngine.UI;
 namespace UISystem
 {
     /// <summary>
-    /// A round radar in the corner of the screen. It shows only what matters for finding the way:
-    ///   Floors and walls -> flat shapes, made once from the level's static box colliders
+    /// A round map in the corner of the screen. It shows only what matters for finding the way:
+    ///   Floors and walls -> the level's own models, seen from above
     ///   Objects with a MinimapIcon (Crystals, Hearts, boxes, plates...) -> icons on top
-    ///   Trees, rocks, clouds and other decoration -> not shown (they have no box collider)
-    /// The shapes are placed far below the level, out of the main camera's reach, and a second camera
-    /// looks straight down at them from above the Player's spot and draws into a texture the map image shows.
+    ///   Trees, rocks, clouds and other decoration -> not shown
+    /// A second camera looks straight down from above the Player and draws into a texture the map image shows.
+    /// It only draws the MapLayer: at the start, the models of the level's floors and walls are put on it.
     ///   The Player moves -> the camera follows, so the Player is always in the middle
     ///   The Player turns -> the arrow in the middle turns with them; north stays up
     /// Icons with Sonar on (Crystals) send out rings while they are inside the map.
     /// </summary>
     public class Minimap : MonoBehaviour
     {
-        private const float RadarDepth = -2000f; // where the shapes are, beyond the main camera's far clip
-        private const float WallThickness = 2f; // a box thinner than this (and 1 m or taller) is a wall, not a floor
+        // Layers in Project Settings > Tags and Layers. The map camera draws only these two.
+        private const string MapLayer = "Minimap"; // the level's floor and wall models, the main camera draws them too
+        private const string MapOnlyLayer = "MinimapOnly"; // the floor shadows, the main camera never draws them
+
+        // A floor shadow sits this far under its floor's top: hidden under the floor, above the floors below it.
+        private const float ShadowDepth = 0.1f;
 
         [SerializeField]
         private Player player;
@@ -48,12 +52,12 @@ namespace UISystem
         private float iconSize = 22f;
 
         [Tooltip(
-            "Outline around icons and sonar rings, so they show on both the sky and the floors."
+            "Outline around icons and sonar rings, so they show on both the background and the floors."
         )]
         [SerializeField]
         private Color iconOutline = Color.black;
 
-        [Tooltip("How high above the shapes the map camera floats.")]
+        [Tooltip("How high above the Player the map camera floats.")]
         [SerializeField]
         private float height = 40f;
 
@@ -61,17 +65,19 @@ namespace UISystem
         [SerializeField]
         private int resolution = 1024;
 
+        [Tooltip(
+            "Drawn under every floating floor on the map only, a bit to the side, so the floors look like floating islands."
+        )]
+        [SerializeField]
+        private Material floorShadow;
+
+        [Tooltip(
+            "Where a floor's shadow sits from the floor, in meters: x to the right, y up on the map."
+        )]
+        [SerializeField]
+        private Vector2 floorShadowOffset = new(0.6f, -0.6f);
+
         [Header("Radar")]
-        [Tooltip("Shown where there is no floor: the sky.")]
-        [SerializeField]
-        private Color background = new(0.53f, 0.78f, 1f);
-
-        [SerializeField]
-        private Material floorMaterial;
-
-        [SerializeField]
-        private Material wallMaterial;
-
         [Tooltip("Rings and a crosshair drawn over the map.")]
         [SerializeField]
         private Sprite radarGrid;
@@ -99,8 +105,6 @@ namespace UISystem
         {
             texture = new RenderTexture(resolution, resolution, 16);
             mapCamera.targetTexture = texture;
-            mapCamera.clearFlags = CameraClearFlags.SolidColor;
-            mapCamera.backgroundColor = background;
             mapImage.texture = texture;
 
             Image grid = CreateImage("RadarGrid", mapImage.transform, radarGrid);
@@ -109,30 +113,33 @@ namespace UISystem
             grid.rectTransform.sizeDelta = Vector2.zero; // covers the whole map, under the icons
             grid.color = gridColor;
 
-            AddOutline(playerArrow.GetComponent<Image>()); // like the icons, so it shows on the sky and the floors
+            AddOutline(playerArrow.GetComponent<Image>()); // like the icons, so it shows on the background and the floors
 
-            BuildShapes();
+            int mapOnly = 1 << LayerMask.NameToLayer(MapOnlyLayer);
+            mapCamera.cullingMask = 1 << LayerMask.NameToLayer(MapLayer) | mapOnly;
+            Camera.main.cullingMask &= ~mapOnly; // the floor shadows would stick out under the islands in the game
+        }
+
+        // Start, not Awake: the floor shadows check what is under each floor, so every collider must be in the physics scene.
+        private void Start()
+        {
+            ShowLevelOnMap(LayerMask.NameToLayer(MapLayer), LayerMask.NameToLayer(MapOnlyLayer));
         }
 
         // LateUpdate, so the camera follows where the Player ended up this frame.
         private void LateUpdate()
         {
             Transform target = player.transform;
-            mapCamera.transform.position = new Vector3(
-                target.position.x,
-                RadarDepth + height,
-                target.position.z
-            );
+            mapCamera.transform.position = target.position + Vector3.up * height;
             playerArrow.localEulerAngles = new Vector3(0f, 0f, -target.eulerAngles.y);
             ShowIcons(target.position);
         }
 
-        // One flat shape per static box collider of the level: floors and walls.
-        // Higher tops are drawn over lower ones, and walls over floors.
-        private void BuildShapes()
+        // Puts the models of the level's floors and walls (the static box colliders) on the map layer,
+        // and gives every floating floor a shadow. Only models without a collider move, so physics and ground checks don't change.
+        private void ShowLevelOnMap(int mapLayer, int mapOnlyLayer)
         {
             Mesh quad = Resources.GetBuiltinResource<Mesh>("Quad.fbx");
-            Transform root = new GameObject("RadarShapes").transform;
 
             foreach (BoxCollider box in FindObjectsByType<BoxCollider>(FindObjectsSortMode.None))
             {
@@ -147,36 +154,53 @@ namespace UISystem
                     continue;
                 }
 
-                Bounds b = box.bounds;
-                bool wall = Mathf.Min(b.size.x, b.size.z) < WallThickness && b.size.y >= 1f;
-                float layer = b.max.y * 0.01f;
-
-                if (wall)
+                foreach (Renderer model in box.GetComponentsInChildren<Renderer>())
                 {
-                    layer += 1f;
+                    if (model.enabled && !model.TryGetComponent(out Collider _))
+                    {
+                        model.gameObject.layer = mapLayer;
+                    }
                 }
 
-                GameObject shape = new("Shape", typeof(MeshFilter), typeof(MeshRenderer));
-                shape.transform.SetParent(root, false);
-                shape.transform.SetPositionAndRotation(
-                    new Vector3(b.center.x, RadarDepth + layer, b.center.z),
-                    Quaternion.Euler(90f, 0f, 0f) // the quad faces up
-                );
-                shape.transform.localScale = new Vector3(b.size.x, b.size.z, 1f);
-                shape.GetComponent<MeshFilter>().sharedMesh = quad;
-
-                MeshRenderer meshRenderer = shape.GetComponent<MeshRenderer>();
-                meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-
-                if (wall)
+                if (IsFloating(box.bounds))
                 {
-                    meshRenderer.sharedMaterial = wallMaterial;
-                }
-                else
-                {
-                    meshRenderer.sharedMaterial = floorMaterial;
+                    AddFloorShadow(box.bounds, mapOnlyLayer, quad);
                 }
             }
+        }
+
+        // Nothing right under its bottom: a floating floor. Walls, ledges and spike trays stand on something.
+        // The ray starts inside the box, and a ray never hits a collider it starts in.
+        private static bool IsFloating(Bounds box)
+        {
+            return !Physics.Raycast(
+                new Vector3(box.center.x, box.min.y + 0.05f, box.center.z),
+                Vector3.down,
+                0.2f,
+                Physics.AllLayers,
+                QueryTriggerInteraction.Ignore
+            );
+        }
+
+        // A flat dark copy of the floor's outline, just under its top and shifted to the side, seen only by the map camera.
+        private void AddFloorShadow(Bounds floor, int layer, Mesh quad)
+        {
+            GameObject shadow = new("FloorShadow", typeof(MeshFilter), typeof(MeshRenderer));
+            shadow.layer = layer;
+            shadow.transform.SetPositionAndRotation(
+                new Vector3(
+                    floor.center.x + floorShadowOffset.x,
+                    floor.max.y - ShadowDepth,
+                    floor.center.z + floorShadowOffset.y
+                ),
+                Quaternion.Euler(90f, 0f, 0f) // the quad faces up
+            );
+            shadow.transform.localScale = new Vector3(floor.size.x, floor.size.z, 1f);
+            shadow.GetComponent<MeshFilter>().sharedMesh = quad;
+
+            MeshRenderer shadowRenderer = shadow.GetComponent<MeshRenderer>();
+            shadowRenderer.sharedMaterial = floorShadow;
+            shadowRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         }
 
         // One image per icon, reused every frame. Extra images are hidden.

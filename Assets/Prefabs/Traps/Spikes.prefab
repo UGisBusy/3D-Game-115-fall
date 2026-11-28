@@ -1658,6 +1658,17 @@ MonoBehaviour:
   cones: {fileID: 7169159771183373704}
   damage: 1
   touchGraceTime: 0
+  peekDepth: 0.9
+  warnEffect:
+    particles: {fileID: 0}
+    sound: {fileID: 0}
+    volume: 0.8
+    playWhilePaused: 0
+  popEffect:
+    particles: {fileID: 0}
+    sound: {fileID: 0}
+    volume: 0.8
+    playWhilePaused: 0
 --- !u!1 &1274692979740563167
 GameObject:
   m_ObjectHideFlags: 0
@@ -8995,7 +9006,6 @@ GameObject:
   - component: {fileID: 8599803488406038484}
   - component: {fileID: 7158045192834703812}
   - component: {fileID: 4606547834766089015}
-  - component: {fileID: 3815802930791622423}
   m_Layer: 0
   m_Name: MetalBase
   m_TagString: Untagged
@@ -9075,27 +9085,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &3815802930791622423
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4991357621412537120}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1.6, z: 1}
-  m_Center: {x: 0, y: 0.3, z: 0}
 --- !u!1 &5212855385077321396
 GameObject:
   m_ObjectHideFlags: 0

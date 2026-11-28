@@ -1,31 +1,38 @@
 using PlayerSystem;
+using UISystem;
 using UnityEngine;
 
 namespace LevelSystem
 {
     /// <summary>
-    /// Respawn location in the level. Notices the Player's touch and showing whether it is active.
+    /// Respawn location in the level, shown by a flag. Notices the Player's touch and shows whether it is active:
+    ///   Inactive -> the flag's cloth (and its minimap icon) is inactiveColor
+    ///   Active   -> both turn activeColor
     /// The Player respawns at this object's position and rotation.
     /// </summary>
-    [RequireComponent(typeof(BoxCollider), typeof(MeshRenderer))]
+    [RequireComponent(typeof(BoxCollider), typeof(MinimapIcon))]
     public class Checkpoint : MonoBehaviour
     {
         [SerializeField]
-        private Color inactiveColor = Color.gray;
+        private Color inactiveColor = new(0.85f, 0.15f, 0.15f);
 
         [SerializeField]
         private Color activeColor = Color.green;
 
-        private MeshRenderer meshRenderer;
+        [Tooltip("The flag's cloth. Only it changes color, not the pole.")]
+        [SerializeField]
+        private Renderer cloth;
+
+        private MinimapIcon mapIcon;
 
         private bool isActive = false;
 
         private void Awake()
         {
-            meshRenderer = GetComponent<MeshRenderer>();
             GetComponent<BoxCollider>().isTrigger = true; // the Player walks through it
+            mapIcon = GetComponent<MinimapIcon>();
             isActive = false;
-            meshRenderer.material.color = inactiveColor;
+            ShowState();
         }
 
         private void OnEnable() => LevelEvents.CheckpointActivated += Activate;
@@ -45,7 +52,24 @@ namespace LevelSystem
         private void Activate(Checkpoint cp)
         {
             isActive = cp == this;
-            meshRenderer.material.color = isActive ? activeColor : inactiveColor;
+            ShowState();
+        }
+
+        private void ShowState()
+        {
+            Color color;
+
+            if (isActive)
+            {
+                color = activeColor;
+            }
+            else
+            {
+                color = inactiveColor;
+            }
+
+            cloth.material.color = color;
+            mapIcon.Color = color;
         }
     }
 }

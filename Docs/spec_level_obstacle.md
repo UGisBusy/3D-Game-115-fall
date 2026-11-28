@@ -34,7 +34,7 @@ State machine, built with `TickState`, `Link` and `LevelTransitions`.
 - Where the Player starts:
   - From the Menu: `SequenceManager` calls `StartLevel(x)` and the Player starts at **Checkpoints** element x (Start = 0, Resume = the saved number).
   - Scene played directly in the editor: at **Test Checkpoint**, or element 0 when it is empty.
-- Only one Checkpoint is active at a time. Touching a Checkpoint makes it the active one and changes its color to green. The Checkpoint the Player starts at turns active as soon as the Player spawns on it.
+- Only one Checkpoint is active at a time. A Checkpoint is a flag: the pole of Quaternius' `Goal_Flag` (its base sunk under the floor, its own wavy cloth hidden) with a flat cloth. Touching it makes it the active one: its cloth and its minimap icon turn from red to green. The Checkpoint the Player starts at turns active as soon as the Player spawns on it.
 - When the Player dies, the Fail screen opens. Retry respawns the Player at the active Checkpoint (green).
 
 ## Death Zone
@@ -67,6 +67,7 @@ One base class, `PushableBox`. The two types of box have a different way to move
 - A box whose middle is not over anything (it only rests on an edge with a corner) slides off that edge and falls, so it never hangs in the air or blocks the way.
 - A Crate that is stuck (on every side it either can't move, or there is no room for the Player to push from, like in a corner) goes back to its start after the Player pushes it for 1 s, so the puzzle can't be soft-locked.
 - A destroyed box goes back to its start position. If something is there (another box, the Player), it waits out of sight until the start is free, so it never respawns inside something.
+- Every box's start is marked on the floor with yellow corner brackets (`StartMarker`), as big as the box. The box covers it at first; once the box is moved away, the Player can see where it respawns.
 - A Crate passes through Spinning Blades, so a blade can't knock it off the path.
 
 ### Pressure Plate and Gate
@@ -109,7 +110,7 @@ The HUD (scripts in `UISystem`):
 |-|-|-|
 | Hearts (top left) | One heart per HP point; lost HP is faded | `PlayerEvents.HpChanged` |
 | Crystal panel (top left) | `collected / total` and one slot per Crystal, lit when collected | `ObstacleLevelEvents.CrystalCountChanged` |
-| Minimap (top right) | A round radar around the Player, north up, with an arrow (black outline) for the Player's facing. It shows only floors (grass green) and walls (hedge green) on the sky's blue, with black rings and a crosshair over them; trees, rocks, clouds and other decoration are left out. Icons, each a small top-down picture of the object with a black outline: Crates, Boulders, Plates, Crystals, Checkpoints (grey, green when active), Gates and Breakable Walls (bars that turn like the object), Moving Platforms (white), Hearts and the Star. Sizes are a bit bigger than the real objects so they read clearly. A far Crystal or the Star stays on the edge to show its direction; a Crystal inside the radar sends out sonar rings | At the start it makes one flat shape per static box collider, far below the level where the main camera never looks; a second camera above them draws into a texture. Icons come from `MinimapIcon`. The round mask, rim and dash ring use a sharp 512 px circle sprite |
+| Minimap (top right) | A round radar around the Player, north up, with an arrow (black outline) for the Player's facing. It shows the level's own floor and wall models seen from above on a dark green background, every floating floor with a soft drop shadow so it looks like a floating island (walls cast none), with faint rings and a crosshair over them; trees, rocks, clouds and other decoration are left out. Icons, each a small top-down picture of the object with a black outline: Crates, Boulders, Plates, Crystals, Checkpoints (grey, green when active), Gates and Breakable Walls (bars that turn like the object), Moving Platforms (white), Hearts and the Star. Sizes are a bit bigger than the real objects so they read clearly. A far Crystal or the Star stays on the edge to show its direction; a Crystal inside the radar sends out sonar rings | A second camera above the Player draws into a texture. It only draws the `Minimap` layer: at the start, the models of the level's floors and walls (the static box colliders) are put on it. The drop shadows are dark shapes on the `MinimapOnly` layer, which the main camera never draws. Icons come from `MinimapIcon`. The round mask, rim and dash ring use a sharp 512 px circle sprite |
 | Dash ring (bottom left) | Empties when the Player dashes and refills over the 2 s cooldown | `DashAbility.CooldownRemaining` |
 
 ## Effects and Sky

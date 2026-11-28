@@ -8,8 +8,9 @@ namespace PlayerSystem
     ///
     /// Each FixedUpdate the velocity is built as:
     ///   if override:  velocity = override
-    ///   else:         horizontal = moveInput * moveSpeed * speedMultiplier + external
-    ///                 vertical   = current y + gravity (if enabled)
+    ///   else:         horizontal = moveInput * moveSpeed * speedMultiplier + external + carry
+    ///                 vertical   = current y + gravity (if enabled), with last step's carry swapped for this step's
+    ///   carry: the moving ground the Player stands on (Carry), zero when there is none
     ///
     /// Setup notes:
     ///  - Rigidbody: useGravity = false (custom gravity), freeze rotation X/Y/Z, interpolate, continuous collision.
@@ -60,6 +61,8 @@ namespace PlayerSystem
         private Vector3 moveInput; // set by states, flat world direction, length 0..1
         private Vector3? velocityOverride; // dash
         private Vector3 externalVelocity; // knockback, impulses
+        private Vector3 carryVelocity; // the moving ground the Player stands on
+        private Vector3 lastCarryVelocity; // the carry that went into the last step's velocity
         private bool gravityEnabled = true;
         private bool jumpRequested;
 
@@ -135,6 +138,12 @@ namespace PlayerSystem
         // Adds a velocity that fades over time (knockback, blade push).
         public void AddImpulse(Vector3 velocity) => externalVelocity += velocity;
 
+        // [Obstacle Level] MovingPlatform: the Player moves along with it for this physics step.
+        // Call it every step the Player stands on it, before this FixedUpdate.
+        // Added to the velocity here, instead of the platform moving the Rigidbody from outside,
+        // because two scripts moving the same Rigidbody made the Player jiggle and bounce.
+        public void Carry(Vector3 velocity) => carryVelocity = velocity;
+
         public void AddModifier(MovementModifier mod)
         {
             if (!modifiers.Contains(mod))
@@ -148,6 +157,8 @@ namespace PlayerSystem
         {
             moveInput = Vector3.zero;
             externalVelocity = Vector3.zero;
+            carryVelocity = Vector3.zero;
+            lastCarryVelocity = Vector3.zero;
             velocityOverride = null;
             jumpRequested = false;
             rb.linearVelocity = Vector3.zero;
@@ -181,17 +192,24 @@ namespace PlayerSystem
             if (externalVelocity.sqrMagnitude < 0.0001f)
                 externalVelocity = Vector3.zero;
 
+            // Carry is used for this step only: the platform sets it again next step while the Player is on it.
+            Vector3 carry = carryVelocity;
+            carryVelocity = Vector3.zero;
+
             Vector3 velocity;
             if (velocityOverride.HasValue)
             {
-                velocity = velocityOverride.Value;
+                velocity = velocityOverride.Value; // a dash leaves the platform, so carry is ignored
+                carry = Vector3.zero;
             }
             else
             {
                 Vector3 horizontal = moveInput * (moveSpeed * SpeedMultiplier);
                 horizontal += new Vector3(externalVelocity.x, 0f, externalVelocity.z);
+                horizontal += new Vector3(carry.x, 0f, carry.z);
 
-                float vertical = rb.linearVelocity.y;
+                // Last step's carry is taken out first, so the platform's speed doesn't add up step after step.
+                float vertical = rb.linearVelocity.y - lastCarryVelocity.y;
                 if (jumpRequested)
                 {
                     vertical = jumpVelocity;
@@ -206,13 +224,15 @@ namespace PlayerSystem
                 vertical += externalVelocity.y;
                 externalVelocity.y = 0f;
 
-                velocity = new Vector3(horizontal.x, vertical, horizontal.z);
+                velocity = new Vector3(horizontal.x, vertical + carry.y, horizontal.z);
             }
+
+            lastCarryVelocity = carry;
 
             // Contacts were collected after the last physics step; use them once, then clear.
             rb.linearVelocity = RemoveBlockedMovement(velocity);
             blockingNormals.Clear();
-            ApplyFacing(velocity, dt); // face where we wanted to go, not the blocked result
+            ApplyFacing(velocity - carry, dt); // face where we wanted to go, not the blocked result or the ride
         }
 
         // ---------------- Step limit ----------------

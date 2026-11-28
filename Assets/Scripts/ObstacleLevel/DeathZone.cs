@@ -6,7 +6,7 @@ namespace ObstacleLevel
     /// <summary>
     /// The death zone area under the level.
     ///   Player falls into it -> the Player dies
-    ///   A box falls into it  -> the box breaks, then it respawns at initial position
+    /// Boxes never reach it: a falling box breaks in the air first.
     /// </summary>
     [RequireComponent(typeof(BoxCollider))]
     public class DeathZone : MonoBehaviour
@@ -21,10 +21,6 @@ namespace ObstacleLevel
             if (other.TryGetComponent(out Player player))
             {
                 player.Kill();
-            }
-            else if (other.TryGetComponent(out PushableBox box))
-            {
-                box.Break();
             }
         }
     }

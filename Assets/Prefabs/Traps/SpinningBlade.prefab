@@ -77,7 +77,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TrapSystem.SpinningBlade
   spinSpeed: 120
   damage: 1
-  pushSpeed: 40
+  pushSpeed: 8
+  pushUp: 6
   pushDuration: 0.3
 --- !u!1 &2532067944632569214
 GameObject:

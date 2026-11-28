@@ -9,7 +9,11 @@ namespace ObstacleLevel
     /// Base of the boxes the Player can push (Movable Box, Dashable Box). It owns what both boxes share:
     ///   Nobody moves it        -> locked in place, it can only fall
     ///   No floor under it      -> it falls, gravity always works on it
-    ///   Something breaks it    -> it goes straight back to its start position (immediately respawns)
+    ///   Hanging over an edge   -> nothing under its middle, so it slides off the edge and falls
+    ///   It falls off the level -> it breaks in the air
+    ///   Something breaks it    -> a break effect, then it respawns at its start, as soon as nothing is in the way there
+    ///   Its start is taken     -> it waits out of sight until the start is free, so it never respawns inside a box or the Player
+    ///   Its start              -> a marker on the floor shows it, once the box is moved away
     ///   Player respawns        -> nothing happens, a box stays wherever it is
     /// Each type decides how the Player moves it, in OnPushed and Step.
     /// </summary>
@@ -29,21 +33,49 @@ namespace ObstacleLevel
         // FreeDistance also leaves out the bottom of the box up to this height
         private const float FloorClearance = 0.25f;
 
-        private static readonly RaycastHit[] hits = new RaycastHit[8];
+        // How fast a box hanging over an edge slides off it
+        private const float SlideOffSpeed = 3f;
 
-        [Tooltip("Plays where the box comes back after it breaks.")]
+        // A box falling this fast has fallen about 7 m, deeper than any drop between floors (the deepest is about 5 m),
+        // so it fell off the level and breaks in the air, where the Player still sees it.
+        private const float FallBreakSpeed = 12f;
+
+        // A broken box waits this far under its start: beyond the cameras' far clip (1000 m), so nobody sees it.
+        private const float WaitDepth = 1500f;
+
+        // The start marker floats this far above the floor, so it doesn't flicker with it.
+        private const float MarkerLift = 0.02f;
+
+        private static readonly RaycastHit[] hits = new RaycastHit[8];
+        private static readonly Collider[] overlaps = new Collider[8];
+
+        [Tooltip("Plays where the box breaks.")]
+        [SerializeField]
+        private Effect breakEffect;
+
+        [Tooltip("Plays where the box respawns.")]
         [SerializeField]
         private Effect respawnEffect;
+
+        [Tooltip(
+            "Placed flat on the floor where the box starts, as big as the box, so the Player sees where it respawns."
+        )]
+        [SerializeField]
+        private GameObject startMarker;
 
         private Rigidbody rb;
         private BoxCollider boxCollider;
         private Vector3 startPosition;
+        private bool waitingForSpace; // broke while its start's space was taken
 
         // The box's size in the world.
         protected Vector3 Size => Vector3.Scale(boxCollider.size, transform.lossyScale);
 
         // The box's Rigidbody. Inside physics steps, read its position
         protected Rigidbody Body => rb;
+
+        // Where it started and where it respawns.
+        protected Vector3 StartPosition => startPosition;
 
         private void Awake()
         {
@@ -52,6 +84,20 @@ namespace ObstacleLevel
             rb.constraints = Locked;
             rb.interpolation = RigidbodyInterpolation.Interpolate;
             startPosition = rb.position;
+            PlaceStartMarker();
+        }
+
+        // The marker stays at the start: hidden under the box until the box is moved away.
+        // It goes under the box's parent (the island), not the box, so it doesn't move with it.
+        private void PlaceStartMarker()
+        {
+            Bounds box = boxCollider.bounds;
+            Vector3 floor = new(box.center.x, box.min.y + MarkerLift, box.center.z);
+            Quaternion flat =
+                Quaternion.Euler(0f, transform.eulerAngles.y, 0f) * startMarker.transform.rotation;
+
+            GameObject marker = Instantiate(startMarker, floor, flat, transform.parent);
+            marker.transform.localScale = new Vector3(Size.x, Size.z, 1f); // the quad lies flat: its y is the box's z
         }
 
         // Runs after every physics step while something touches the box.
@@ -79,15 +125,81 @@ namespace ObstacleLevel
 
         private void FixedUpdate()
         {
+            if (waitingForSpace)
+            {
+                if (IsStartFree())
+                {
+                    Respawn();
+                }
+
+                return;
+            }
+
+            if (rb.linearVelocity.y < -FallBreakSpeed)
+            {
+                Break();
+                return;
+            }
+
             Step();
+
+            if (!rb.isKinematic) // a sliding Boulder moves on its own until it stops
+            {
+                SlideOffEdge();
+            }
 
             // A box only ever falls. Physics can throw a squeezed box upward, so upward speed is removed.
             Vector3 velocity = rb.linearVelocity;
 
-            if (velocity.y > 0f)
+            if (velocity.y > 0f && !rb.isKinematic) // a sliding Boulder is kinematic, its velocity can't be set
             {
                 velocity.y = 0f;
                 rb.linearVelocity = velocity;
+            }
+        }
+
+        // A box whose middle is over nothing only rests on an edge with a corner.
+        // It slides away from that edge and falls, so it can't hang in the air and block the way.
+        private void SlideOffEdge()
+        {
+            Bounds box = boxCollider.bounds;
+
+            if (
+                Physics.Raycast(
+                    box.center,
+                    Vector3.down,
+                    box.extents.y + 0.1f,
+                    Physics.AllLayers,
+                    QueryTriggerInteraction.Ignore
+                )
+            )
+            {
+                return; // something is under its middle
+            }
+
+            // What it rests on: anything in a thin slice just under its bottom.
+            int count = Physics.OverlapBoxNonAlloc(
+                new Vector3(box.center.x, box.min.y - 0.05f, box.center.z),
+                new Vector3(box.extents.x, 0.05f, box.extents.z),
+                overlaps,
+                Quaternion.identity,
+                Physics.AllLayers,
+                QueryTriggerInteraction.Ignore
+            );
+
+            for (int i = 0; i < count; i++)
+            {
+                Vector3 away = box.center - overlaps[i].bounds.ClosestPoint(box.center);
+                away.y = 0f;
+
+                if (overlaps[i] != boxCollider && away.sqrMagnitude > 0.0001f)
+                {
+                    Unlock();
+                    rb.linearVelocity =
+                        away.normalized * SlideOffSpeed
+                        + Vector3.up * Mathf.Min(rb.linearVelocity.y, 0f);
+                    return;
+                }
             }
         }
 
@@ -105,9 +217,10 @@ namespace ObstacleLevel
         }
 
         // How far the box can move in direction, up to maxDistance, before it touches something solid.
-        // These don't count: the box itself, the Player (a dash presses the Player into the box).
+        // These don't count: the box itself, the Player
+        // What physics ignores for this box (a Crate and the blades): a cast doesn't know about ignored pairs.
         // Prevent clipping
-        public float FreeDistance(Vector3 direction, float maxDistance, List<Rigidbody> moving)
+        public float FreeDistance(Vector3 direction, float maxDistance, List<Rigidbody> moving) // ignored rigidbodies
         {
             Vector3 halfSize = Size / 2f - Vector3.one * Skin;
             halfSize.y -= FloorClearance / 2f;
@@ -132,6 +245,7 @@ namespace ObstacleLevel
                 bool ignored =
                     body == rb
                     || hits[i].collider.TryGetComponent(out Player _)
+                    || Physics.GetIgnoreCollision(boxCollider, hits[i].collider) // a Crate or blades
                     || (body != null && moving != null && moving.Contains(body))
                     || (body == null && alreadyOverlaps);
 
@@ -144,13 +258,62 @@ namespace ObstacleLevel
             return Mathf.Max(free, 0f);
         }
 
-        // The box respawns at its start right away.
+        // The box breaks where it is and respawns at its start, as soon as nothing is in the way there.
+        // While it waits, it stays far under its start, out of sight, without falling.
         public virtual void Break()
         {
+            breakEffect.Play(rb.position);
             Lock();
             rb.linearVelocity = Vector3.zero;
+
+            if (IsStartFree())
+            {
+                Respawn();
+            }
+            else
+            {
+                waitingForSpace = true;
+                rb.isKinematic = true;
+                transform.position = startPosition + Vector3.down * WaitDepth;
+            }
+        }
+
+        private void Respawn()
+        {
+            waitingForSpace = false;
+            rb.isKinematic = false;
             transform.position = startPosition;
             respawnEffect.Play(startPosition);
+        }
+
+        // Nothing solid at the start position, apart from the floor under it (the bottom is lifted like in FreeDistance).
+        private bool IsStartFree()
+        {
+            Vector3 halfSize = Size / 2f - Vector3.one * Skin;
+            halfSize.y -= FloorClearance / 2f;
+            Vector3 center =
+                startPosition
+                + (boxCollider.bounds.center - rb.position)
+                + transform.up * (FloorClearance / 2f);
+
+            int count = Physics.OverlapBoxNonAlloc(
+                center,
+                halfSize,
+                overlaps,
+                transform.rotation,
+                Physics.AllLayers,
+                QueryTriggerInteraction.Ignore
+            );
+
+            for (int i = 0; i < count; i++)
+            {
+                if (overlaps[i] != boxCollider)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

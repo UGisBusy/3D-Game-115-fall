@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 1593325803490117545}
   - component: {fileID: 3498083788920596907}
   - component: {fileID: 8331378637345662919}
+  - component: {fileID: 7983617123256580089}
   m_Layer: 0
   m_Name: Crate
   m_TagString: Untagged
@@ -156,14 +157,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33c4abcd8bd02c040abee87065e7f81b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ObstacleLevel.MovableBox
+  breakEffect:
+    particles: {fileID: 141433446842962269, guid: 9fe8f8b3288e45a44af36ff8aa04486e, type: 3}
+    sound: {fileID: 8300000, guid: d634913aeb2180241a4148398a3c5215, type: 3}
+    volume: 0.8
   respawnEffect:
     particles: {fileID: 9157105887711914197, guid: c4f829cb7dd4b864caf8832ec5b1ee55, type: 3}
-    sounds:
-    - {fileID: 8300000, guid: 7c086155b65931b44a96583d70c3a96c, type: 3}
-    - {fileID: 8300000, guid: da21f9f54b57e954c8d44ea1edc5b41d, type: 3}
-    - {fileID: 8300000, guid: 68554c2872e0b1b46851149cc8e6b9b3, type: 3}
-    - {fileID: 8300000, guid: bc6171b549142d44db2abc8dfe3906cb, type: 3}
+    sound: {fileID: 8300000, guid: 7c086155b65931b44a96583d70c3a96c, type: 3}
     volume: 0.8
+  startMarker: {fileID: 1100000000000000001, guid: a63d7827f39b472c8752f35fa3404df5, type: 3}
   slideSound: {fileID: 8331378637345662919}
 --- !u!82 &3498083788920596907
 AudioSource:
@@ -276,6 +278,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EffectSystem.LoopingSound
   volume: 0.5
   fadeTime: 0.1
+--- !u!114 &7983617123256580089
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5781454206255246676}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84c6a96fd5abf9d46982b163105ebd4e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UISystem.MinimapIcon
+  sprite: {fileID: 1111246056858453296, guid: 40e953762caa40218bd8af258c78403c, type: 3}
+  color: {r: 1, g: 1, b: 1, a: 1}
+  size: {x: 18, y: 18}
+  turnWithObject: 0
+  useObjectColor: 0
+  keepOnEdge: 0
+  sonar: 0
 --- !u!1001 &4276971508124697063
 PrefabInstance:
   m_ObjectHideFlags: 0

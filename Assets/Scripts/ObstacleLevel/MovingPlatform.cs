@@ -15,8 +15,12 @@ namespace ObstacleLevel
     /// Platforms whose loops take the same time stay in step forever, and startDelay lines them up
     /// for jumps from one platform to the next.
     /// Carrying: can carry the player and the boxes. A wall in a box's way stops the box, the platform goes on without it.
+    /// The Player is carried through PlayerMotor.Carry (the platform's speed is added to the Player's own movement),
+    /// not by moving the Player's Rigidbody from here.
+    /// Path preview: dots along the whole route, with bigger dots where it stops, so the Player can plan the ride.
     /// </summary>
-    [RequireComponent(typeof(Rigidbody), typeof(Collider))]
+    [RequireComponent(typeof(Rigidbody))]
+    [DefaultExecutionOrder(-10)] // before PlayerMotor, so the Player is carried in the same physics step the platform moves
     public class MovingPlatform : MonoBehaviour
     {
         private const float RiderCheckHeight = 0.2f; // how far above the top surface that counts as standing on it
@@ -36,11 +40,25 @@ namespace ObstacleLevel
         [SerializeField]
         private float startDelay;
 
+        [Header("Path Preview")]
+        [Tooltip(
+            "A small mark placed along the route, so the Player sees where the platform goes."
+        )]
+        [SerializeField]
+        private GameObject pathDot;
+
+        [SerializeField]
+        private float dotSpacing = 1f;
+
+        [Tooltip("The points where the platform stops get a mark this many times bigger.")]
+        [SerializeField]
+        private float stopDotScale = 2.5f;
+
         private static readonly Collider[] buffer = new Collider[16];
         private readonly List<Rigidbody> riders = new(); // who stands on it in this physics step
 
         private Rigidbody rb;
-        private Collider platformCollider;
+        private Collider platformCollider; // the round top the riders stand on
         private Vector3[] route; // destination points the platform will move to.
         private float[] travelTimes; // how long each move takes: from route[i] to the next point
         private float loopTime; // how long the whole route takes, waits included
@@ -49,7 +67,7 @@ namespace ObstacleLevel
         private void Awake()
         {
             rb = GetComponent<Rigidbody>();
-            platformCollider = GetComponent<Collider>();
+            platformCollider = GetComponentInChildren<Collider>(); // the round top (a child), so the cloud has no square corners
             rb.isKinematic = true; // independent env obj
             rb.interpolation = RigidbodyInterpolation.Interpolate; // moves in FixedUpdate
 
@@ -70,6 +88,34 @@ namespace ObstacleLevel
                 travelTimes[i] = Vector3.Distance(route[i], NextPoint(i)) / moveSpeed;
                 loopTime += waitTime + travelTimes[i];
             }
+
+            ShowPath();
+        }
+
+        // Dots along every move of the route, evenly spaced, and a big dot at each stop.
+        // They go under the platform's parent, so they stay in place while the platform moves.
+        private void ShowPath()
+        {
+            for (int i = 0; i < route.Length; i++)
+            {
+                PlaceDot(route[i], stopDotScale);
+
+                int gaps = Mathf.Max(
+                    1,
+                    Mathf.RoundToInt(Vector3.Distance(route[i], NextPoint(i)) / dotSpacing)
+                );
+
+                for (int k = 1; k < gaps; k++)
+                {
+                    PlaceDot(Vector3.Lerp(route[i], NextPoint(i), (float)k / gaps), 1f);
+                }
+            }
+        }
+
+        private void PlaceDot(Vector3 position, float scale)
+        {
+            GameObject dot = Instantiate(pathDot, position, Quaternion.identity, transform.parent);
+            dot.transform.localScale *= scale;
         }
 
         private void FixedUpdate()
@@ -174,9 +220,10 @@ namespace ObstacleLevel
         // Moves the rider by the same step the platform moved.
         private void Carry(Rigidbody rider, Vector3 step)
         {
-            if (rider.TryGetComponent(out Player _))
+            // The Player is moved by its own PlayerMotor (Carry), so only one script moves the Player's Rigidbody.
+            if (rider.TryGetComponent(out Player player))
             {
-                rider.MovePosition(rider.position + step); // keeps the Player's movement smooth
+                player.Motor.Carry(step / Time.fixedDeltaTime);
                 return;
             }
 

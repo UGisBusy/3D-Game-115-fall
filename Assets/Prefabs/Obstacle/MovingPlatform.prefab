@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8604920193283082439}
+  - component: {fileID: 7310482593150622001}
   - component: {fileID: 8928370538337747315}
   - component: {fileID: 1832665418048398310}
   m_Layer: 0
@@ -33,6 +34,28 @@ Transform:
   m_Children: []
   m_Father: {fileID: 3691538211661139859}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!64 &7310482593150622001
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1246208437959779480}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!33 &8928370538337747315
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -101,9 +124,9 @@ GameObject:
   - component: {fileID: 3691538211661139859}
   - component: {fileID: 8225132769676521185}
   - component: {fileID: 176741262232257975}
-  - component: {fileID: 444876565435673507}
   - component: {fileID: 1051400202032791857}
   - component: {fileID: 2637383707616629953}
+  - component: {fileID: 6098518860729257070}
   m_Layer: 0
   m_Name: MovingPlatform
   m_TagString: Untagged
@@ -185,27 +208,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &444876565435673507
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8434253744767948092}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1.3333334, y: 1, z: 1.3333334}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &1051400202032791857
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -249,6 +251,28 @@ MonoBehaviour:
   moveSpeed: 6
   waitTime: 0.6666667
   startDelay: 0
+  pathDot: {fileID: 1100000000000000001, guid: 6fd458430aa643d99e6470b3a21e8e8a, type: 3}
+  dotSpacing: 1
+  stopDotScale: 2.5
+--- !u!114 &6098518860729257070
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8434253744767948092}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84c6a96fd5abf9d46982b163105ebd4e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UISystem.MinimapIcon
+  sprite: {fileID: 5184661652771308817, guid: a0bb537858874707998b1357ab75bac7, type: 3}
+  color: {r: 0.5647059, g: 0.70980394, b: 0.79215693, a: 1}
+  size: {x: 22, y: 22}
+  turnWithObject: 0
+  useObjectColor: 0
+  keepOnEdge: 0
+  sonar: 0
 --- !u!1001 &5473982857802757660
 PrefabInstance:
   m_ObjectHideFlags: 0

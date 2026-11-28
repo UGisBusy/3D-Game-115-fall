@@ -76,9 +76,10 @@ namespace EffectSystem
             spawned.Play(PlayerCenter());
         }
 
+        // The wind streaks blow backward, past the Player.
         private void OnDashStarted(Vector3 direction)
         {
-            dashed.Play(PlayerCenter());
+            dashed.Play(PlayerCenter(), Quaternion.LookRotation(-direction));
         }
 
         private void OnCollected(Collectible collectible)

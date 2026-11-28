@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 3248403778085781952}
   - component: {fileID: 4858630139003886138}
   - component: {fileID: 214477201065058686}
+  - component: {fileID: 6245052447562137825}
   m_Layer: 0
   m_Name: Boulder
   m_TagString: Untagged
@@ -113,7 +114,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 0.95, y: 1, z: 0.95}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &4858630139003886138
 Rigidbody:
@@ -154,20 +155,44 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a7b3a9b75afffac45ab182cd769f467b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ObstacleLevel.PushBox
+  breakEffect:
+    particles: {fileID: 141433446842962269, guid: 9fe8f8b3288e45a44af36ff8aa04486e, type: 3}
+    sound: {fileID: 8300000, guid: d634913aeb2180241a4148398a3c5215, type: 3}
+    volume: 0.8
   respawnEffect:
     particles: {fileID: 9157105887711914197, guid: c4f829cb7dd4b864caf8832ec5b1ee55, type: 3}
-    sounds:
-    - {fileID: 8300000, guid: 7c086155b65931b44a96583d70c3a96c, type: 3}
-    - {fileID: 8300000, guid: da21f9f54b57e954c8d44ea1edc5b41d, type: 3}
-    - {fileID: 8300000, guid: 68554c2872e0b1b46851149cc8e6b9b3, type: 3}
-    - {fileID: 8300000, guid: bc6171b549142d44db2abc8dfe3906cb, type: 3}
+    sound: {fileID: 8300000, guid: 7c086155b65931b44a96583d70c3a96c, type: 3}
     volume: 0.8
+  startMarker: {fileID: 1100000000000000001, guid: a63d7827f39b472c8752f35fa3404df5, type: 3}
   moveDistance: 4
+  gridSize: 2
   hitEffect:
     particles: {fileID: 3432958286849152088, guid: 87ee7299dd44ed747af24dbb91bcd33b, type: 3}
-    sounds:
-    - {fileID: 8300000, guid: 9046a1fbd550e1d4195c86729161571a, type: 3}
+    sound: {fileID: 8300000, guid: 9046a1fbd550e1d4195c86729161571a, type: 3}
     volume: 0.8
+  bounce:
+    backSpeed: 8
+    upSpeed: 4
+    duration: 0.3
+--- !u!114 &6245052447562137825
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3282048365526455070}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84c6a96fd5abf9d46982b163105ebd4e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UISystem.MinimapIcon
+  sprite: {fileID: 1335490361647311930, guid: 62b12729f44b4346ae7fb47284f5d104, type: 3}
+  color: {r: 1, g: 1, b: 1, a: 1}
+  size: {x: 24, y: 24}
+  turnWithObject: 0
+  useObjectColor: 0
+  keepOnEdge: 0
+  sonar: 0
 --- !u!1001 &5105014934291461314
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -178,27 +203,27 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 2d625270b6290c642af0cf3c67788dfe, type: 3}
       propertyPath: m_LocalScale.x
-      value: 62.40135
+      value: 59.281277
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2d625270b6290c642af0cf3c67788dfe, type: 3}
       propertyPath: m_LocalScale.y
-      value: 68.27658
+      value: 64.86275
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2d625270b6290c642af0cf3c67788dfe, type: 3}
       propertyPath: m_LocalScale.z
-      value: 91.21127
+      value: 91.21129
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2d625270b6290c642af0cf3c67788dfe, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.003364095
+      value: 0.0031958856
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2d625270b6290c642af0cf3c67788dfe, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.3255612
+      value: -0.32556123
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2d625270b6290c642af0cf3c67788dfe, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.012741473
+      value: -0.012104408
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2d625270b6290c642af0cf3c67788dfe, type: 3}
       propertyPath: m_LocalRotation.w
@@ -228,6 +253,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 2d625270b6290c642af0cf3c67788dfe, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 05a04bf34d48a4e4690463837a3bd783, type: 2}
     - target: {fileID: 919132149155446097, guid: 2d625270b6290c642af0cf3c67788dfe, type: 3}
       propertyPath: m_Name
       value: Rock_1
